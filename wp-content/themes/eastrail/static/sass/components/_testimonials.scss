@@ -1,0 +1,64 @@
+section.testimonials {
+    text-align: center;
+}
+
+.testimonials-slider {
+    overflow: visible;
+
+    .swiper-slide {
+        opacity: 0;
+        transition: opacity 0.5s;
+    }
+
+    .swiper-slide-active {
+        opacity: 1;
+    }
+
+    --swiper-navigation-size: 34px;
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        width: var(--swiper-navigation-size);
+        width: var(--swiper-navigation-size);
+        border-radius: 50%;
+        background: $white;
+        border: 1px solid $maroon;
+        color: $maroon;
+        transition: transform 0.25s $ease-out;
+
+        &:after {
+            display: none;
+        }
+
+        &:hover {
+            transform: scale(1.2);
+        }
+    }
+
+    .swiper-button-prev {
+        left: -10vw;
+    }
+
+    .swiper-button-next {
+        right: -10vw;
+    }
+
+    --swiper-pagination-color: #{$grey-5};
+    --swiper-pagination-bullet-size: 11px;
+    --swiper-pagination-bullet-opacity: 0.7;
+    --swiper-pagination-bullet-inactive-opacity: 0.3;
+
+    .swiper-pagination {
+        position: relative;
+        left: 0;
+        bottom: 0;
+    }
+
+    @include md {
+        --swiper-navigation-size: 44px;
+    }
+
+    @include lg {
+        --swiper-navigation-size: 54px;
+    }
+}

@@ -1,0 +1,113 @@
+.dataTables_wrapper {
+    display: flex;
+    flex-flow: row wrap;
+    opacity: 1 !important;
+    transform: none !important;
+
+    .dataTables_filter {
+        order: 1;
+        width: 100%;
+        margin-bottom: 40px;
+
+        label {
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            margin: 0 !important;
+        }
+    }
+
+    .dataTables_info {
+        order: 2;
+        width: 50%;
+        letter-spacing: letter-spacing(-15);
+        font-size: rem(16px);
+        font-weight: $font-weight-medium;
+    }
+
+    .dataTables_length {
+        order: 3;
+        width: 50%;
+        text-align: right;
+    }
+
+    .dataTable {
+        order: 4;
+        width: 100%;
+    }
+
+    .dataTables_paginate {
+        order: 5;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 40px;
+
+        > span {
+            display: flex;
+        }
+
+        .ellipsis,
+        .paginate_button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+            min-width: 38px;
+            margin: 0 -0.5px;
+            padding: 4px;
+            text-decoration: none;
+            text-align: center;
+            font-size: rem(16px);
+            line-height: rem(30px);
+            border: 1px solid $grey-border;
+            color: $maroon !important;
+            transition: color 0.25s, background-color 0.25s;
+        }
+
+        .paginate_button.previous::before,
+        .paginate_button.next::after {
+            display: none;
+        }
+
+        a:hover {
+            background-color: $grey-1;
+            text-decoration: none;
+        }
+
+        .current {
+            background-color: $maroon;
+            color: $white !important;
+            font-weight: $font-weight-regular;
+
+            &:hover {
+                background-color: $maroon;
+            }
+        }
+    }
+
+    @include md {
+        .dataTables_filter {
+            input {
+                width: 33.33%;
+            }
+        }
+    }
+}
+
+.tablepress {
+    thead th,
+    tfoot th {
+        background-color: $grey-3 !important;
+        color: $white;
+        font-weight: $font-weight-semibold;
+    }
+
+    td,
+    th {
+        padding: 10px 16px;
+    }
+}

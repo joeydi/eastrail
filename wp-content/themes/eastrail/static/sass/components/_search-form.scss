@@ -1,0 +1,142 @@
+section.search-form {
+    position: fixed;
+    z-index: 11;
+    width: 100%;
+    min-height: 100vh;
+    padding-top: 80px;
+    background: $dark-blue;
+    color: $white;
+    transition: visibility 0s linear 0.25s, opacity 0.25s, transform 0.25s $ease-in;
+    transform: scale(1) translateY(-40px);
+    visibility: hidden;
+    opacity: 0;
+
+    .close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin-left: auto;
+        padding: 0;
+        background: transparent;
+        border: none;
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            color: $white;
+        }
+    }
+
+    form {
+        position: relative;
+        width: 100%;
+        margin: 20px 0 80px;
+
+        .icon {
+            position: absolute;
+            left: 0;
+            top: calc(50% - 14px);
+            width: 28px;
+            height: 28px;
+            color: $white;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 20px 20px 20px 50px;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            background: transparent;
+            font-size: rem(30px);
+            letter-spacing: letter-spacing(-25);
+            color: $white;
+            transition: border-color 0.25s;
+
+            &:focus {
+                box-shadow: none;
+                border-color: $white;
+            }
+        }
+
+        ::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+    }
+
+    ul.menu {
+        display: flex;
+        flex-flow: row wrap;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+            margin: 0 20px 20px 0;
+        }
+
+        a {
+            display: inline-block;
+            padding: 0.75rem 2.5rem;
+            background-color: $white;
+            border: none;
+            border-radius: 50rem;
+            transition: background-color 0.25s, color 0.25s;
+            text-decoration: none;
+            color: $maroon;
+
+            &:hover {
+                background-color: $maroon;
+                color: $white;
+            }
+        }
+    }
+}
+
+html.search-active section.search-form {
+    transition: visibility 0s, opacity 0.25s, transform 0.5s $ease-out;
+    transform: scale(1);
+    visibility: visible;
+    opacity: 1;
+}
+
+form.search {
+    position: relative;
+
+    .icon {
+        position: absolute;
+        left: 16px;
+        top: calc(50% - 10px);
+        width: 20px;
+        height: 20px;
+        color: $grey-3;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 10px 10px 10px 50px;
+        background: transparent;
+        border: 1px solid $grey-border;
+    }
+
+    @include md {
+        input[type="text"] {
+            font-size: rem(20px);
+        }
+    }
+
+    @include lg {
+        .icon {
+            left: 20px;
+            top: calc(50% - 12px);
+            width: 24px;
+            height: 24px;
+        }
+
+        input[type="text"] {
+            padding: 20px 20px 20px 64px;
+            font-size: rem(24px);
+        }
+    }
+}

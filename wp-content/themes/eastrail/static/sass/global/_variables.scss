@@ -1,0 +1,159 @@
+@use "sass:math";
+
+$enable-smooth-scroll: false;
+
+// Colors
+$white: #ffffff;
+$grey-border: #bcbcbc;
+$grey-1: #efefef;
+$grey-2: #999999;
+$grey-3: #707070;
+$grey-4: #484848;
+$grey-5: #2b2b2b;
+$black: #000000;
+
+$teal: #7bced1;
+$green: #7fb142;
+$yellow: #fee703;
+$orange: #e66d28;
+$pink: #ed1f8b;
+$maroon: #8c2865;
+$light-maroon: #b51778;
+$blue: #194f72;
+$dark-blue: #143c55;
+
+$primary: $maroon;
+$secondary: $green;
+$body-color: $grey-4;
+
+$theme-colors: (
+    "primary": $primary,
+    "secondary": $secondary,
+    "white": $white,
+    "grey-1": $grey-1,
+    "grey-2": $grey-2,
+    "grey-3": $grey-3,
+    "grey-4": $grey-4,
+    "grey-5": $grey-5,
+    "black": $black,
+    "teal": $teal,
+    "green": $green,
+    "yellow": $yellow,
+    "orange": $orange,
+    "pink": $pink,
+    "maroon": $maroon,
+    "blue": $blue,
+    "dark-blue": $dark-blue,
+);
+
+// Gradients
+
+$gradient-primary: linear-gradient(to right, $orange, $pink);
+
+// Shadows
+
+$shadow-default: 0 3px 6px rgba(0, 0, 0, 0.16);
+
+// Fonts
+$enable-rfs: false;
+
+$font-family-sans-serif: "Poppins", sans-serif;
+$font-family-base: $font-family-sans-serif;
+
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$font-size-base: 1rem;
+$font-weight-base: $font-weight-light;
+$line-height-base: 1.5;
+
+$lead-font-size: 1.125rem;
+
+$paragraph-margin-bottom: 1.5em;
+$label-margin-bottom: 0.25rem;
+
+$input-padding-y: 0.75rem;
+$input-padding-x: 1.25rem;
+$input-border-width: 1px;
+$input-border-color: $grey-border;
+
+$headings-margin-bottom: 1em;
+$headings-line-height: 1.1;
+$headings-font-family: $font-family-sans-serif;
+$headings-font-weight: $font-weight-bold;
+
+$h1-font-size: rem(44px);
+$h2-font-size: rem(32px);
+$h3-font-size: rem(26px);
+$h4-font-size: rem(22px);
+$h5-font-size: rem(18px);
+$h6-font-size: rem(18px);
+
+$enable-rounded: false;
+
+$btn-padding-y: rem(10px);
+$btn-padding-x: rem(24px);
+$btn-font-size: 16px;
+$btn-font-weight: $font-weight-regular;
+
+$transition-fade: opacity 0.25s;
+
+// Transitions
+$snappy: cubic-bezier(0.42, 0, 0.05, 0.99);
+$snappy-2: cubic-bezier(0.42, 0, 0.35, 0.94);
+$ease-in: cubic-bezier(0.42, 0, 0.9, 0.51);
+$ease-out: cubic-bezier(0, 0.5, 0.5, 1);
+$ease-in-out: cubic-bezier(0.57, 0.18, 0.49, 0.97);
+$ease-out-back: cubic-bezier(0.35, 1.6, 0.54, 0.96);
+$ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
+
+// Grid
+$spacers: (
+    0: 0,
+    5: 5px,
+    10: 10px,
+    15: 15px,
+    16: 16px,
+    20: 20px,
+    25: 25px,
+    30: 30px,
+    35: 35px,
+    40: 40px,
+    45: 45px,
+    50: 50px,
+    60: 60px,
+    70: 70px,
+    75: 75px,
+    80: 80px,
+    90: 90px,
+    100: 100px,
+    110: 110px,
+    120: 120px,
+    130: 130px,
+    140: 140px,
+    150: 150px,
+    160: 160px,
+    170: 170px,
+    180: 180px,
+    190: 190px,
+    200: 200px,
+);
+
+$grid-gutter-width: 30px;
+
+$grid-breakpoints: (
+    xxs: 0,
+    xs: 375px,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1530px,
+);
+
+$container-max-widths: (
+    xxl: 1530px,
+);

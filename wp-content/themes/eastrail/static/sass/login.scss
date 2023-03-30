@@ -1,0 +1,106 @@
+@import "global/plugins";
+@import "global/functions";
+@import "global/variables";
+@import "global/mixins";
+
+@import "bootstrap/scss/bootstrap-reboot";
+@import "bootstrap/scss/buttons";
+
+@import "global/typography";
+
+#login {
+    font-size: rem(16px);
+    font-weight: $font-weight-regular;
+}
+
+.login {
+    background-color: #fafafa;
+
+    h1 {
+        margin: 30px;
+
+        a {
+            display: block;
+            width: 250px;
+            height: 50px;
+            margin: 0 auto;
+            background: url("../img/logo.svg") 50% 100% no-repeat;
+            background-size: contain;
+        }
+    }
+
+    form {
+        margin: 0;
+        padding: 30px;
+        border: none;
+        background-color: #fff;
+        border: 1px solid #f0f0f0;
+        border-radius: 6px;
+        box-shadow: none;
+    }
+
+    label {
+        font-weight: $font-weight-regular;
+        font-size: rem(15px);
+    }
+
+    .user-pass-wrap {
+        margin-bottom: 20px;
+    }
+
+    #login_error,
+    .message,
+    .success {
+        position: relative;
+        z-index: 1;
+        margin: 20px 0;
+        font-size: rem(14px);
+        background-color: #fff;
+        border: 1px solid #f0f0f0;
+        border-left: 4px solid #72aee6;
+        border-radius: 6px;
+        box-shadow: none;
+    }
+
+    @include lg {
+        .label {
+            font-size: rem(18px);
+        }
+    }
+}
+
+input[type="checkbox"]:focus,
+input[type="color"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+input[type="datetime"]:focus,
+input[type="email"]:focus,
+input[type="month"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+input[type="radio"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="text"]:focus,
+input[type="time"]:focus,
+input[type="url"]:focus,
+input[type="week"]:focus,
+select:focus,
+textarea:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 1px $primary;
+    outline: 2px solid transparent;
+}
+
+.wp-core-ui .button-primary {
+    min-width: 100px;
+    padding: 0.65rem 1.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.75 !important;
+}
+
+.forgetmenot {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+}

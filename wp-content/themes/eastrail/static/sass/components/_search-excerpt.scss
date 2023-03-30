@@ -1,0 +1,13 @@
+.search-excerpt {
+    display: block;
+    color: $body-color;
+
+    &:hover {
+        text-decoration: none;
+        color: $body-color;
+
+        h2 {
+            text-decoration: underline;
+        }
+    }
+}

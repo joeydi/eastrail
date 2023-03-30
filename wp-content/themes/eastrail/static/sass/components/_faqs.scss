@@ -1,0 +1,117 @@
+section.faqs {
+    overflow: hidden;
+
+    dl.faqs {
+        &.is-selected {
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+
+        dt {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            padding: 15px 10px 15px 20px;
+            font-weight: $font-weight-semibold;
+            background-color: $grey-1;
+            color: $maroon;
+            cursor: pointer;
+
+            button {
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: auto;
+                width: 30px;
+                height: 30px;
+                margin-right: 10px;
+                padding: 0;
+                background: transparent;
+                border: none;
+                appearance: none;
+                color: $primary;
+                transition: transform 0.75s $ease-out-back;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                    display: block;
+                    width: 20px;
+                    height: 4px;
+                    background-color: $maroon;
+                }
+
+                &::after {
+                    content: "";
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%) rotate(90deg);
+                    display: block;
+                    width: 20px;
+                    height: 4px;
+                    background-color: $maroon;
+                    transition: transform 0.75s $ease-out-back;
+                }
+            }
+
+            .icon {
+                font-size: 0.75em;
+            }
+
+            &.active {
+                border-bottom-color: transparent;
+
+                button {
+                    transform: rotate(180deg);
+
+                    &::after {
+                        transform: translate(-50%, -50%) rotate(0);
+                    }
+                }
+
+                + dd {
+                    height: auto;
+                    padding: 20px;
+                    opacity: 1;
+                    transform: translateY(0);
+                    transition: opacity 0.5s, transform 0.5s $ease-out, visibility 0s linear 0s;
+                }
+            }
+        }
+
+        dd {
+            overflow: hidden;
+            height: 0;
+            margin-bottom: 0;
+            padding: 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.5s, transform 0.5s ease-in, visibility 0s linear 0.5s;
+
+            &:last-child {
+                margin-bottom: -1px;
+            }
+        }
+    }
+
+    @include md {
+        dl.faqs dt {
+            font-size: rem(18px);
+        }
+    }
+
+    @include lg {
+        dl.faqs dt {
+            font-size: rem(20px);
+
+            &.active + dd {
+                padding: 30px 20px;
+            }
+        }
+    }
+}

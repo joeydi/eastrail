@@ -1,0 +1,140 @@
+@use "sass:math";
+
+@import "global/plugins";
+@import "global/functions";
+@import "global/variables";
+@import "global/mixins";
+
+@import "bootstrap/scss/bootstrap-utilities";
+@import "bootstrap/scss/bootstrap-reboot";
+@import "bootstrap/scss/bootstrap-grid";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/dropdown";
+
+@import "global/typography";
+@import "global/forms";
+@import "global/media";
+
+@import "components/alert-bar";
+@import "components/banner-image";
+@import "components/breadcrumbs";
+@import "components/content-with-image";
+@import "components/default-content";
+@import "components/default-slider";
+@import "components/event-excerpt";
+@import "components/faqs";
+@import "components/feature-cards";
+@import "components/featured-post-excerpt";
+@import "components/find-provider";
+@import "components/footer";
+@import "components/header";
+@import "components/icon-block";
+@import "components/image-slider";
+@import "components/job-excerpt";
+@import "components/link-cards";
+@import "components/location-excerpt";
+@import "components/locations-map";
+@import "components/modals";
+@import "components/page-header";
+@import "components/pagination";
+@import "components/post-content";
+@import "components/post-excerpt";
+@import "components/provider-excerpt";
+@import "components/provider-header";
+@import "components/search-excerpt";
+@import "components/search-form";
+@import "components/sidebar";
+@import "components/step-block";
+@import "components/tables";
+@import "components/testimonials";
+
+html {
+    scroll-padding-top: calc(var(--headerHeight, 80px) + 20px);
+
+    @include lg {
+        scroll-padding-top: calc(var(--headerHeight, 146px) + 40px);
+    }
+
+    @include xl {
+        scroll-padding-top: calc(var(--headerHeight, 170px) + 60px);
+    }
+
+    @include xxl {
+        scroll-padding-top: calc(var(--headerHeight, 200px) + 80px);
+    }
+}
+
+main {
+    padding-top: var(--headerHeight, 80px);
+    background-color: $white;
+    overflow: hidden;
+
+    @include lg {
+        padding-top: var(--headerHeight, 146px);
+    }
+
+    @include xl {
+        padding-top: var(--headerHeight, 170px);
+    }
+
+    @include xxl {
+        padding-top: var(--headerHeight, 200px);
+    }
+}
+
+section {
+    position: relative;
+
+    &.section-padding {
+        overflow: hidden;
+    }
+}
+
+.container,
+.container-fluid {
+    padding-left: 30px;
+    padding-right: 30px;
+
+    @include md {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @include lg {
+        padding-left: 50px;
+        padding-right: 50px;
+    }
+
+    @include xl {
+        padding-left: 60px;
+        padding-right: 60px;
+    }
+}
+
+// Default Focus State
+
+:focus-visible {
+    outline: none;
+    box-shadow: $input-focus-box-shadow;
+}
+
+// Scroll Animations
+
+[data-scroll-fade],
+[data-scroll-fade-children] > * {
+    opacity: 0;
+    transform: translateY(40px);
+}
+
+// Background Colors
+
+@each $color, $value in $theme-colors {
+    .bg-#{$color} {
+        background-color: $value !important;
+    }
+}

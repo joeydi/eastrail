@@ -1,0 +1,15 @@
+.find-provider {
+  
+    .row-cols-xl-3 > * {
+      .single & {
+          width: 50%;
+      }
+    }
+
+    .col-md-4 { 
+        .single & {
+            width: 50%;
+        }
+    }
+
+}

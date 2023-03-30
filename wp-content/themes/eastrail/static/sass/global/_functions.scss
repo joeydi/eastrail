@@ -1,0 +1,13 @@
+@use "sass:math";
+
+@function rem($size) {
+    @return math.div($size, 16px) * 1rem;
+}
+
+@function letter-spacing($val) {
+    @return math.div($val, 1000) * 1em;
+}
+
+@function aspect($width, $height) {
+    @return math.div($height, $width) * 100%;
+}

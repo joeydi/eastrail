@@ -1,0 +1,159 @@
+.form-control {
+    font-weight: $font-weight-regular;
+}
+
+select.form-control {
+    border-radius: rem(16px);
+    background: white url("../img/caret-down.svg") calc(100% - 1rem) 50% no-repeat;
+    background-size: 13px 10px;
+}
+
+select.form-control-sm {
+    border-radius: rem(8px);
+    background-size: 10px 8px;
+}
+
+// Select2
+.select2-container--default .select2-selection--multiple {
+    padding: rem(10px) rem(24px) rem(12px) rem(16px);
+    border-radius: rem(16px);
+    border-color: $grey-border;
+    background: white url("../img/caret-down.svg") calc(100% - 1rem) 1.25rem no-repeat;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: $grey-border;
+    box-shadow: $input-focus-box-shadow;
+}
+
+.select2-container--default .select2-search--inline .select2-search__field {
+    margin: 0;
+    height: 1.5rem;
+    font-family: $font-family-base;
+    font-size: rem(16px);
+}
+
+.select2-container .select2-selection--multiple .select2-selection__rendered {
+    margin: 0;
+}
+
+.select2-selection__choice {
+    margin-bottom: 0;
+    font-weight: $font-weight-medium;
+    font-size: rem(14px);
+}
+
+.select2-results__option {
+    margin-bottom: 0;
+}
+
+.gfield_description {
+    margin-bottom: 1rem;
+}
+
+legend.gfield_label {
+    @include lead;
+    font-weight: $font-weight-semibold;
+}
+
+.gform_footer {
+    margin-top: 2rem;
+}
+
+.gfield_checkbox {
+    [type="checkbox"] {
+        position: absolute;
+        left: 0;
+        opacity: 0.01;
+    }
+
+    [type="checkbox"] + label {
+        position: relative;
+        padding-left: 40px;
+        cursor: pointer;
+    }
+
+    /* Check box */
+    [type="checkbox"] + label::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 30px;
+        height: 30px;
+        border: 3px solid $blue;
+        border-radius: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* Check mark */
+    [type="checkbox"] + label::after {
+        content: "";
+        position: absolute;
+        left: 7px;
+        top: 50%;
+        width: 16px;
+        height: 16px;
+        background-color: $blue;
+        border-radius: 50%;
+        opacity: 0;
+        transform: translateY(-50%) scale(0);
+        transition: opacity 0.25s, trasnform 0.35s $ease-out;
+    }
+
+    [type="checkbox"]:checked + label::after {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+
+    /* Disabled checkbox */
+    [type="checkbox"]:disabled + label::before {
+        box-shadow: none;
+        border-color: #bbb;
+        background-color: #e9e9e9;
+    }
+
+    [type="checkbox"]:disabled:checked + label::after {
+        opacity: 0.5;
+    }
+
+    [type="checkbox"]:disabled + label {
+        color: #aaa;
+    }
+
+    /* Accessibility */
+    [type="checkbox"]:focus + label::before {
+        box-shadow: 0 0 0 0.25rem rgb(29 39 85 / 25%);
+    }
+}
+
+.gform_button {
+    @extend .btn;
+    @extend .btn-outline-primary;
+}
+
+label {
+    @include medium;
+    margin-bottom: 10px;
+    font-weight: $font-weight-medium;
+}
+
+.hidden_label .gfield_label {
+    @include visually-hidden();
+}
+
+.gfield {
+    margin-bottom: 1rem;
+}
+
+.validation_message {
+    margin-top: 5px;
+    font-size: rem(14px);
+    color: $danger;
+}
+
+.gform_submission_error {
+    margin-bottom: 1em !important;
+    @include lead;
+}

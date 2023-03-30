@@ -1,0 +1,18 @@
+.icon-block {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    .icon {
+        flex-shrink: 0;
+        display: block;
+        width: 20px;
+        height: 26px;
+        margin-right: 1rem;
+        object-fit: contain;
+    }
+}

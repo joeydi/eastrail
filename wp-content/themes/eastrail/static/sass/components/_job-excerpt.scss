@@ -1,0 +1,12 @@
+.job-excerpt {
+    color: $body-color;
+
+    &:hover {
+        text-decoration: none;
+        color: $body-color;
+
+        h3 {
+            text-decoration: underline;
+        }
+    }
+}

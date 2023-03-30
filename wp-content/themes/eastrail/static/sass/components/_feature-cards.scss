@@ -1,0 +1,66 @@
+.feature-card {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    min-height: 100%;
+    background-color: $white;
+    color: $body-color;
+    font-weight: $font-weight-light;
+    transition: transform 0.25s $ease-out, box-shadow 0.25s;
+
+    .icon {
+        width: 70px;
+        margin-bottom: 30px;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    @include sm {
+        .content {
+            padding: 30px;
+        }
+    }
+
+    @include xl {
+        .content {
+            padding: 40px;
+        }
+    }
+}
+
+a.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: $shadow-default;
+    color: $body-color;
+    text-decoration: none;
+
+    h3 {
+        text-decoration: underline;
+    }
+}
+
+.feature-card.horizontal {
+    @include lg {
+        display: flex;
+
+        .image {
+            flex-shrink: 0;
+            width: 50%;
+
+            picture {
+                min-height: 100%;
+            }
+        }
+
+        .content {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 50%;
+        }
+    }
+}

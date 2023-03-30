@@ -1,0 +1,36 @@
+.link-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20% 20px;
+    text-align: center;
+    border: 1px solid $maroon;
+    border-bottom: none;
+    transition: transform 0.25s $ease-out, box-shadow 0.25s;
+
+    &::after {
+        content: "";
+        position: absolute;
+        left: -1px;
+        bottom: 0;
+        display: block;
+        width: calc(100% + 2px);
+        height: 8px;
+        background: $gradient-primary 0 0 no-repeat;
+        background-size: cover;
+        transform-origin: 50% 100%;
+        transition: transform 0.25s $ease-out;
+    }
+
+    &:hover {
+        transform: translateY(-10px);
+        box-shadow: $shadow-default;
+        background-size: 100% 12px;
+
+        &::after {
+            transform: scaleY(1.5);
+        }
+    }
+}

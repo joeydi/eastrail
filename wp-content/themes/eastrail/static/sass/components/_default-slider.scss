@@ -1,0 +1,18 @@
+.default-slider {
+    .swiper-button-next,
+    .swiper-button-prev {
+        width: var(--swiper-navigation-size);
+        border-radius: 50%;
+        background-color: $maroon;
+        color: $white;
+        transition: transform 0.25s $ease-out;
+
+        &:after {
+            display: none;
+        }
+
+        &:hover {
+            transform: scale(1.2);
+        }
+    }
+}

@@ -1,0 +1,266 @@
+@mixin xs {
+    @media (min-width: map-get($grid-breakpoints, "xs")) {
+        @content;
+    }
+}
+
+@mixin sm {
+    @media (min-width: map-get($grid-breakpoints, "sm")) {
+        @content;
+    }
+}
+
+@mixin md {
+    @media (min-width: map-get($grid-breakpoints, "md")) {
+        @content;
+    }
+}
+
+@mixin lg {
+    @media (min-width: map-get($grid-breakpoints, "lg")) {
+        @content;
+    }
+}
+
+@mixin xl {
+    @media (min-width: map-get($grid-breakpoints, "xl")) {
+        @content;
+    }
+}
+
+@mixin xxl {
+    @media (min-width: map-get($grid-breakpoints, "xxl")) {
+        @content;
+    }
+}
+
+@mixin fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+.fill {
+    @include fill;
+}
+
+@mixin cover {
+    background-size: cover;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+}
+.cover {
+    @include cover;
+}
+
+@mixin contain {
+    background-size: contain;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+}
+.cover {
+    @include cover;
+}
+
+@mixin debug {
+    outline: 1px solid red;
+}
+.debug {
+    @include debug;
+}
+
+@mixin content-padding {
+    padding-top: 40px;
+    padding-bottom: 40px;
+
+    @include md {
+        padding-top: 60px;
+        padding-bottom: 60px;
+    }
+
+    @include lg {
+        padding-top: 80px;
+        padding-bottom: 80px;
+    }
+}
+.content-padding {
+    @include content-padding;
+}
+
+@mixin section-padding {
+    padding-top: 60px;
+    padding-bottom: 60px;
+
+    @include md {
+        padding-top: 80px;
+        padding-bottom: 80px;
+    }
+
+    @include lg {
+        padding-top: 100px;
+        padding-bottom: 100px;
+    }
+
+    @include xl {
+        padding-top: 120px;
+        padding-bottom: 120px;
+    }
+}
+.section-padding {
+    @include section-padding;
+}
+
+@mixin section-padding-bottom {
+    padding-bottom: 60px;
+
+    @include md {
+        padding-bottom: 80px;
+    }
+
+    @include lg {
+        padding-bottom: 100px;
+    }
+
+    @include xl {
+        padding-bottom: 120px;
+    }
+}
+.section-padding-bottom {
+    @include section-padding-bottom;
+}
+
+@mixin section-padding-top {
+    padding-top: 60px;
+
+    @include md {
+        padding-top: 80px;
+    }
+
+    @include lg {
+        padding-top: 100px;
+    }
+
+    @include xl {
+        padding-top: 120px;
+    }
+}
+.section-padding-top {
+    @include section-padding-top;
+}
+
+@mixin section-margin {
+    margin-top: 60px;
+    margin-bottom: 60px;
+
+    @include md {
+        margin-top: 80px;
+        margin-bottom: 80px;
+    }
+
+    @include lg {
+        margin-top: 100px;
+        margin-bottom: 100px;
+    }
+
+    @include xl {
+        margin-top: 120px;
+        margin-bottom: 120px;
+    }
+}
+.section-margin {
+    @include section-margin;
+}
+
+@mixin section-margin-sm {
+    margin-top: 40px;
+    margin-bottom: 40px;
+
+    @include md {
+        margin-top: 60px;
+        margin-bottom: 60px;
+    }
+
+    @include lg {
+        margin-top: 80px;
+        margin-bottom: 80px;
+    }
+
+    @include xl {
+        margin-top: 100px;
+        margin-bottom: 100px;
+    }
+}
+.section-margin-sm {
+    @include section-margin-sm;
+}
+
+@mixin section-margin-bottom {
+    margin-bottom: 60px;
+
+    @include md {
+        margin-bottom: 80px;
+    }
+
+    @include lg {
+        margin-bottom: 100px;
+    }
+
+    @include xl {
+        margin-bottom: 120px;
+    }
+}
+.section-margin-bottom {
+    @include section-margin-bottom;
+}
+
+@mixin section-margin-top {
+    margin-top: 60px;
+
+    @include md {
+        margin-top: 80px;
+    }
+
+    @include lg {
+        margin-top: 100px;
+    }
+
+    @include xl {
+        margin-top: 120px;
+    }
+}
+.section-margin-top {
+    @include section-margin-top;
+}
+
+@mixin rounded-default {
+    border-radius: 10px;
+    overflow: hidden;
+
+    @include lg {
+        border-radius: 20px;
+    }
+
+    @include xl {
+        border-radius: 30px;
+    }
+}
+.rounded-default {
+    @include rounded-default;
+}
+
+@mixin rounded-default-sm {
+    border-radius: 8px;
+    overflow: hidden;
+
+    @include lg {
+        border-radius: 15px;
+    }
+
+    @include xl {
+        border-radius: 20px;
+    }
+}
+.rounded-default-sm {
+    @include rounded-default-sm;
+}

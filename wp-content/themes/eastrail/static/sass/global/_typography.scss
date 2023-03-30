@@ -1,0 +1,720 @@
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    @include lg {
+        font-size: rem(18px);
+    }
+}
+
+h1,
+.h1 {
+    font-weight: $font-weight-regular;
+    letter-spacing: letter-spacing(-30);
+
+    @include lg {
+        font-size: rem(54px);
+    }
+
+    @include xl {
+        font-size: rem(64px);
+    }
+
+    @include xxl {
+        font-size: rem(80px);
+    }
+}
+
+h1.small {
+    font-size: rem(36px);
+
+    @include md {
+        font-size: rem(42px);
+    }
+
+    @include lg {
+        font-size: rem(48px);
+    }
+
+    @include xl {
+        font-size: rem(54px);
+    }
+
+    @include xxl {
+        font-size: rem(60px);
+    }
+}
+
+h2,
+.h2 {
+    letter-spacing: letter-spacing(-15);
+
+    @include md {
+        font-size: rem(36px);
+    }
+
+    @include lg {
+        font-size: rem(40px);
+    }
+
+    @include xl {
+        font-size: rem(42px);
+    }
+}
+
+h3,
+.h3 {
+    font-weight: $font-weight-semibold;
+    letter-spacing: letter-spacing(-15);
+
+    @include md {
+        font-size: rem(28px);
+    }
+
+    @include lg {
+        font-size: rem(30px);
+    }
+
+    @include xl {
+        font-size: rem(32px);
+    }
+}
+
+h4,
+.h4 {
+    font-weight: $font-weight-semibold;
+    letter-spacing: letter-spacing(-15);
+
+    @include md {
+        font-size: rem(24px);
+    }
+
+    @include lg {
+        font-size: rem(26px);
+    }
+}
+
+h5,
+.h5,
+h6,
+.h6 {
+    font-weight: $font-weight-semibold;
+    letter-spacing: letter-spacing(-15);
+
+    @include lg {
+        font-size: rem(20px);
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: 1em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ol,
+ul {
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+ol,
+ul {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+dl {
+    margin-bottom: 1.5rem;
+}
+
+hr,
+hr.wp-block-separator {
+    margin: 40px auto;
+    border-top: 1px solid $grey-border;
+    border-bottom: none;
+    opacity: 1;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    @include lg {
+        margin: 50px auto;
+    }
+
+    @include xl {
+        margin: 60px auto;
+    }
+}
+
+strong {
+    font-weight: $font-weight-semibold;
+}
+
+a {
+    text-decoration: none;
+    font-weight: $font-weight-regular;
+
+    &:hover {
+        text-decoration: underline;
+    }
+
+    strong & {
+        font-weight: $font-weight-semibold;
+    }
+}
+
+a.arrow-link {
+    display: inline-flex;
+    align-items: center;
+    font-weight: $font-weight-light;
+
+    .text-white & {
+        color: $white;
+    }
+
+    &:hover .icon {
+        transform: translateX(10px);
+    }
+
+    .icon {
+        width: rem(20px);
+        height: rem(20px);
+        margin-left: 10px;
+        transition: transform 0.25s $ease-out;
+        color: $pink;
+    }
+}
+
+@mixin small {
+    font-size: rem(14px);
+    --wp--preset--font-size--small: #{rem(14px)};
+}
+.small,
+.has-small-font-size {
+    @include small;
+}
+
+@mixin medium {
+    font-size: rem(15px);
+
+    @include lg {
+        font-size: rem(16px);
+    }
+}
+.medium {
+    @include medium;
+}
+
+@mixin large {
+    font-size: rem(18px);
+
+    @include lg {
+        font-size: rem(20px);
+    }
+}
+.large {
+    @include large;
+}
+
+@mixin lead {
+    font-size: rem(18px);
+    --wp--preset--font-size--medium: #{rem(18px)};
+
+    @include md {
+        font-size: rem(20px);
+        --wp--preset--font-size--medium: #{rem(20px)};
+    }
+
+    @include lg {
+        font-size: rem(22px);
+        --wp--preset--font-size--medium: #{rem(22px)};
+    }
+}
+.lead,
+.has-medium-font-size {
+    @include lead;
+}
+
+.meta {
+    text-transform: uppercase;
+    letter-spacing: letter-spacing(100);
+    font-weight: $font-weight-semibold;
+    font-size: rem(12px);
+
+    @include lg {
+        font-size: rem(13px);
+    }
+}
+
+.wp-block-buttons {
+    margin-bottom: 1.5em;
+}
+
+.wp-block-button .wp-block-button__link {
+    @extend .btn;
+    @extend .btn-primary;
+}
+
+.wp-block-button.is-style-outline .wp-block-button__link {
+    @extend .btn;
+    @extend .btn-outline-primary;
+}
+
+.btn {
+    border-radius: 50rem;
+
+    &:hover {
+        text-decoration: none;
+    }
+
+    @include md {
+        min-width: 220px;
+    }
+}
+
+.btn-outline-primary {
+    background-color: $white;
+}
+
+.btn-white {
+    color: $primary;
+}
+
+.btn-link {
+    min-width: 0;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+p .btn,
+.btn-list .btn {
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+    vertical-align: top;
+
+    &:last-child {
+        margin-right: 0;
+        margin-bottom: 0;
+    }
+}
+
+.btn-list .dropdown {
+    display: inline-block;
+}
+
+.dropdown-item:hover {
+    text-decoration: none;
+}
+
+.dropdown-menu li {
+    margin-bottom: 0;
+}
+
+.line-height-sm {
+    line-height: 1;
+}
+
+.line-height-md {
+    line-height: 1.25;
+}
+
+.line-height-lg {
+    line-height: 1.5;
+}
+
+blockquote {
+    line-height: 1.6;
+    font-weight: $font-weight-light;
+    font-size: rem(20px);
+
+    @include md {
+        font-size: rem(24px);
+    }
+
+    @include lg {
+        font-size: rem(27px);
+    }
+}
+
+cite {
+    letter-spacing: letter-spacing(-10);
+    font-style: normal;
+    font-weight: $font-weight-regular;
+    font-size: rem(16px);
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+img.icon,
+svg.icon {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    overflow: visible;
+    transition: color 0.25s;
+}
+
+ul.icons,
+ol.icons {
+    margin: 2rem 0;
+    padding: 0;
+    list-style: none;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        img,
+        svg {
+            flex-shrink: 0;
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75em;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    @include md {
+        li {
+            img,
+            svg {
+                width: 22px;
+                height: 22px;
+            }
+        }
+    }
+
+    @include lg {
+        li {
+            img,
+            svg {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    }
+}
+
+ul.checkmarks,
+ol.checkmarks {
+    margin: 2rem 0;
+    padding: 0;
+    list-style: none;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        &::before {
+            content: "";
+            flex-shrink: 0;
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75em;
+            background: url("../icons/checkmark.svg") 50% 50% no-repeat;
+            background-size: contain;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    @include md {
+        li:before {
+            width: 22px;
+            height: 22px;
+        }
+    }
+
+    @include lg {
+        li:before {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+ul.warning,
+ol.warning {
+    margin: 2rem 0;
+    padding: 0;
+    list-style: none;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+
+        &::before {
+            content: "";
+            flex-shrink: 0;
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75em;
+            background: url("../icons/cross.svg") 50% 50% no-repeat;
+            background-size: contain;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    @include md {
+        li:before {
+            width: 22px;
+            height: 22px;
+        }
+    }
+
+    @include lg {
+        li:before {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+ul.numbered,
+ol.numbered {
+    margin: 2rem 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: numbered-list;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        counter-increment: numbered-list;
+
+        &::before {
+            content: counter(numbered-list);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            margin-right: 1rem;
+            background: $gradient-primary;
+            border-radius: 50%;
+            font-weight: $font-weight-semibold;
+            font-size: rem(20px);
+            color: $white;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    @include md {
+        li:before {
+            width: 36px;
+            height: 36px;
+        }
+    }
+
+    @include lg {
+        li:before {
+            width: 40px;
+            height: 40px;
+        }
+    }
+}
+
+ul.ruled,
+ol.ruled {
+    margin: 2rem 0;
+    padding-left: 3rem;
+    border-left: 3px solid $maroon;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+ul.basic,
+ol.basic {
+    margin: 2rem 0;
+    padding-left: 0;
+    list-style: none;
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    li {
+        margin-bottom: 1rem;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.two-columns {
+    @include sm {
+        columns: 2;
+        column-gap: 30px;
+    }
+
+    @include md {
+        column-gap: 40px;
+    }
+
+    @include lg {
+        column-gap: 50px;
+    }
+
+    @include xl {
+        column-gap: 60px;
+    }
+}
+
+.three-columns {
+    @include sm {
+        columns: 2;
+        column-gap: 30px;
+    }
+
+    @include md {
+        columns: 3;
+        column-gap: 40px;
+    }
+
+    @include lg {
+        column-gap: 50px;
+    }
+
+    @include xl {
+        column-gap: 60px;
+    }
+}
+
+// Font Styles
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.no-underline {
+    text-decoration: none;
+}
+
+// Font Weights
+
+.font-weight-light {
+    font-weight: $font-weight-light;
+}
+
+.font-weight-regular {
+    font-weight: $font-weight-regular;
+}
+
+.font-weight-medium {
+    font-weight: $font-weight-medium;
+}
+
+.font-weight-semibold {
+    font-weight: $font-weight-semibold;
+}
+
+.font-weight-bold {
+    font-weight: $font-weight-bold;
+}
+
+// Text Colors
+
+@each $color, $value in $theme-colors {
+    .text-#{$color} {
+        color: $value !important;
+    }
+}
