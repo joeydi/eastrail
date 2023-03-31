@@ -58,27 +58,27 @@ get_header(); ?>
                 <div class="row">
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
                         <div class="bg-sand" style="padding-top: 100%;"></div>
-                        <span class="meta">#7bced1</span>
+                        <span class="meta">#f7f5f2</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
                         <div class="bg-willow" style="padding-top: 100%;"></div>
-                        <span class="meta">#7fb142</span>
+                        <span class="meta">#38d430</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
                         <div class="bg-spruce" style="padding-top: 100%;"></div>
-                        <span class="meta">#fee703</span>
+                        <span class="meta">#00ae42</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
                         <div class="bg-dark-spruce" style="padding-top: 100%;"></div>
-                        <span class="meta">#e66d28</span>
+                        <span class="meta">#008934</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
                         <div class="bg-evergreen" style="padding-top: 100%;"></div>
-                        <span class="meta">#ed1f8b</span>
+                        <span class="meta">#006241</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
                         <div class="bg-dark-evergreen" style="padding-top: 100%;"></div>
-                        <span class="meta">#8c2865</span>
+                        <span class="meta">#005538</span>
                     </div>
                 </div>
             </div>
@@ -90,7 +90,7 @@ get_header(); ?>
                 <div class="meta" data-text-styles="#h1"></div>
             </div>
             <div class="col-sm-8">
-                <h1 id="h1">Exceptional care, for your whole family.</h1>
+                <h1 id="h1">Connecting East Lake Washington & Snohomish Counties by Trail & Rail</h1>
             </div>
         </div>
 
@@ -100,7 +100,7 @@ get_header(); ?>
                 <div class="meta" data-text-styles="#h2"></div>
             </div>
             <div class="col-sm-8">
-                <h2 id="h2">Welcome to Adelante Healthcare</h2>
+                <h2 id="h2">Two Eastrail Projects Receive Federal Funding!</h2>
             </div>
         </div>
 
@@ -110,27 +110,17 @@ get_header(); ?>
                 <div class="meta" data-text-styles="#h3"></div>
             </div>
             <div class="col-sm-8">
-                <h3 id="h3">Find what you need</h3>
+                <h3 id="h3">History of the Trail</h3>
             </div>
         </div>
 
         <div class="row section-margin-bottom">
             <div class="col-sm-4 mb-20">
-                <p class="badge rounded-pill bg-primary">H4</p>
+                <p class="badge rounded-pill bg-primary">H4, H5, H6</p>
                 <div class="meta" data-text-styles="#h4"></div>
             </div>
             <div class="col-sm-8">
-                <h4 id="h4">Featured services</h4>
-            </div>
-        </div>
-
-        <div class="row section-margin-bottom">
-            <div class="col-sm-4 mb-20">
-                <p class="badge rounded-pill bg-primary">H5, H6</p>
-                <div class="meta" data-text-styles="#h5"></div>
-            </div>
-            <div class="col-sm-8">
-                <h5 id="h4">Featured services</h4>
+                <h4 id="h4">Project Timeline</h4>
             </div>
         </div>
 
@@ -370,21 +360,41 @@ get_header(); ?>
 
         <div class="row section-margin-bottom">
             <div class="col-sm-4 mb-20">
-                <p class="badge rounded-pill bg-primary">.btn</p>
-                <div class="meta" data-text-styles="#btn"></div>
+                <p class="badge rounded-pill bg-primary">.btn-primary</p>
+                <div class="meta" data-text-styles="#btn-primary"></div>
             </div>
             <div class="col-sm-8">
-                <p><a href="/" class="btn btn-primary" id="btn">Get Started</a></p>
+                <p><a href="/" class="btn btn-primary" id="btn-primary">Get Started</a></p>
             </div>
         </div>
 
         <div class="row section-margin-bottom">
             <div class="col-sm-4 mb-20">
-                <p class="badge rounded-pill bg-primary">.btn-outline</p>
-                <div class="meta" data-text-styles="#btn-outline"></div>
+                <p class="badge rounded-pill bg-primary">.btn-outline-primary</p>
+                <div class="meta" data-text-styles="#btn-outline-primary"></div>
             </div>
             <div class="col-sm-8">
-                <p><a href="/" class="btn btn-outline-primary" id="btn-outline">Get Started</a></p>
+                <p><a href="/" class="btn btn-outline-primary" id="btn-outline-primary">Get Started</a></p>
+            </div>
+        </div>
+
+        <div class="row section-margin-bottom">
+            <div class="col-sm-4 mb-20">
+                <p class="badge rounded-pill bg-primary">.btn-secondary</p>
+                <div class="meta" data-text-styles="#btn-secondary"></div>
+            </div>
+            <div class="col-sm-8">
+                <p><a href="/" class="btn btn-secondary" id="btn-secondary">Get Started</a></p>
+            </div>
+        </div>
+
+        <div class="row section-margin-bottom">
+            <div class="col-sm-4 mb-20">
+                <p class="badge rounded-pill bg-primary">.btn-outline-secondary</p>
+                <div class="meta" data-text-styles="#btn-outline-secondary"></div>
+            </div>
+            <div class="col-sm-8">
+                <p><a href="/" class="btn btn-outline-secondary" id="btn-outline-secondary">Get Started</a></p>
             </div>
         </div>
     </div>

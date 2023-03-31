@@ -74,19 +74,20 @@ $headings-line-height: 1.1;
 $headings-font-family: $font-family-sans-serif;
 $headings-font-weight: $font-weight-bold;
 
-$h1-font-size: rem(44px);
-$h2-font-size: rem(32px);
-$h3-font-size: rem(26px);
-$h4-font-size: rem(22px);
-$h5-font-size: rem(18px);
-$h6-font-size: rem(18px);
+$h1-font-size: rem(30px);
+$h2-font-size: rem(20px);
+$h3-font-size: rem(18px);
+$h4-font-size: rem(16px);
+$h5-font-size: rem(16px);
+$h6-font-size: rem(16px);
 
 $enable-rounded: false;
 
 $btn-padding-y: rem(10px);
 $btn-padding-x: rem(24px);
+$btn-border-width: 2px;
 $btn-font-size: 16px;
-$btn-font-weight: $font-weight-regular;
+$btn-font-weight: $font-weight-bold;
 
 $transition-fade: opacity 0.25s;
 
