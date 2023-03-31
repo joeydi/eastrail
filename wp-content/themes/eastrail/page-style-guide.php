@@ -57,36 +57,28 @@ get_header(); ?>
             <div class="col-sm-8">
                 <div class="row">
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
-                        <div class="bg-teal" style="padding-top: 100%;"></div>
+                        <div class="bg-sand" style="padding-top: 100%;"></div>
                         <span class="meta">#7bced1</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
-                        <div class="bg-green" style="padding-top: 100%;"></div>
+                        <div class="bg-willow" style="padding-top: 100%;"></div>
                         <span class="meta">#7fb142</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
-                        <div class="bg-yellow" style="padding-top: 100%;"></div>
+                        <div class="bg-spruce" style="padding-top: 100%;"></div>
                         <span class="meta">#fee703</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
-                        <div class="bg-orange" style="padding-top: 100%;"></div>
+                        <div class="bg-dark-spruce" style="padding-top: 100%;"></div>
                         <span class="meta">#e66d28</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
-                        <div class="bg-pink" style="padding-top: 100%;"></div>
+                        <div class="bg-evergreen" style="padding-top: 100%;"></div>
                         <span class="meta">#ed1f8b</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2 mb-20">
-                        <div class="bg-maroon" style="padding-top: 100%;"></div>
+                        <div class="bg-dark-evergreen" style="padding-top: 100%;"></div>
                         <span class="meta">#8c2865</span>
-                    </div>
-                    <div class="col-4 col-md-3 col-lg-2 mb-20">
-                        <div class="bg-blue" style="padding-top: 100%;"></div>
-                        <span class="meta">#194f72</span>
-                    </div>
-                    <div class="col-4 col-md-3 col-lg-2 mb-20">
-                        <div class="bg-dark-blue" style="padding-top: 100%;"></div>
-                        <span class="meta">#143c55</span>
                     </div>
                 </div>
             </div>

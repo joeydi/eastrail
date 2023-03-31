@@ -17,7 +17,7 @@ header {
         margin-left: -15px;
         padding: 10px 15px;
         font-size: rem(16px);
-        font-weight: $font-weight-semibold;
+        font-weight: $font-weight-bold;
         line-height: rem(20px);
         color: $white;
         opacity: 0;
@@ -94,7 +94,7 @@ header {
 
         &:hover,
         &:focus-visible {
-            color: $maroon;
+            color: $spruce;
         }
 
         .icon {
@@ -148,7 +148,8 @@ header {
         visibility: hidden;
         opacity: 0;
         transform: translateX(100%);
-        transition: opacity 0.25s linear 0s, transform 0.35s $snappy 0s, visibility 0s linear 0.35s, width 0s linear 0.35s;
+        transition: opacity 0.25s linear 0s, transform 0.35s $snappy 0s, visibility 0s linear 0.35s,
+            width 0s linear 0.35s;
     }
 
     .menu-header {
@@ -197,16 +198,16 @@ header {
                 display: inline-block;
                 min-width: 240px;
                 padding: 0.75rem 1.75rem;
-                border: 1px solid $maroon;
+                border: 1px solid $spruce;
                 border-radius: 50rem;
                 text-decoration: none;
                 text-align: center;
                 font-weight: $font-weight-regular;
-                color: $maroon;
+                color: $spruce;
                 transition: background-color 0.25s, color 0.25s;
 
                 &:hover {
-                    background-color: $maroon;
+                    background-color: $spruce;
                     color: $white;
                 }
             }
@@ -253,7 +254,7 @@ header {
             > a:hover,
             > a:focus-visible,
             &.current-menu-item > a {
-                color: $maroon;
+                color: $spruce;
             }
         }
 
@@ -402,7 +403,7 @@ header {
                     color: $body-color;
 
                     &:hover {
-                        color: $maroon;
+                        color: $spruce;
                         text-decoration: none;
                     }
                 }
@@ -410,14 +411,14 @@ header {
 
             li.button > a {
                 padding: 0.75rem 1.75rem;
-                color: $maroon;
-                border: 1px solid $maroon;
+                color: $spruce;
+                border: 1px solid $spruce;
                 border-radius: 50rem;
                 font-size: rem(16px);
                 transition: background-color 0.25s, color 0.25s;
 
                 &:hover {
-                    background-color: $maroon;
+                    background-color: $spruce;
                     color: $white;
                 }
             }
@@ -451,7 +452,7 @@ header {
 
                 &:hover,
                 &:focus-visible {
-                    color: $maroon;
+                    color: $spruce;
                     text-decoration: underline;
                 }
             }

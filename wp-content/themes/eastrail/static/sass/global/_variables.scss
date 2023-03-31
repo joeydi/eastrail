@@ -12,19 +12,16 @@ $grey-4: #484848;
 $grey-5: #2b2b2b;
 $black: #000000;
 
-$teal: #7bced1;
-$green: #7fb142;
-$yellow: #fee703;
-$orange: #e66d28;
-$pink: #ed1f8b;
-$maroon: #8c2865;
-$light-maroon: #b51778;
-$blue: #194f72;
-$dark-blue: #143c55;
+$sand: #f7f5f2;
+$willow: #38d430;
+$spruce: #00ae42;
+$dark-spruce: #008934;
+$evergreen: #006241;
+$dark-evergreen: #005538;
 
-$primary: $maroon;
-$secondary: $green;
-$body-color: $grey-4;
+$primary: $dark-spruce;
+$secondary: $evergreen;
+$body-color: $grey-5;
 
 $theme-colors: (
     "primary": $primary,
@@ -36,19 +33,13 @@ $theme-colors: (
     "grey-4": $grey-4,
     "grey-5": $grey-5,
     "black": $black,
-    "teal": $teal,
-    "green": $green,
-    "yellow": $yellow,
-    "orange": $orange,
-    "pink": $pink,
-    "maroon": $maroon,
-    "blue": $blue,
-    "dark-blue": $dark-blue,
+    "sand": $sand,
+    "willow": $willow,
+    "spruce": $spruce,
+    "dark-spruce": $dark-spruce,
+    "evergreen": $evergreen,
+    "dark-evergreen": $dark-evergreen,
 );
-
-// Gradients
-
-$gradient-primary: linear-gradient(to right, $orange, $pink);
 
 // Shadows
 
@@ -57,17 +48,15 @@ $shadow-default: 0 3px 6px rgba(0, 0, 0, 0.16);
 // Fonts
 $enable-rfs: false;
 
-$font-family-sans-serif: "Poppins", sans-serif;
+$font-family-sans-serif: "Source Sans Pro", sans-serif;
 $font-family-base: $font-family-sans-serif;
 
 $font-weight-light: 300;
 $font-weight-regular: 400;
-$font-weight-medium: 500;
-$font-weight-semibold: 600;
 $font-weight-bold: 700;
 
 $font-size-base: 1rem;
-$font-weight-base: $font-weight-light;
+$font-weight-base: $font-weight-regular;
 $line-height-base: 1.5;
 
 $lead-font-size: 1.125rem;

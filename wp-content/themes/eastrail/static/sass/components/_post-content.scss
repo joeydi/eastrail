@@ -1,40 +1,40 @@
 .post-content {
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-      font-size: rem(18px);
-      font-weight: $font-weight-semibold;
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-size: rem(18px);
+        font-weight: $font-weight-bold;
 
-      @include lg {
-          font-size: rem(20px);
-      }
-  }
+        @include lg {
+            font-size: rem(20px);
+        }
+    }
 
-  section:not(.default-content):not(.content-with-image):not(.feature-cards):not(.team-members):not(.post-grid) > .container {
-      padding-left: 0;
-      padding-right: 0;
-  }
+    section:not(.default-content):not(.content-with-image):not(.feature-cards):not(.team-members):not(.post-grid)
+        > .container {
+        padding-left: 0;
+        padding-right: 0;
+    }
 
-  .section-margin {
-      margin-top: 30px;
-      margin-bottom: 30px;
+    .section-margin {
+        margin-top: 30px;
+        margin-bottom: 30px;
 
-      @include md {
-          margin-top: 40px;
-          margin-bottom: 40px;
-      }
+        @include md {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
 
-      @include lg {
-          margin-top: 50px;
-          margin-bottom: 50px;
-      }
+        @include lg {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
 
-      @include xl {
-          margin-top: 60px;
-          margin-bottom: 60px;
-      }
-  }
-
+        @include xl {
+            margin-top: 60px;
+            margin-bottom: 60px;
+        }
+    }
 }

@@ -27,8 +27,6 @@
         <?php include_once(ET::theme_path('static/icons/symbol/svg/sprite.symbol.svg')); ?>
     </div>
 
-    <?php get_template_part('partials/search-form'); ?>
-
     <header>
         <?php get_template_part('partials/alert-bar'); ?>
 

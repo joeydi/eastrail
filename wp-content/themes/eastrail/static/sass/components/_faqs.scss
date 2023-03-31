@@ -12,9 +12,9 @@ section.faqs {
             align-items: center;
             margin-bottom: 5px;
             padding: 15px 10px 15px 20px;
-            font-weight: $font-weight-semibold;
+            font-weight: $font-weight-bold;
             background-color: $grey-1;
-            color: $maroon;
+            color: $spruce;
             cursor: pointer;
 
             button {
@@ -42,7 +42,7 @@ section.faqs {
                     display: block;
                     width: 20px;
                     height: 4px;
-                    background-color: $maroon;
+                    background-color: $spruce;
                 }
 
                 &::after {
@@ -54,7 +54,7 @@ section.faqs {
                     display: block;
                     width: 20px;
                     height: 4px;
-                    background-color: $maroon;
+                    background-color: $spruce;
                     transition: transform 0.75s $ease-out-back;
                 }
             }

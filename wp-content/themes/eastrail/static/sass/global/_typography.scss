@@ -64,7 +64,7 @@ h2,
 
 h3,
 .h3 {
-    font-weight: $font-weight-semibold;
+    font-weight: $font-weight-bold;
     letter-spacing: letter-spacing(-15);
 
     @include md {
@@ -82,7 +82,7 @@ h3,
 
 h4,
 .h4 {
-    font-weight: $font-weight-semibold;
+    font-weight: $font-weight-bold;
     letter-spacing: letter-spacing(-15);
 
     @include md {
@@ -98,7 +98,7 @@ h5,
 .h5,
 h6,
 .h6 {
-    font-weight: $font-weight-semibold;
+    font-weight: $font-weight-bold;
     letter-spacing: letter-spacing(-15);
 
     @include lg {
@@ -172,7 +172,7 @@ hr.wp-block-separator {
 }
 
 strong {
-    font-weight: $font-weight-semibold;
+    font-weight: $font-weight-bold;
 }
 
 a {
@@ -184,7 +184,7 @@ a {
     }
 
     strong & {
-        font-weight: $font-weight-semibold;
+        font-weight: $font-weight-bold;
     }
 }
 
@@ -263,7 +263,7 @@ a.arrow-link {
 .meta {
     text-transform: uppercase;
     letter-spacing: letter-spacing(100);
-    font-weight: $font-weight-semibold;
+    font-weight: $font-weight-bold;
     font-size: rem(12px);
 
     @include lg {
@@ -567,9 +567,9 @@ ol.numbered {
             width: 32px;
             height: 32px;
             margin-right: 1rem;
-            background: $gradient-primary;
+            background: $spruce;
             border-radius: 50%;
-            font-weight: $font-weight-semibold;
+            font-weight: $font-weight-bold;
             font-size: rem(20px);
             color: $white;
         }
@@ -598,7 +598,7 @@ ul.ruled,
 ol.ruled {
     margin: 2rem 0;
     padding-left: 3rem;
-    border-left: 3px solid $maroon;
+    border-left: 3px solid $spruce;
 
     &:first-child {
         margin-top: 0;
@@ -697,14 +697,6 @@ ol.basic {
 
 .font-weight-regular {
     font-weight: $font-weight-regular;
-}
-
-.font-weight-medium {
-    font-weight: $font-weight-medium;
-}
-
-.font-weight-semibold {
-    font-weight: $font-weight-semibold;
 }
 
 .font-weight-bold {

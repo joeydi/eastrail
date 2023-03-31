@@ -4,7 +4,7 @@
     overflow: visible;
 
     .single & {
-      overflow: hidden;
+        overflow: hidden;
     }
 
     .swiper-button-next,
@@ -12,7 +12,7 @@
         width: var(--swiper-navigation-size);
         width: var(--swiper-navigation-size);
         border-radius: 50%;
-        background: $maroon;
+        background: $spruce;
         color: $white;
         transition: transform 0.25s $ease-out;
 
@@ -46,8 +46,8 @@
         margin-left: -25%;
 
         .single & {
-          width: 100%;
-          margin-left: 0;
+            width: 100%;
+            margin-left: 0;
         }
 
         .swiper-button-prev {

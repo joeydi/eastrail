@@ -125,7 +125,7 @@ class ET
         wp_dequeue_style('contact-form-7');
 
         wp_enqueue_style('main', get_stylesheet_directory_uri() . '/static/css/main.css', false, $this->version);
-        wp_enqueue_style('gfonts', 'https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap', false, $this->version);
+        wp_enqueue_style('gfonts', 'https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap', false, $this->version);
     }
 
     function action_acf_admin_footer()
