@@ -1,6 +1,6 @@
 {
     "key": "group_63c9a3b8498d3",
-    "title": "Gutenberg: FAQs",
+    "title": "Block: FAQs",
     "fields": [
         {
             "key": "field_63c9a8b1c02e7",
@@ -111,5 +111,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1674174240
+    "modified": 1680288489
 }
