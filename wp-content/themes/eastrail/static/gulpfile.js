@@ -18,7 +18,6 @@ gulp.task("css", function () {
         "../../../../wp-includes/css/dist/block-library/style.min.css",
         "./node_modules/magnific-popup/dist/magnific-popup.css",
         "./node_modules/swiper/swiper-bundle.min.css",
-        "./node_modules/select2/dist/css/select2.min.css",
     ];
 
     return gulp.src(includes).pipe(concat("_plugins.scss")).pipe(gulp.dest("sass/global")).pipe(livereload());
@@ -82,42 +81,27 @@ gulp.task("js", function () {
         "./node_modules/fitvids/dist/fitvids.min.js",
         "./node_modules/gsap/dist/gsap.min.js",
         "./node_modules/gsap/dist/ScrollTrigger.min.js",
-        "./node_modules/swup/dist/swup.min.js",
-        "./node_modules/swup-morph-plugin/dist/SwupMorphPlugin.js",
-        "./node_modules/@swup/body-class-plugin/dist/SwupBodyClassPlugin.js",
-        "./node_modules/@swup/scroll-plugin/dist/SwupScrollPlugin.js",
         "./node_modules/swiper/swiper-bundle.min.js",
         "./node_modules/lazysizes/lazysizes.min.js",
-        "./node_modules/objectFitPolyfill/dist/objectFitPolyfill.min.js",
         "./node_modules/magnific-popup/dist/jquery.magnific-popup.min.js",
         "./node_modules/body-scroll-lock/lib/bodyScrollLock.min.js",
-        "./node_modules/select2/dist/js/select2.min.js",
-        "./node_modules/@popperjs/core/dist/umd/popper.min.js",
-        "./node_modules/bootstrap/js/dist/dom/data.js",
-        "./node_modules/bootstrap/js/dist/dom/event-handler.js",
-        "./node_modules/bootstrap/js/dist/dom/manipulator.js",
-        "./node_modules/bootstrap/js/dist/dom/selector-engine.js",
-        "./node_modules/bootstrap/js/dist/base-component.js",
-        "./node_modules/bootstrap/js/dist/dropdown.js",
     ];
 
-    return (
-        gulp
-            .src(main)
-            .pipe(
-                plumber(function (error) {
-                    console.error(error.message);
-                    this.emit("end");
-                })
-            )
-            // .pipe(uglify())
-            .pipe(add.prepend(plugins))
-            .pipe(strip())
-            .pipe(size({ showFiles: true }))
-            .pipe(concat("main.min.js"))
-            .pipe(gulp.dest("js"))
-            .pipe(livereload())
-    );
+    return gulp
+        .src(main)
+        .pipe(
+            plumber(function (error) {
+                console.error(error.message);
+                this.emit("end");
+            })
+        )
+        .pipe(uglify())
+        .pipe(add.prepend(plugins))
+        .pipe(strip())
+        .pipe(size({ showFiles: true }))
+        .pipe(concat("main.min.js"))
+        .pipe(gulp.dest("js"))
+        .pipe(livereload());
 });
 
 gulp.task("watch", function () {

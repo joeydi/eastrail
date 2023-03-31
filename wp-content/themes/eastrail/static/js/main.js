@@ -14,81 +14,6 @@ ET.mq = {
     xxl: "(min-width: 1530px)",
 };
 
-ET.cleanupFunctions = [];
-ET.cleanup = function () {
-    // Execute each of the cleanup functions
-    for (var i = 0; i < ET.cleanupFunctions.length; i++) {
-        ET.cleanupFunctions[i]();
-    }
-
-    // Reset the array
-    ET.cleanupFunctions = [];
-};
-
-ET.initSwup = function () {
-    var linkNotExpression =
-        ':not([data-no-swup], [target="_blank"], [href*=".pdf"], [href*=".jpg"], [href*=".png"], [href*=".gif"])';
-    var linkSelectors = [
-        'a[href^="' + window.location.origin + '"]' + linkNotExpression,
-        'a[href^="/"]' + linkNotExpression,
-        'a[href^="#"]' + linkNotExpression,
-    ];
-
-    ET.swup = new Swup({
-        containers: ["#main"],
-        linkSelector: linkSelectors.join(", "),
-        plugins: [
-            new SwupMorphPlugin({
-                containers: ["#wpadminbar"],
-            }),
-            new SwupBodyClassPlugin(),
-            new SwupScrollPlugin({
-                offset: function () {
-                    return header.height() + 20;
-                },
-            }),
-        ],
-    });
-
-    // Disable scroll animation for page transitions
-    // var scrollPlugin = ET.swup.findPlugin("ScrollPlugin");
-
-    // ET.swup.on("animationOutStart", function () {
-    //     scrollPlugin.options.animateScroll = false;
-    // });
-
-    // ET.swup.on("animationInDone", function () {
-    //     scrollPlugin.options.animateScroll = true;
-    // });
-
-    ET.swup.on("pageView", function () {
-        // Hide menu and search form if shown
-        $("html").removeClass("menu-active").removeClass("search-active");
-        bodyScrollLock.clearAllBodyScrollLocks();
-
-        // Scroll to the top
-        // window.scrollTo({
-        //     top: 0,
-        //     behavior: "instant",
-        // });
-
-        // Update active nav item
-        $("header li").removeClass("current-menu-item");
-        $("header a[href='" + window.location.href + "']")
-            .closest("li")
-            .addClass("current-menu-item");
-
-        // Track pageview in Google Analytics
-        // if (typeof ga !== "undefined") {
-        //     ga("gtm10.set", "page", window.location.pathname);
-        //     ga("gtm10.send", "pageview");
-        // }
-
-        objectFitPolyfill();
-        ET.newPageReady();
-    });
-};
-
 ET.initHeaderMenu = function () {
     var html = $("html"),
         toggle = $(".menu-toggle"),
@@ -130,7 +55,7 @@ ET.initHeaderMenu = function () {
             });
 
             gsap.fromTo(
-                "header .menu-header > *, header .menu-search, header .menu-buttons li, header .menu > li, header .utility > *",
+                "header .menu-header > *, header .menu > li, header .utility > *",
                 {
                     opacity: 0,
                     x: 100,
@@ -148,8 +73,6 @@ ET.initHeaderMenu = function () {
             bodyScrollLock.enableBodyScroll(menuWrap);
         }
     });
-
-    submenu_items.append('<button class="sub-menu-toggle"><svg><use xlink:href="#chevron-down" /></svg></button>');
 
     gsap.set(".sub-menu", { height: 0 });
     $(".sub-menu-toggle").on("click", function () {
@@ -257,42 +180,6 @@ ET.initHeaderScrollBehavior = function () {
             lastScrollPosition = scrollY;
         }, 50)
     );
-};
-
-ET.initSearchOverlay = function () {
-    var html = $("html"),
-        toggle = $(".search-toggle"),
-        close = $("section.search-form .close"),
-        input = $('section.search-form input[type="text"]');
-
-    toggle.on("click", function (e) {
-        html.toggleClass("search-active");
-
-        if (html.hasClass("search-active")) {
-            input.trigger("focus");
-        }
-    });
-
-    close.on("click", function (e) {
-        html.removeClass("search-active");
-    });
-};
-
-ET.initSearchForms = function () {
-    $(document).on("submit", "form.menu-search, .search-form form, form.search", function (e) {
-        e.preventDefault();
-
-        var form = $(this),
-            action = form.attr("action"),
-            data = form.serialize();
-
-        ET.swup.loadPage({ url: action + "?" + data });
-
-        window.setTimeout(function () {
-            document.activeElement.blur();
-            form[0].reset();
-        }, 500);
-    });
 };
 
 ET.initContentScrollTriggers = function () {
@@ -659,162 +546,9 @@ ET.initBanners = function () {
     });
 };
 
-ET.initLocationsMap = function () {
-    var container = $(".locations-map");
-
-    if (!container.length) {
-        return;
-    }
-
-    var infowindow = new google.maps.InfoWindow();
-    var bounds = new google.maps.LatLngBounds();
-
-    var mapNode = container.find(".map")[0];
-    var options = {
-        zoom: 15,
-        mapId: "5f57204fb11ce09d",
-        // mapTypeId: google.maps.MapTypeId.ROADMAP,
-    };
-
-    var map = new google.maps.Map(mapNode, options);
-
-    var locations = $(".location-excerpt");
-    locations.each(function () {
-        var location = $(this),
-            lat = location.data("lat"),
-            lng = location.data("lng");
-
-        if (lat && lng) {
-            latLng = new google.maps.LatLng(location.data("lat"), location.data("lng"));
-        }
-
-        var marker = new google.maps.Marker({
-            position: latLng,
-            map: map,
-            icon: {
-                url: ET.template_directory_url + "/static/img/map-marker.png",
-                scaledSize: new google.maps.Size(30, 40),
-            },
-            zIndex: 1,
-        });
-
-        bounds.extend(latLng);
-
-        var content = location.find(".content").html();
-
-        google.maps.event.addListener(marker, "click", function () {
-            infowindow.setContent(content);
-            infowindow.open(map, marker);
-        });
-
-        google.maps.event.addListener(marker, "mouseover", function () {
-            marker.setIcon({
-                url: ET.template_directory_url + "/static/img/map-marker-active.png",
-                scaledSize: new google.maps.Size(30, 40),
-            });
-        });
-
-        google.maps.event.addListener(marker, "mouseout", function () {
-            marker.setIcon({
-                url: ET.template_directory_url + "/static/img/map-marker.png",
-                scaledSize: new google.maps.Size(30, 40),
-            });
-        });
-    });
-
-    map.fitBounds(bounds);
-
-    google.maps.event.addListener(map, "click", function () {
-        infowindow.close();
-    });
-
-    ScrollTrigger.matchMedia({
-        "(min-width: 992px)": function () {
-            ScrollTrigger.create({
-                trigger: container,
-                start: "bottom bottom-=40px",
-                endTrigger: $(".locations-list"),
-                end: "bottom bottom-=40px",
-                pin: true,
-            });
-        },
-    });
-};
-
-ET.initForms = function () {
-    var forms = $("div.gform");
-
-    forms.each(function () {
-        var form = $(this),
-            id = form.data("id");
-
-        $.get(
-            ET.ajaxurl,
-            {
-                action: "load_gravity_form",
-                id: id,
-            },
-            function (data) {
-                form.html(data);
-            }
-        );
-    });
-};
-
-ET.initPharmacyTable = function () {
-    $("#tablepress-4").on("init.dt", function () {
-        // Remove the "Search" label
-        $(".dataTables_filter label")
-            .contents()
-            .filter(function () {
-                return this.nodeType === Node.TEXT_NODE;
-            })
-            .remove();
-
-        // Replace with new hidden label
-        $(".dataTables_filter label").prepend('<span class="visually-hidden">Search</span>');
-
-        // Add the .form-control class to the search input, and update the placeholder text
-        $(".dataTables_filter input").addClass("form-control").attr("placeholder", "Search by pharmacy, address, city");
-
-        // Remove the "Show XX entries" label
-        $(".dataTables_length label")
-            .contents()
-            .filter(function () {
-                return this.nodeType === Node.TEXT_NODE;
-            })
-            .remove();
-
-        // Replace with new label
-        $(".dataTables_length label").prepend('<span class="nowrap me-10">Per Page</span>');
-
-        // Add the .form-control class to the length select
-        $(".dataTables_length select").addClass("form-control form-control-sm").css("minWidth", "60px");
-    });
-
-    $("#tablepress-4").on("draw.dt", function () {
-        // Add arrow icons to pagination buttons
-        $(".paginate_button.previous").html(
-            '<svg class="icon"><use xlink:href="#arrow-left" /></svg><span class="visually-hidden">Previous</span>'
-        );
-        $(".paginate_button.next").html(
-            '<span class="visually-hidden">Next</span> <svg class="icon"><use xlink:href="#arrow-right" /></svg>'
-        );
-    });
-};
-
-// This get's called once on initial DOM ready
-ET.initOnce = function () {
-    ET.initSwup();
+$(document).ready(function () {
     ET.initHeaderMenu();
     ET.initHeaderScrollBehavior();
-    ET.initSearchOverlay();
-    ET.initSearchForms();
-};
-
-// This get's called as soon as the new content is in the DOM
-ET.newPageReady = function () {
-    ET.cleanup();
     ET.initContentScrollTriggers();
     ET.initFitVids();
     ET.initShareLinks();
@@ -829,16 +563,4 @@ ET.newPageReady = function () {
     ET.initPagination();
     ET.initFAQs();
     ET.initBanners();
-    ET.initLocationsMap();
-    ET.initForms();
-    ET.initPharmacyTable();
-};
-
-$(document).ready(function () {
-    ET.initOnce();
-    ET.newPageReady();
-});
-
-$(window).on("load", function () {
-    objectFitPolyfill();
 });

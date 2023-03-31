@@ -4,6 +4,7 @@ require 'inc/comments.php';
 require 'inc/events.php';
 require 'inc/gravityforms.php';
 require 'inc/news.php';
+require 'inc/simple_html_dom.php';
 require 'inc/shortcodes.php';
 
 new ET();
@@ -64,7 +65,7 @@ class ET
         add_filter('body_class',                            [$this, 'filter_body_class']);
         add_filter('mce_buttons_2',                         [$this, 'filter_mce_buttons_2']);
         add_filter('tiny_mce_before_init',                  [$this, 'filter_tiny_mce_before_init']);
-        add_filter('wp_nav_menu_objects',                   [$this, 'filter_wp_nav_menu_objects'], 10, 2);
+        add_filter('wp_nav_menu_items',                     [$this, 'filter_wp_nav_menu_items'], 10, 2);
     }
 
     function add_editor_styles()
@@ -122,8 +123,6 @@ class ET
     function action_enqueue_styles()
     {
         wp_dequeue_style('wp-block-library');
-        wp_dequeue_style('contact-form-7');
-
         wp_enqueue_style('main', get_stylesheet_directory_uri() . '/static/css/main.css', false, $this->version);
         wp_enqueue_style('gfonts', 'https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap', false, $this->version);
     }
@@ -462,15 +461,37 @@ class ET
         return $init;
     }
 
-    function filter_wp_nav_menu_objects($items, $args)
+    function filter_wp_nav_menu_items($items, $args)
     {
-        if (stripos($args->menu_class, 'buttons') !== false) {
-            $items = array_filter($items, function ($item) {
-                return in_array('button', $item->classes);
-            });
+        $html = str_get_html($items);
+
+        if ($args->menu === 'Header') {
+            $button = '<button class="sub-menu-toggle"><svg><title>Toggle Submenu</title><use xlink:href="#chevron-down" /></svg></button>';
+
+            $nested_parents = $html->find('li li.menu-item-has-children');
+            foreach ($nested_parents as $parent) {
+                $parent->innertext .= $button;
+            }
+
+            $parents = $html->find('li.menu-item-has-children');
+            foreach ($parents as $parent) {
+                $parent->innertext .= $button;
+            }
         }
 
-        return $items;
+        if ($args->menu === 'Header Utility') {
+            $parents = $html->find('li');
+
+            foreach ($parents as $parent) {
+                if ($parent->hasClass('btn')) {
+                    $anchor = $parent->find('a', 0);
+                    $anchor->class = $parent->class;
+                    $parent->class = '';
+                }
+            }
+        }
+
+        return $html;
     }
 
     static function theme_url($path)

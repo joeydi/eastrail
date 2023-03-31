@@ -30,56 +30,30 @@
     <header>
         <?php get_template_part('partials/alert-bar'); ?>
 
-        <?php if (is_nav_menu('Header Utility')) : ?>
-            <div class="utility-nav">
-                <div class="container">
-                    <a href="#main" class="skip">Skip to content</a>
-                    <?php wp_nav_menu(['menu' => 'Header Utility', 'menu_class' => 'utility', 'container' => false, 'depth' => 1]); ?>
-                    <button class="search-toggle">
-                        <svg class="icon">
-                            <use xlink:href="#search" />
-                        </svg>
-                        <span class="visually-hidden">Search</span>
-                    </button>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <div class="main-nav container">
-            <a class="logo" href="<?php echo site_url(); ?>" title="<?php bloginfo('sitename'); ?>">
-                <?php include(ET::theme_path('static/img/eastrail-logo.svg')); ?>
-            </a>
-            <button class="menu-toggle">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="visually-hidden">Show Menu</span>
-            </button>
-            <div class="menu-wrap">
-                <div class="menu-header">
-                    <span class="visually-hidden">Menu</span>
-                    <button class="menu-toggle">
-                        <span class="bar"></span>
-                        <span class="bar"></span>
-                        <span class="bar"></span>
-                        <span class="visually-hidden">Hide Menu</span>
-                    </button>
-                </div>
-                <form action="/" class="menu-search">
-                    <div>
-                        <svg class="icon">
-                            <use xlink:href="#search" />
-                        </svg>
-                        <input type="text" name="s" />
-                        <input type="submit" class="visually-hidden" />
+        <div class="container">
+            <div class="main-nav">
+                <a class="logo" href="<?php echo site_url(); ?>" title="<?php bloginfo('sitename'); ?>">
+                    <?php include(ET::theme_path('static/img/eastrail-logo.svg')); ?>
+                </a>
+                <button class="menu-toggle">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="visually-hidden">Show Menu</span>
+                </button>
+                <div class="menu-wrap">
+                    <div class="menu-header">
+                        <span class="visually-hidden">Menu</span>
+                        <button class="menu-toggle">
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="bar"></span>
+                            <span class="visually-hidden">Hide Menu</span>
+                        </button>
                     </div>
-                </form>
-                <div class="menu-buttons">
-                    <?php wp_nav_menu(['menu' => 'Header', 'menu_class' => 'buttons', 'container' => false, 'depth' => 1]); ?>
-                    <?php wp_nav_menu(['menu' => 'Header Utility', 'menu_class' => 'buttons', 'container' => false, 'depth' => 1]); ?>
+                    <?php wp_nav_menu(['menu' => 'Header', 'container' => false, 'depth' => 2]); ?>
+                    <?php wp_nav_menu(['menu' => 'Header Utility', 'menu_class' => 'utility', 'container' => false, 'depth' => 1]); ?>
                 </div>
-                <?php wp_nav_menu(['menu' => 'Header', 'container' => false, 'depth' => 2]); ?>
-                <?php wp_nav_menu(['menu' => 'Header Utility', 'menu_class' => 'utility', 'container' => false, 'depth' => 1]); ?>
             </div>
         </div>
     </header>
