@@ -74,7 +74,7 @@ ET.initHeaderMenu = function () {
         }
     });
 
-    gsap.set(".sub-menu", { height: 0 });
+    gsap.set("header .sub-menu", { height: 0 });
     $(".sub-menu-toggle").on("click", function () {
         var submenu = $(this).closest("li").find(".sub-menu");
 

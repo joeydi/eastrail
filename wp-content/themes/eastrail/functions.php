@@ -65,6 +65,7 @@ class ET
         add_filter('body_class',                            [$this, 'filter_body_class']);
         add_filter('mce_buttons_2',                         [$this, 'filter_mce_buttons_2']);
         add_filter('tiny_mce_before_init',                  [$this, 'filter_tiny_mce_before_init']);
+        add_filter('wp_nav_menu_objects',                   [$this, 'filter_wp_nav_menu_objects'], 10, 2);
         add_filter('wp_nav_menu_items',                     [$this, 'filter_wp_nav_menu_items'], 10, 2);
     }
 
@@ -459,6 +460,31 @@ class ET
         $init['textcolor_cols'] = 8;
 
         return $init;
+    }
+
+    function filter_wp_nav_menu_objects($items, $args)
+    {
+        if ($args->menu === 'Social') {
+            foreach ($items as &$item) {
+                $icon = get_field('icon', $item);
+                if ($icon) {
+                    $mime_type = get_post_mime_type($icon);
+
+                    if ($mime_type === 'image/svg+xml') {
+                        $file = get_attached_file($icon);
+                        ob_start();
+                        include $file;
+                        $image = ob_get_clean();
+                    } else {
+                        $image = wp_get_attachment_image($icon);
+                    }
+
+                    $item->title = sprintf('%s<span class="visually-hidden">%s</span>', $image, $item->title);
+                }
+            }
+        }
+
+        return $items;
     }
 
     function filter_wp_nav_menu_items($items, $args)

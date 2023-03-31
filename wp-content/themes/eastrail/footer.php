@@ -2,24 +2,19 @@
 
 $social_links = [
     [
-        'icon' => '#twitter',
-        'title' => 'Twitter',
-        'url' => get_field('twitter_url', 'options'),
-    ],
-    [
         'icon' => '#facebook',
         'title' => 'Facebook',
         'url' => get_field('facebook_url', 'options'),
     ],
     [
-        'icon' => '#youtube',
-        'title' => 'YouTube',
-        'url' => get_field('youtube_url', 'options'),
+        'icon' => '#twitter',
+        'title' => 'Twitter',
+        'url' => get_field('twitter_url', 'options'),
     ],
     [
-        'icon' => '#instagram',
-        'title' => 'Instagram',
-        'url' => get_field('instagram_url', 'options'),
+        'icon' => '#linkedin',
+        'title' => 'LinkedIn',
+        'url' => get_field('linkedin_url', 'options'),
     ],
 ];
 
@@ -27,42 +22,33 @@ $social_links = [
 
 <footer>
     <div class="container">
+        <a class="logo" href="<?php echo site_url(); ?>" title="<?php bloginfo('sitename'); ?>">
+            <img src="<?php echo ET::theme_url('static/img/eastrail-partners-logo.jpg'); ?>" alt="Eastrail Partners">
+        </a>
+
         <div class="row">
-            <div class="col-md-4 col-lg-2 col-xxl-3">
-                <?php wp_nav_menu(['menu' => 'Footer', 'container' => false]); ?>
-            </div>
-
-            <div class="col-md-4 col-lg-3 col-xxl-3 mb-50">
-                <?php the_field('footer_column_1', 'options'); ?>
-            </div>
-
-            <div class="col-md-4 col-lg-3 col-xxl-3 mb-50">
-                <?php the_field('footer_column_2', 'options'); ?>
-            </div>
-
-            <div class="col-md-12 col-lg-4 col-xxl-3 mb-50">
-                <a class="logo" href="<?php echo site_url(); ?>" title="<?php bloginfo('sitename'); ?>">
-                    <img src="<?php echo ET::theme_url('static/img/eastrail-partners-logo.jpg'); ?>" alt="Eastrail Partners">
-                </a>
-
-                <div class="social-links">
-                    <?php foreach ($social_links as $link) : if ($link['url']) : ?>
-                            <a title="<?php echo $link['title']; ?>" href="<?php echo $link['url']; ?>" target="_blank" rel="noopener noreferrer">
-                                <svg>
-                                    <use xlink:href="<?php echo $link['icon']; ?>" />
-                                </svg>
-                            </a>
-                    <?php endif;
-                    endforeach; ?>
+            <div class="col-md-8 order-md-2 col-xl-6">
+                <div class="d-sm-flex justify-content-between">
+                    <?php wp_nav_menu(['menu' => 'Footer Column 1', 'container' => false]); ?>
+                    <?php wp_nav_menu(['menu' => 'Footer Column 2', 'container' => false]); ?>
+                    <?php wp_nav_menu(['menu' => 'Footer Column 3', 'container' => false]); ?>
                 </div>
             </div>
-        </div>
-        <div class="disclaimer">
-            <div class="copyright">
-                <p>&copy; <?php echo date('Y'); ?> <?php bloginfo('sitename'); ?>. All Rights Reserved.</p>
-                <?php wp_nav_menu(['menu' => 'Footer Utility', 'container' => false]); ?>
+            <div class="col-md-4 order-md-1 col-xl-6">
+                <?php the_field('footer_contact_info', 'options'); ?>
+                <?php wp_nav_menu(['menu' => 'Social', 'menu_class' => 'social', 'container' => false]); ?>
             </div>
-            <?php the_field('footer_disclaimer', 'options'); ?>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-xl-6">
+                <div class="disclaimer">
+                    <?php the_field('footer_disclaimer', 'options'); ?>
+                </div>
+            </div>
+            <div class="col-md-8 col-xl-6">
+                <?php wp_nav_menu(['menu' => 'Footer Utility', 'menu_class' => 'utility', 'container' => false]); ?>
+            </div>
         </div>
     </div>
 </footer>
