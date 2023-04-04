@@ -14,8 +14,6 @@ body {
 
 h1,
 .h1 {
-    letter-spacing: letter-spacing(-30);
-
     @include md {
         font-size: rem(40px);
     }
@@ -31,8 +29,6 @@ h1,
 
 h2,
 .h2 {
-    letter-spacing: letter-spacing(-15);
-
     @include md {
         font-size: rem(24px);
     }
@@ -48,8 +44,6 @@ h2,
 
 h3,
 .h3 {
-    letter-spacing: letter-spacing(-15);
-
     @include md {
         font-size: rem(20px);
     }
@@ -69,8 +63,6 @@ h5,
 .h5,
 h6,
 .h6 {
-    letter-spacing: letter-spacing(-15);
-
     @include md {
         font-size: rem(17px);
     }

@@ -18,7 +18,11 @@ $social_links = [
     ],
 ];
 
-?></main>
+?>
+
+<?php get_template_part('partials/footer-cta'); ?>
+
+</main>
 
 <footer>
     <div class="container">
