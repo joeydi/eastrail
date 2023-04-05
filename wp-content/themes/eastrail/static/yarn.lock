@@ -1845,10 +1845,10 @@ growl@1.10.5:
   resolved "https://registry.npmjs.org/growl/-/growl-1.10.5.tgz"
   integrity sha512-qBr4OuELkhPenW6goKVXiv47US3clb3/IbuWF9KNKEijAy9oeHxU9IgzjvJhHkUzhaj7rOUD7+YGWqUjLp5oSA==
 
-gsap@^3.8.0:
-  version "3.8.0"
-  resolved "https://registry.npmjs.org/gsap/-/gsap-3.8.0.tgz"
-  integrity sha512-cvpzKkWFePDZCycwXwJnDSpTR3j+a4QLQF/t0c+pXqzRESgAYx5hieaoshzZFjbwsARqr0+5c3GKE7wI273w/g==
+"gsap@npm:@gsap/shockingly":
+  version "3.11.5"
+  resolved "https://npm.greensock.com/@gsap%2fshockingly/-/shockingly-3.11.5.tgz#4dd2c9e37dcb6e989ce11e8ee940623faf627f46"
+  integrity sha512-OeGuGJbek8R2NcVuf201zBQDOHcFlNnEZPIvNsxE4flFnkKDFJP4Tf6hfjGFfKINlC6pwkqbD/G2WrmHvupyEw==
 
 gulp-add-src@^1.0.0:
   version "1.0.0"

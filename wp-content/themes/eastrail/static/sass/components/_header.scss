@@ -4,7 +4,6 @@ header {
     left: 0;
     top: 0;
     width: 100%;
-    background-color: $evergreen;
     transition: background-color 0.25s;
 
     body.admin-bar & {
@@ -418,13 +417,13 @@ header {
 
     @include xl {
         .main-nav {
-            transition: padding 0.25s $ease-out;
+            transition: padding 0.5s $ease-out;
             padding-top: 30px;
             padding-bottom: 30px;
         }
 
         .logo svg {
-            transition: height 0.25s $ease-out;
+            transition: height 0.5s $ease-out;
             height: 50px;
         }
     }
@@ -444,12 +443,12 @@ header {
 header.minify {
     @include xl {
         .main-nav {
-            padding-top: 20px;
-            padding-bottom: 20px;
+            padding-top: 12px;
+            padding-bottom: 12px;
         }
 
         .logo svg {
-            height: 48px;
+            height: 36px;
         }
     }
 }

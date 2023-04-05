@@ -46,11 +46,11 @@ html {
     scroll-padding-top: calc(var(--headerHeight, 80px) + 20px);
 
     @include lg {
-        scroll-padding-top: calc(var(--headerHeight, 146px) + 40px);
+        scroll-padding-top: calc(var(--headerHeight, 100px) + 40px);
     }
 
     @include xl {
-        scroll-padding-top: calc(var(--headerHeight, 170px) + 60px);
+        scroll-padding-top: calc(var(--headerHeight, 120px) + 60px);
     }
 
     @include xxl {
@@ -60,15 +60,15 @@ html {
 
 main {
     padding-top: var(--headerHeight, 80px);
-    background-color: $white;
+    background-color: $evergreen;
     overflow: hidden;
 
     @include lg {
-        padding-top: var(--headerHeight, 146px);
+        padding-top: var(--headerHeight, 100px);
     }
 
     @include xl {
-        padding-top: var(--headerHeight, 170px);
+        padding-top: var(--headerHeight, 120px);
     }
 
     @include xxl {

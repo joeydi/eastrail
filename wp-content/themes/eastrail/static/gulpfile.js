@@ -81,6 +81,8 @@ gulp.task("js", function () {
         "./node_modules/fitvids/dist/fitvids.min.js",
         "./node_modules/gsap/dist/gsap.min.js",
         "./node_modules/gsap/dist/ScrollTrigger.min.js",
+        "./node_modules/gsap/dist/SplitText.min.js",
+        "./node_modules/gsap/dist/DrawSVGPlugin.min.js",
         "./node_modules/swiper/swiper-bundle.min.js",
         "./node_modules/lazysizes/lazysizes.min.js",
         "./node_modules/magnific-popup/dist/jquery.magnific-popup.min.js",

@@ -3,7 +3,7 @@
 var $ = $ || jQuery,
     ET = ET || {};
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(DrawSVGPlugin, ScrollTrigger, SplitText);
 
 ET.mq = {
     xs: "(min-width: 375px)",
@@ -102,82 +102,12 @@ ET.initHeaderMenu = function () {
 };
 
 ET.initHeaderScrollBehavior = function () {
-    var lastScrollPosition = 0,
-        header = $("header"),
-        headerHeight = header[0].getBoundingClientRect().height,
-        mainNav = header.find(".main-nav"),
-        mainNavPosition = mainNav.offset().top,
-        mainNavHeight = mainNav[0].getBoundingClientRect().height,
-        headerPosition = 0,
-        minHeaderPosition = -headerHeight + mainNavHeight,
-        isDesktop = window.matchMedia(ET.mq.lg).matches;
-
-    var root = document.documentElement;
-    root.style.setProperty("--headerHeight", headerHeight + "px");
-    root.style.setProperty("--mainNavHeight", mainNavHeight + "px");
-
-    $(window).on(
-        "resize",
-        debounce(function () {
-            isDesktop = window.matchMedia(ET.mq.lg).matches;
-            headerHeight = header[0].getBoundingClientRect().height;
-            root.style.setProperty("--headerHeight", headerHeight + "px");
-            mainNavPosition = mainNav.offset().top;
-            mainNavHeight = mainNav[0].getBoundingClientRect().height;
-            root.style.setProperty("--mainNavHeight", mainNavHeight + "px");
-            minHeaderPosition = -headerHeight + mainNavHeight;
-        }, 100)
-    );
+    var header = $("header");
 
     $(window).on(
         "scroll",
         throttle(function () {
-            var scrollY = Math.max(0, window.scrollY),
-                scrollDelta = scrollY - lastScrollPosition;
-
-            if (scrollDelta < 0) {
-                // If scrolling up, animate the header to 0
-                if (isDesktop || scrollY < mainNavPosition) {
-                    headerPosition = 0;
-                    gsap.to(header, {
-                        y: headerPosition,
-                        duration: 0.35,
-                        ease: "power2.out",
-                        overwrite: true,
-                    });
-                }
-            } else {
-                // If scrolling down, animate the header up by the scrollDelta
-                headerPosition = Math.min(Math.max(headerPosition - scrollDelta, minHeaderPosition), 0);
-                gsap.to(header, {
-                    y: headerPosition,
-                    duration: 0.05,
-                    ease: "none",
-                    overwrite: true,
-                });
-            }
-
-            // If the header has scrolled up to it's minHeaderPosition, minify it
-            if (headerPosition === minHeaderPosition && !header.hasClass("minify")) {
-                header.addClass("minify");
-                window.setTimeout(function () {
-                    mainNavHeight = mainNav[0].getBoundingClientRect().height;
-                    root.style.setProperty("--mainNavHeight", mainNavHeight + "px");
-                    ScrollTrigger.refresh();
-                }, 250);
-            }
-
-            // If the header has scrolled up to the top of the page, unminify it
-            if (scrollY < 50 && header.hasClass("minify")) {
-                header.removeClass("minify");
-                window.setTimeout(function () {
-                    mainNavHeight = mainNav[0].getBoundingClientRect().height;
-                    root.style.setProperty("--mainNavHeight", mainNavHeight + "px");
-                    ScrollTrigger.refresh();
-                }, 250);
-            }
-
-            lastScrollPosition = scrollY;
+            header.toggleClass("minify", window.scrollY > 100);
         }, 50)
     );
 };
@@ -548,35 +478,88 @@ ET.initBanners = function () {
 
 ET.initFooterCTA = function () {
     var section = $("section.footer-cta"),
-        pathRadius = 10;
+        pathRadius = 8;
 
     if (!section.length) {
         return;
     }
 
-    var d = "M0,0 L480,0 C490,0 500,9 500,20 L500,80 C500,90 509,100 520,100 L1000,100";
     var d2 = "M0,0 L{0},0 C{1},0 500,{2} 500,{3} L500,{4} C500,{5} {6},100 {7},100 L1000,100";
 
     var h1 = section.find("h1"),
-        span1 = section.find(".path-wrap-1"),
+        svg1 = section.find("svg.footer-cta-path-1"),
         path1 = section.find("svg.footer-cta-path-1 path"),
-        span2 = section.find(".path-wrap-2"),
         svg2 = section.find("svg.footer-cta-path-2"),
-        path2 = section.find("svg.footer-cta-path-2 path");
+        path2 = section.find("svg.footer-cta-path-2 path"),
+        btn = section.find(".btn");
 
-    console.log(path2);
+    var split = new SplitText(h1);
+
+    var path1Timeline = new gsap.timeline({
+        scrollTrigger: {
+            trigger: svg1,
+            start: "top bottom",
+            end: "center center",
+        },
+    });
+
+    // path1Timeline.from(
+    //     path1,
+    //     {
+    //         drawSVG: 0,
+    //         duration: 3,
+    //         ease: "power2.inOut",
+    //     },
+    //     0
+    // );
+
+    path1Timeline.from(split.chars, {
+        duration: 1,
+        x: -100,
+        autoAlpha: 0,
+        stagger: 0.005,
+        ease: "power2.out",
+    });
+
+    var path2Timeline = new gsap.timeline({
+        scrollTrigger: {
+            trigger: svg2,
+            start: "top bottom",
+            end: "center center",
+        },
+    });
+
+    path2Timeline.from(
+        path2,
+        {
+            drawSVG: 0,
+            duration: 2,
+            ease: "power2.out",
+        },
+        0
+    );
+
+    path2Timeline.from(
+        btn,
+        {
+            opacity: 0,
+            scale: 0.75,
+            x: -40,
+            duration: 1,
+            ease: "back.out",
+        },
+        0.85
+    );
 
     var redrawPath = function () {
         var h1Rect = h1[0].getBoundingClientRect(),
-            path2Rect = path2[0].getBoundingClientRect(),
+            path1Width = h1Rect.x - 16,
+            path2Rect = svg2[0].getBoundingClientRect(),
             path2Width = h1Rect.x + h1Rect.width - path2Rect.x,
-            scaleRatio = path2Width / 1000,
+            scaleRatio = 1000 / path2Width,
             pathRadiusScaled = pathRadius * scaleRatio;
 
-        console.log(h1Rect);
-        console.log(path2Rect);
-        console.log(path2Width);
-
+        svg1.width(path1Width);
         svg2.width(path2Width);
 
         d2Formatted = d2
@@ -590,11 +573,9 @@ ET.initFooterCTA = function () {
             .replace("{7}", 500 + pathRadiusScaled * 2);
 
         path2.attr("d", d2Formatted);
-
-        console.log(path2);
     };
 
-    $(window).on("resize", throttle(redrawPath, 100));
+    $(window).on("load resize", throttle(redrawPath, 100));
 
     redrawPath();
 };
@@ -616,5 +597,8 @@ $(document).ready(function () {
     ET.initPagination();
     ET.initFAQs();
     ET.initBanners();
+});
+
+$(window).on("load", function () {
     ET.initFooterCTA();
 });

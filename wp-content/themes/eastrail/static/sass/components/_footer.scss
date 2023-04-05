@@ -4,23 +4,38 @@ section.footer-cta {
     }
 
     span {
-        @include debug;
+        // @include debug;
         position: relative;
     }
 
     svg {
-        position: absolute;
-        left: 50%;
+        display: none;
+    }
+
+    .footer-cta-path-1 {
+        right: 1rem;
         top: 50%;
-        max-width: none;
         width: 1000px;
         height: 100px;
-        overflow: visible;
+    }
+
+    .footer-cta-path-2 {
+        left: 50%;
+        top: 50%;
+        width: 1000px;
+        height: 100px;
     }
 
     @include md {
         h1 {
             margin-bottom: 102px;
+        }
+
+        svg {
+            display: block;
+            position: absolute;
+            max-width: none;
+            overflow: visible;
         }
     }
 
