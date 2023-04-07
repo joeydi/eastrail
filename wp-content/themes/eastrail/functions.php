@@ -441,17 +441,22 @@ class ET
 
         $custom_colours = [
             'ffffff', 'White',
-            'f6f6f8', 'Light Grey',
+            'efefef', 'Grey 1',
+            '999999', 'Grey 2',
+            '707070', 'Grey 3',
+            '484848', 'Grey 4',
+            '2b2b2b', 'Grey 5',
             '000000', 'Black',
-            '00ccd6', 'Teal',
-            '0ba8ff', 'Light Blue',
-            '2e3fb3', 'Blue',
-            '4f40fb', 'Purple',
-            '2e0379', 'Dark Purple',
+            'f7f5f2', 'Sand',
+            '38d430', 'Willow',
+            '00ae42', 'Spruce',
+            '008934', 'Dark Spruce',
+            '006241', 'Evergreen',
+            '005538', 'Dark Evergreen',
         ];
 
         $init['textcolor_map'] = json_encode($custom_colours);
-        $init['textcolor_cols'] = 8;
+        $init['textcolor_cols'] = 7;
 
         return $init;
     }

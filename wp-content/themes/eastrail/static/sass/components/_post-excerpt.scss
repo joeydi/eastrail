@@ -2,30 +2,23 @@
     display: block;
     min-height: 100%;
     border: 1px solid $grey-border;
+    color: $body-color;
     transition: transform 0.25s $ease-out, box-shadow 0.25s;
 
     &:hover {
         transform: translateY(-10px);
         box-shadow: $shadow-default;
         text-decoration: none;
-
-        h3 {
-            text-decoration: underline;
-        }
+        color: $body-color;
     }
 
     .content {
         padding: 20px;
     }
 
-    h3 {
-        font-size: rem(18px);
-        color: $body-color;
-    }
-
     @include lg {
         .content {
-            padding: 30px 40px 50px;
+            padding: 30px 40px 40px;
         }
     }
 }

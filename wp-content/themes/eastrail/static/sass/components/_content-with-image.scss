@@ -1,4 +1,5 @@
 section.content-with-image {
+    z-index: 1;
     overflow: visible;
 
     @include md {

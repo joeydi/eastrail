@@ -883,6 +883,85 @@
                     "min": "",
                     "max": ""
                 },
+                "layout_61bc270eb4e60": {
+                    "key": "layout_61bc270eb4e60",
+                    "name": "featured_news",
+                    "label": "Featured News",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_6249eb44d49c6",
+                            "label": "Label",
+                            "name": "label",
+                            "aria-label": "",
+                            "type": "text",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "placeholder": "",
+                            "prepend": "",
+                            "append": "",
+                            "maxlength": ""
+                        },
+                        {
+                            "key": "field_61bc2734b4e61",
+                            "label": "Intro",
+                            "name": "intro",
+                            "aria-label": "",
+                            "type": "wysiwyg",
+                            "instructions": "",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "default_value": "",
+                            "tabs": "all",
+                            "toolbar": "full",
+                            "media_upload": 1,
+                            "delay": 0
+                        },
+                        {
+                            "key": "field_61bc2769b4e63",
+                            "label": "Posts",
+                            "name": "posts",
+                            "aria-label": "",
+                            "type": "relationship",
+                            "instructions": "Leave blank to show three recent posts.",
+                            "required": 0,
+                            "conditional_logic": 0,
+                            "wrapper": {
+                                "width": "",
+                                "class": "",
+                                "id": ""
+                            },
+                            "post_type": [
+                                "post"
+                            ],
+                            "taxonomy": "",
+                            "filters": [
+                                "search",
+                                "taxonomy"
+                            ],
+                            "elements": [
+                                "featured_image"
+                            ],
+                            "min": "",
+                            "max": "",
+                            "return_format": ""
+                        }
+                    ],
+                    "min": "",
+                    "max": ""
+                },
                 "layout_6078fe988df51": {
                     "key": "layout_6078fe988df51",
                     "name": "media_embed",
@@ -1371,101 +1450,6 @@
                                     "parent_repeater": "field_629f69701086e"
                                 }
                             ]
-                        }
-                    ],
-                    "min": "",
-                    "max": ""
-                },
-                "layout_61bc270eb4e60": {
-                    "key": "layout_61bc270eb4e60",
-                    "name": "news",
-                    "label": "News",
-                    "display": "block",
-                    "sub_fields": [
-                        {
-                            "key": "field_6249eb44d49c6",
-                            "label": "Label",
-                            "name": "label",
-                            "aria-label": "",
-                            "type": "text",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "default_value": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
-                            "maxlength": ""
-                        },
-                        {
-                            "key": "field_61bc2734b4e61",
-                            "label": "Heading",
-                            "name": "heading",
-                            "aria-label": "",
-                            "type": "text",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "default_value": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
-                            "maxlength": ""
-                        },
-                        {
-                            "key": "field_629fb75b6a30b",
-                            "label": "CTA",
-                            "name": "cta",
-                            "aria-label": "",
-                            "type": "link",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "return_format": "array"
-                        },
-                        {
-                            "key": "field_61bc2769b4e63",
-                            "label": "Posts",
-                            "name": "posts",
-                            "aria-label": "",
-                            "type": "relationship",
-                            "instructions": "Leave blank to show three recent posts.",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "post_type": [
-                                "post"
-                            ],
-                            "taxonomy": "",
-                            "filters": [
-                                "search",
-                                "taxonomy"
-                            ],
-                            "elements": [
-                                "featured_image"
-                            ],
-                            "min": "",
-                            "max": "",
-                            "return_format": ""
                         }
                     ],
                     "min": "",
@@ -2589,34 +2573,6 @@
                 "operator": "==",
                 "value": "event"
             }
-        ],
-        [
-            {
-                "param": "post_type",
-                "operator": "==",
-                "value": "post"
-            }
-        ],
-        [
-            {
-                "param": "post_type",
-                "operator": "==",
-                "value": "post"
-            }
-        ],
-        [
-            {
-                "param": "post_type",
-                "operator": "==",
-                "value": "post"
-            }
-        ],
-        [
-            {
-                "param": "post_type",
-                "operator": "==",
-                "value": "post"
-            }
         ]
     ],
     "menu_order": 0,
@@ -2628,5 +2584,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1680884846
+    "modified": 1680885482
 }

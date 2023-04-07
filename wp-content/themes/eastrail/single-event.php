@@ -9,18 +9,9 @@ get_header();
 
 ?>
 
-<section class="page-header"></section>
+<?php get_template_part('partials/page-header'); ?>
 
-<section class="breadcrumbs" data-scroll-fade>
-    <div class="container">
-        <a href="<?php echo site_url('/'); ?>">Home</a>
-        <a href="<?php echo site_url('/about-us/'); ?>">About Us</a>
-        <a href="<?php echo site_url('/about-us/events/'); ?>">Events</a>
-        <span><?php the_title(); ?></span>
-    </div>
-</section>
-
-<section class="section-margin">
+<section class="section-padding bg-white">
     <div class="container">
         <div class="row">
             <div class="order-md-2 col-md-5 col-lg-4 offset-lg-1 mb-60 mb-md-0" data-scroll-fade-children>
