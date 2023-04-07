@@ -352,21 +352,27 @@ class ET
                 'wrapper' => false,
             ],
             [
-                'title' => 'Button',
+                'title' => 'Button - Dark Green',
                 'selector' => 'a',
                 'classes' => 'btn btn-primary',
                 'wrapper' => false,
             ],
             [
-                'title' => 'Button - Outline',
+                'title' => 'Button - Dark Green Outline',
                 'selector' => 'a',
                 'classes' => 'btn btn-outline-primary',
                 'wrapper' => false,
             ],
             [
-                'title' => 'Button - White',
+                'title' => 'Button - Light Green',
                 'selector' => 'a',
-                'classes' => 'btn btn-white',
+                'classes' => 'btn btn-secondary',
+                'wrapper' => false,
+            ],
+            [
+                'title' => 'Button - Light Green Outline',
+                'selector' => 'a',
+                'classes' => 'btn btn-outline-secondary',
                 'wrapper' => false,
             ],
             [

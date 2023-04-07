@@ -511,7 +511,7 @@
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
-                                "width": "25",
+                                "width": "33",
                                 "class": "",
                                 "id": ""
                             },
@@ -520,37 +520,10 @@
                                 "right": "Right"
                             },
                             "default_value": false,
-                            "allow_null": 0,
-                            "multiple": 0,
-                            "ui": 0,
                             "return_format": "value",
-                            "ajax": 0,
-                            "placeholder": ""
-                        },
-                        {
-                            "key": "field_60785d2ed8036",
-                            "label": "Vertical Alignment",
-                            "name": "vertical_alignment",
-                            "aria-label": "",
-                            "type": "select",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "25",
-                                "class": "",
-                                "id": ""
-                            },
-                            "choices": {
-                                "align-items-start": "Top",
-                                "align-items-center": "Center",
-                                "align-items-end": "Bottom"
-                            },
-                            "default_value": "align-items-center",
-                            "allow_null": 0,
                             "multiple": 0,
+                            "allow_null": 0,
                             "ui": 0,
-                            "return_format": "value",
                             "ajax": 0,
                             "placeholder": ""
                         },
@@ -564,7 +537,7 @@
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
-                                "width": "25",
+                                "width": "33",
                                 "class": "",
                                 "id": ""
                             },
@@ -576,10 +549,10 @@
                                 "square": "Square"
                             },
                             "default_value": "landscape",
-                            "allow_null": 0,
-                            "multiple": 0,
-                            "ui": 0,
                             "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "ui": 0,
                             "ajax": 0,
                             "placeholder": ""
                         },
@@ -593,20 +566,21 @@
                             "required": 0,
                             "conditional_logic": 0,
                             "wrapper": {
-                                "width": "25",
+                                "width": "34",
                                 "class": "",
                                 "id": ""
                             },
                             "choices": {
-                                "bg-grey-1": "Light Grey",
-                                "bg-blue text-white": "Blue",
-                                "bg-maroon text-white": "Maroon"
+                                "bg-white": "White",
+                                "bg-sand": "Sand",
+                                "bg-evergreen text-white": "Evergreen",
+                                "bg-dark-evergreen text-white": "Dark Evergreen"
                             },
                             "default_value": false,
-                            "allow_null": 1,
-                            "multiple": 0,
-                            "ui": 0,
                             "return_format": "value",
+                            "multiple": 0,
+                            "allow_null": 0,
+                            "ui": 0,
                             "ajax": 0,
                             "placeholder": ""
                         }
@@ -2654,5 +2628,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1680882347
+    "modified": 1680884846
 }

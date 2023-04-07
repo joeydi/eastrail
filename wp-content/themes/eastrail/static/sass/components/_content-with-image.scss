@@ -1,0 +1,57 @@
+section.content-with-image {
+    overflow: visible;
+
+    @include md {
+        .image {
+            height: calc(100% + 220px);
+        }
+
+        &.align-left .image {
+            margin: -110px 0 -110px -40px;
+        }
+
+        &.align-right .image {
+            margin: -110px -40px -110px 0;
+        }
+
+        .content {
+            padding: 0 30px;
+        }
+    }
+
+    @include lg {
+        .image {
+            height: calc(100% + 280px);
+        }
+
+        &.align-left .image {
+            margin: -140px 0 -140px -50px;
+        }
+
+        &.align-right .image {
+            margin: -140px -50px -140px 0;
+        }
+
+        .content {
+            padding: 0 50px;
+        }
+    }
+
+    @include xl {
+        .image {
+            height: calc(100% + 320px);
+        }
+
+        &.align-left .image {
+            margin: -160px 0 -160px -60px;
+        }
+
+        &.align-right .image {
+            margin: -160px -60px -160px 0;
+        }
+
+        .content {
+            padding: 0 70px;
+        }
+    }
+}
