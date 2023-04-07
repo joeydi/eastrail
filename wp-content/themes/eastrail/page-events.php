@@ -10,7 +10,7 @@ get_header();
 
 <?php get_template_part('partials/page-header'); ?>
 
-<section class="post-grid section-margin">
+<section class="post-grid section-padding">
     <div class="container">
         <?php if ($events->have_posts()) : ?>
             <div class="posts">

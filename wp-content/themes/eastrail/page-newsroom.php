@@ -19,7 +19,7 @@ get_header();
 <?php get_template_part('partials/page-header'); ?>
 
 <?php if ($featured_news && $paged == 1 && !$selected_category) : ?>
-    <section class="section-margin">
+    <section class="section-padding bg-white">
         <div class="container">
             <div class="d-sm-flex align-items-end justify-content-between mb-40 mb-lg-60" data-scroll-fade-children>
                 <h2 class="mb-sm-0">Featured news</h2>
@@ -48,7 +48,7 @@ get_header();
     </section>
 <?php endif; ?>
 
-<section class="post-grid section-margin">
+<section class="post-grid section-padding bg-white">
     <div class="container">
         <h2 class="mb-40 mb-lg-60" data-scroll-fade>All news</h2>
 

@@ -29,7 +29,7 @@ if ($count < $limit) {
                 </div>
             <?php endif; ?>
 
-            <?php $post = reset($news);
+            <?php $post = array_shift($news);
             setup_postdata($post); ?>
             <div class="mb-30" data-scroll-fade>
                 <a class="post-excerpt" href="<?php the_permalink() ?>" target="<?php ET::the_target() ?>" rel="<?php ET::the_rel() ?>">
