@@ -2,4 +2,34 @@
     @include section-padding;
     background-color: $evergreen;
     color: $white;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    .picture-wrapper {
+        position: relative;
+        padding: 10vw 0;
+    }
+
+    picture {
+        position: absolute;
+        z-index: 0;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        max-width: 1700px;
+        width: calc(100% - 60px);
+        height: 100%;
+
+        &::before {
+            content: "";
+            @include fill;
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+    }
 }

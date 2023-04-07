@@ -54,7 +54,7 @@ html {
     }
 
     @include xxl {
-        scroll-padding-top: calc(var(--headerHeight, 200px) + 80px);
+        scroll-padding-top: calc(var(--headerHeight, 140px) + 80px);
     }
 }
 
@@ -72,7 +72,7 @@ main {
     }
 
     @include xxl {
-        padding-top: var(--headerHeight, 200px);
+        padding-top: var(--headerHeight, 140px);
     }
 }
 
