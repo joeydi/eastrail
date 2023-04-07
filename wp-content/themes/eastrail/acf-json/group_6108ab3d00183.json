@@ -16,7 +16,6 @@
                 "class": "",
                 "id": ""
             },
-            "relevanssi_exclude": 0,
             "layouts": {
                 "layout_6196ff48cffe5": {
                     "key": "layout_6196ff48cffe5",
@@ -329,6 +328,7 @@
                             "max": 4,
                             "layout": "table",
                             "button_label": "Add Column",
+                            "rows_per_page": 20,
                             "sub_fields": [
                                 {
                                     "key": "field_615f4a173c0ab",
@@ -351,8 +351,7 @@
                                     "delay": 0,
                                     "parent_repeater": "field_614bca4a9c9c3"
                                 }
-                            ],
-                            "rows_per_page": 20
+                            ]
                         },
                         {
                             "key": "field_615f4f6d01255",
@@ -731,6 +730,7 @@
                                             "max": 0,
                                             "layout": "table",
                                             "button_label": "Add Item",
+                                            "rows_per_page": 20,
                                             "sub_fields": [
                                                 {
                                                     "key": "field_629e40b1888d2",
@@ -779,8 +779,7 @@
                                                     "delay": 0,
                                                     "parent_repeater": "field_629e40ac888d1"
                                                 }
-                                            ],
-                                            "rows_per_page": 20
+                                            ]
                                         }
                                     ],
                                     "min": "",
@@ -1088,6 +1087,7 @@
                             "max": 0,
                             "layout": "row",
                             "button_label": "Add Card",
+                            "rows_per_page": 20,
                             "sub_fields": [
                                 {
                                     "key": "field_607ced0dfb7fc",
@@ -1189,8 +1189,7 @@
                                     "return_format": "array",
                                     "parent_repeater": "field_607ced0dfb7fb"
                                 }
-                            ],
-                            "rows_per_page": 20
+                            ]
                         },
                         {
                             "key": "field_629f8197d3818",
@@ -1370,6 +1369,7 @@
                             "max": 0,
                             "layout": "row",
                             "button_label": "Add Card",
+                            "rows_per_page": 20,
                             "sub_fields": [
                                 {
                                     "key": "field_629f697010872",
@@ -1396,8 +1396,7 @@
                                     "return_format": "array",
                                     "parent_repeater": "field_629f69701086e"
                                 }
-                            ],
-                            "rows_per_page": 20
+                            ]
                         }
                     ],
                     "min": "",
@@ -1946,6 +1945,7 @@
                             "max": 0,
                             "layout": "block",
                             "button_label": "Add Row",
+                            "rows_per_page": 20,
                             "sub_fields": [
                                 {
                                     "key": "field_619804bda8f99",
@@ -1989,8 +1989,7 @@
                                     "delay": 0,
                                     "parent_repeater": "field_6079cb254b877"
                                 }
-                            ],
-                            "rows_per_page": 20
+                            ]
                         }
                     ],
                     "min": "",
@@ -2061,6 +2060,7 @@
                             "max": 0,
                             "layout": "table",
                             "button_label": "Add Testimonial",
+                            "rows_per_page": 20,
                             "sub_fields": [
                                 {
                                     "key": "field_629fd00b6db34",
@@ -2125,8 +2125,7 @@
                                     "maxlength": "",
                                     "parent_repeater": "field_629fd0036db33"
                                 }
-                            ],
-                            "rows_per_page": 20
+                            ]
                         },
                         {
                             "key": "field_629fd02c6db37",
@@ -2193,6 +2192,7 @@
                             "max": 0,
                             "layout": "block",
                             "button_label": "Add Story",
+                            "rows_per_page": 20,
                             "sub_fields": [
                                 {
                                     "key": "field_62a009b40c04f",
@@ -2241,8 +2241,7 @@
                                     "delay": 0,
                                     "parent_repeater": "field_62a009710c04e"
                                 }
-                            ],
-                            "rows_per_page": 20
+                            ]
                         }
                     ],
                     "min": "",
@@ -2293,6 +2292,7 @@
                             "max": 0,
                             "layout": "block",
                             "button_label": "Add Member",
+                            "rows_per_page": 20,
                             "sub_fields": [
                                 {
                                     "key": "field_6197fae89bd8a",
@@ -2404,8 +2404,7 @@
                                     "new_lines": "wpautop",
                                     "parent_repeater": "field_607919e4180fb"
                                 }
-                            ],
-                            "rows_per_page": 20
+                            ]
                         },
                         {
                             "key": "field_629fe74bf2424",
@@ -2595,222 +2594,6 @@
                     ],
                     "min": "",
                     "max": ""
-                },
-                "layout_62a748fa7d32a": {
-                    "key": "layout_62a748fa7d32a",
-                    "name": "appointment_cards",
-                    "label": "Appointment Cards",
-                    "display": "block",
-                    "sub_fields": [
-                        {
-                            "key": "field_62a749bc79dfd",
-                            "label": "Label",
-                            "name": "label",
-                            "aria-label": "",
-                            "type": "text",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "default_value": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
-                            "maxlength": ""
-                        },
-                        {
-                            "key": "field_62a749037d32b",
-                            "label": "New Patient Content",
-                            "name": "new_patient_content",
-                            "aria-label": "",
-                            "type": "wysiwyg",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "default_value": "",
-                            "tabs": "all",
-                            "toolbar": "full",
-                            "media_upload": 1,
-                            "delay": 0
-                        },
-                        {
-                            "key": "field_62a749237d32c",
-                            "label": "New Patient Links",
-                            "name": "new_patient_links",
-                            "aria-label": "",
-                            "type": "repeater",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "collapsed": "",
-                            "min": 0,
-                            "max": 0,
-                            "layout": "table",
-                            "button_label": "Add Row",
-                            "sub_fields": [
-                                {
-                                    "key": "field_62a7496e7d32d",
-                                    "label": "Link",
-                                    "name": "link",
-                                    "aria-label": "",
-                                    "type": "link",
-                                    "instructions": "",
-                                    "required": 0,
-                                    "conditional_logic": 0,
-                                    "wrapper": {
-                                        "width": "",
-                                        "class": "",
-                                        "id": ""
-                                    },
-                                    "return_format": "",
-                                    "parent_repeater": "field_62a749237d32c"
-                                }
-                            ],
-                            "rows_per_page": 20
-                        },
-                        {
-                            "key": "field_62a749757d32e",
-                            "label": "New Patient Phone",
-                            "name": "new_patient_phone",
-                            "aria-label": "",
-                            "type": "link",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "return_format": "array"
-                        },
-                        {
-                            "key": "field_62a749897d32f",
-                            "label": "Current Patient Content",
-                            "name": "current_patient_content",
-                            "aria-label": "",
-                            "type": "wysiwyg",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "default_value": "",
-                            "tabs": "all",
-                            "toolbar": "full",
-                            "media_upload": 1,
-                            "delay": 0
-                        },
-                        {
-                            "key": "field_62a749917d330",
-                            "label": "Current Patient Links",
-                            "name": "current_patient_links",
-                            "aria-label": "",
-                            "type": "repeater",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "collapsed": "",
-                            "min": 0,
-                            "max": 0,
-                            "layout": "table",
-                            "button_label": "Add Row",
-                            "sub_fields": [
-                                {
-                                    "key": "field_62a749917d331",
-                                    "label": "Link",
-                                    "name": "link",
-                                    "aria-label": "",
-                                    "type": "link",
-                                    "instructions": "",
-                                    "required": 0,
-                                    "conditional_logic": 0,
-                                    "wrapper": {
-                                        "width": "",
-                                        "class": "",
-                                        "id": ""
-                                    },
-                                    "return_format": "array",
-                                    "parent_repeater": "field_62a749917d330"
-                                }
-                            ],
-                            "rows_per_page": 20
-                        },
-                        {
-                            "key": "field_62a7499b7d332",
-                            "label": "Current Patient Phone",
-                            "name": "current_patient_phone",
-                            "aria-label": "",
-                            "type": "link",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "return_format": "array"
-                        }
-                    ],
-                    "min": "",
-                    "max": ""
-                },
-                "layout_63d2b8106a77a": {
-                    "key": "layout_63d2b8106a77a",
-                    "name": "find_provider",
-                    "label": "Find Providers",
-                    "display": "block",
-                    "sub_fields": [
-                        {
-                            "key": "field_63d2b8196a77c",
-                            "label": "Specialty",
-                            "name": "specialty",
-                            "aria-label": "",
-                            "type": "taxonomy",
-                            "instructions": "Choose one or multiple specialties to display providers from those specific areas.",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "relevanssi_exclude": 0,
-                            "taxonomy": "specialty",
-                            "add_term": 0,
-                            "save_terms": 0,
-                            "load_terms": 0,
-                            "return_format": "object",
-                            "field_type": "multi_select",
-                            "allow_null": 0,
-                            "multiple": 0
-                        }
-                    ],
-                    "min": "",
-                    "max": ""
                 }
             },
             "min": "",
@@ -2837,21 +2620,21 @@
             {
                 "param": "post_type",
                 "operator": "==",
-                "value": "location"
+                "value": "post"
             }
         ],
         [
             {
                 "param": "post_type",
                 "operator": "==",
-                "value": "provider"
+                "value": "post"
             }
         ],
         [
             {
                 "param": "post_type",
                 "operator": "==",
-                "value": "service"
+                "value": "post"
             }
         ],
         [
@@ -2871,5 +2654,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1674853666
+    "modified": 1680882347
 }
