@@ -45,6 +45,7 @@ header {
             background-color: $sand;
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
+            transition: box-shadow 0.25s;
         }
     }
 
@@ -445,6 +446,10 @@ header.minify {
         .main-nav {
             padding-top: 12px;
             padding-bottom: 12px;
+
+            &::before {
+                box-shadow: $shadow-default;
+            }
         }
 
         .logo svg {
