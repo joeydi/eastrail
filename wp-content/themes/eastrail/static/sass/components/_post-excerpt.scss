@@ -1,13 +1,15 @@
 .post-excerpt {
     display: block;
     min-height: 100%;
-    border: 1px solid $grey-border;
+    background-color: $white;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    box-shadow: $shadow-hairline;
     color: $body-color;
     transition: transform 0.25s $ease-out, box-shadow 0.25s;
 
     &:hover {
         transform: translateY(-10px);
-        box-shadow: $shadow-default;
+        box-shadow: $shadow-hairline, $shadow-default;
         text-decoration: none;
         color: $body-color;
     }

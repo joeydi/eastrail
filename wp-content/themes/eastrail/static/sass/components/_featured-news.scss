@@ -1,3 +1,26 @@
 section.featured-news {
+    position: relative;
     background-color: $sand;
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 20%;
+        right: 0;
+        bottom: 0;
+        background-color: $evergreen;
+    }
+
+    @include sm {
+        &::before {
+            top: 30%;
+        }
+    }
+
+    @include xl {
+        &::before {
+            top: 35%;
+        }
+    }
 }

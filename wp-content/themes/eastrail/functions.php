@@ -101,6 +101,24 @@ class ET
     function action_register_acf_blocks()
     {
         register_block_type(__DIR__ . '/blocks/faqs');
+
+        register_block_style(
+            'core/group',
+            [
+                'name'         => 'callout',
+                'label'        => __('Callout', 'textdomain'),
+                'inline_style' => '.wp-block-group.is-style-callout { background-color: rgba(222,227,237,.3); padding: 20px; }',
+            ]
+        );
+
+        register_block_style(
+            'core/group',
+            [
+                'name'         => 'fullwidth',
+                'label'        => __('Full Width', 'textdomain'),
+                'inline_style' => '.wp-block-group.is-style-fullwidth { max-width: 1040px; } .wp-block-group.is-style-fullwidth .wp-block { max-width: 1040px; }',
+            ]
+        );
     }
 
     function action_enqueue_scripts()

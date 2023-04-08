@@ -1,0 +1,84 @@
+div.excerpts {
+    max-width: 800px;
+
+    a.excerpt picture,
+    a.excerpt picture img {
+        transition: transform 0.25s $ease-out;
+    }
+
+    a.excerpt:hover picture {
+        transform: scale(1.1);
+
+        img {
+            transform: scale(1.1);
+        }
+    }
+}
+
+.wp-block-group.is-style-fullwidth {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+
+    @include md {
+        margin-left: -13.25%;
+        margin-right: -13.25%;
+    }
+
+    @include xl {
+        margin-left: -26.5%;
+        margin-right: -26.5%;
+    }
+}
+
+.wp-block-group.is-style-callout {
+    position: relative;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 30px 0;
+
+    &:last-child {
+        margin-bottom: -40px;
+        border-bottom: none;
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        left: 50%;
+        top: 0;
+        width: 100vw;
+        height: 100%;
+        transform: translateX(-50%);
+        background-color: rgba($grey-1, 0.3);
+        border-top: 1px solid rgba($grey-5, 0.1);
+        border-bottom: 1px solid rgba($grey-5, 0.1);
+    }
+
+    .wp-block-group__inner-container {
+        position: relative;
+        z-index: 2;
+    }
+
+    @include md {
+        padding: 40px 0;
+
+        &:last-child {
+            margin-bottom: -60px;
+        }
+    }
+
+    @include lg {
+        padding: 60px 0;
+
+        &:last-child {
+            margin-bottom: -80px;
+        }
+    }
+
+    @include xl {
+        &:last-child {
+            margin-bottom: -100px;
+        }
+    }
+}

@@ -19,7 +19,7 @@ if ($count < $limit) {
 ?>
 
 <?php if ($news) : ?>
-    <section class="featured-news section-padding" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
+    <section class="featured-news section-padding bg-topo" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
         <div class="container">
             <?php if ($intro) : ?>
                 <div class="row justify-content-center mb-30 mb-md-40 mb-lg-50" data-scroll-fade>
@@ -35,12 +35,12 @@ if ($count < $limit) {
                 <a class="post-excerpt" href="<?php the_permalink() ?>" target="<?php ET::the_target() ?>" rel="<?php ET::the_rel() ?>">
                     <div class="row g-0">
                         <div class="col-sm-6">
-                            <picture class="aspect-block">
+                            <picture class="aspect-block h-100">
                                 <?php the_post_thumbnail('block'); ?>
                             </picture>
                         </div>
                         <div class="col-sm-6 d-flex align-items-center">
-                            <div class="content">
+                            <div class="content p-md-40 p-lg-60 p-xl-80">
                                 <p class="meta text-dark-spruce mb-10"><?php echo ET::the_category_name(); ?></p>
                                 <h3 class="text-dark-evergreen my-10"><?php the_title(); ?></h3>
                                 <?php the_excerpt(); ?>
@@ -51,8 +51,8 @@ if ($count < $limit) {
             </div>
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-30" data-scroll-fade-children>
-                <?php foreach ($news as $post) : setup_postdata($post); ?>
-                    <div class="col">
+                <?php foreach ($news as $i => $post) : setup_postdata($post); ?>
+                    <div class="col <?php echo $i == 2 ? 'd-none d-md-block' : ''; ?>">
                         <a class="post-excerpt" href="<?php the_permalink() ?>" target="<?php ET::the_target() ?>" rel="<?php ET::the_rel() ?>">
                             <picture class="aspect-landscape">
                                 <?php the_post_thumbnail('landscape'); ?>

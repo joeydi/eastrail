@@ -22,12 +22,14 @@
 
 @import "components/alert-bar";
 @import "components/banner-image";
+@import "components/blocks";
 @import "components/content-with-image";
 @import "components/default-content";
 @import "components/default-slider";
 @import "components/event-excerpt";
 @import "components/faqs";
 @import "components/feature-cards";
+@import "components/featured-news";
 @import "components/featured-post-excerpt";
 @import "components/footer";
 @import "components/header";
@@ -115,4 +117,9 @@ section {
 [data-scroll-fade-children] > * {
     opacity: 0;
     transform: translateY(40px);
+}
+
+.bg-topo {
+    background: $sand url("../img/topo.png") 50% 50% repeat;
+    background-size: 600px auto;
 }

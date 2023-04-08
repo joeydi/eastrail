@@ -48,7 +48,7 @@ get_header();
     </section>
 <?php endif; ?>
 
-<section class="post-grid section-padding bg-white">
+<section class="post-grid section-padding">
     <div class="container">
         <h2 class="mb-40 mb-lg-60" data-scroll-fade>All news</h2>
 
