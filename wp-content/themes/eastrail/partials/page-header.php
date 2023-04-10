@@ -19,7 +19,7 @@
             <section class="page-header page-header-image text-center">
                 <div class="picture-wrapper">
                     <?php if ($image = get_sub_field('image')) : ?>
-                        <picture class="aspect bg-grey-1">
+                        <picture class="aspect bg-evergreen">
                             <?php echo wp_get_attachment_image($image, 'landscape'); ?>
                         </picture>
                     <?php endif; ?>
