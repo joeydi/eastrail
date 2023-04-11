@@ -1,7 +1,10 @@
 .wp-pagenavi {
-    display: flex;
+    display: inline-flex;
+    margin: 0 auto;
     align-items: center;
     justify-content: center;
+    border-radius: 5px;
+    box-shadow: $shadow-hairline, $shadow-default;
 
     a,
     span {
@@ -10,22 +13,50 @@
         justify-content: center;
         height: 38px;
         min-width: 38px;
-        margin: 0 -0.5px;
+        margin: 0;
         padding: 4px;
+        text-decoration: none;
         text-align: center;
+        font-weight: $font-weight-bold;
         font-size: rem(16px);
         line-height: rem(30px);
-        border: 1px solid $grey-border;
+        border: none;
+        border-right: 1px solid rgba($grey-2, 0.25);
         transition: color 0.25s, background-color 0.25s;
+
+        &:first-child {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        &:last-child {
+            border-right: none;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
     }
 
     a:hover {
         background-color: $grey-1;
-        text-decoration: none;
+    }
+
+    a.page,
+    span.extend {
+        display: none;
+    }
+
+    span.pages {
+        padding: 4px 12px;
     }
 
     span.current {
-        background-color: $spruce;
-        color: $white;
+        background-color: $grey-1;
+    }
+
+    @include sm {
+        a.page,
+        span.extend {
+            display: flex;
+        }
     }
 }

@@ -90,7 +90,7 @@ get_header();
                     <?php endwhile;
                     wp_reset_postdata(); ?>
                 </div>
-                <div class="pagination mt-60 mt-lg-80" data-scroll-fade>
+                <div class="pagination text-center mt-60 mt-lg-80" data-scroll-fade>
                     <?php wp_pagenavi([
                         'query' => $news,
                         'options' => [
