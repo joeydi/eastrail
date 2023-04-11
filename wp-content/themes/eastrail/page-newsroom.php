@@ -50,8 +50,6 @@ get_header();
 
 <section class="post-grid section-padding">
     <div class="container">
-        <h2 class="mb-40 mb-lg-60" data-scroll-fade>All news</h2>
-
         <form action="<?php the_permalink(); ?>" class="post-filter mb-40 mb-lg-60" data-scroll-fade>
             <div class="row">
                 <div class="col-md-4">
@@ -82,8 +80,10 @@ get_header();
                                 <picture class="aspect-landscape">
                                     <?php the_post_thumbnail('landscape'); ?>
                                 </picture>
-                                <div class="content">
-                                    <h3 class="h4"><?php the_title(); ?></h3>
+                                <div class="content p-20 p-lg-40 pt-lg-30">
+                                    <p class="meta text-dark-spruce mb-10"><?php echo ET::the_category_name(); ?></p>
+                                    <h3 class="text-dark-evergreen my-10"><?php the_title(); ?></h3>
+                                    <div class="medium"><?php the_excerpt(); ?></div>
                                 </div>
                             </a>
                         </div>

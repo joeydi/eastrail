@@ -60,7 +60,9 @@ if ($count < $limit) {
                             <div class="content p-20 p-lg-40 pt-lg-30">
                                 <p class="meta text-dark-spruce mb-10"><?php echo ET::the_category_name(); ?></p>
                                 <h3 class="text-dark-evergreen my-10"><?php the_title(); ?></h3>
-                                <?php the_excerpt(); ?>
+                                <div class="medium">
+                                    <?php the_excerpt(); ?>
+                                </div>
                             </div>
                         </a>
                     </div>
