@@ -75,7 +75,7 @@ $column_class = in_array($count, [1, 2, 4]) ? 'col-sm-6' : 'col-sm-6 col-lg-4';
                                         </div>
                                     <?php endif; ?>
                                     <?php if ($card['heading']) : ?>
-                                        <h3 class="h6"><?php echo $card['heading']; ?></h3>
+                                        <h3><?php echo $card['heading']; ?></h3>
                                     <?php endif; ?>
                                     <?php echo $card['content']; ?>
                                 </div>

@@ -10,22 +10,24 @@ section.faqs {
         dt {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             margin-bottom: 5px;
             padding: 15px 10px 15px 20px;
             font-weight: $font-weight-bold;
-            background-color: $grey-1;
-            color: $spruce;
+            background-color: $sand;
+            color: $dark-spruce;
             cursor: pointer;
 
             button {
                 position: relative;
                 display: flex;
+                flex-shrink: 0;
                 align-items: center;
                 justify-content: center;
                 margin-left: auto;
                 width: 30px;
                 height: 30px;
-                margin-right: 10px;
+                margin: 0 10px;
                 padding: 0;
                 background: transparent;
                 border: none;
@@ -76,7 +78,7 @@ section.faqs {
 
                 + dd {
                     height: auto;
-                    padding: 20px;
+                    padding: 10px 20px 25px;
                     opacity: 1;
                     transform: translateY(0);
                     transition: opacity 0.5s, transform 0.5s $ease-out, visibility 0s linear 0s;
@@ -108,10 +110,6 @@ section.faqs {
     @include lg {
         dl.faqs dt {
             font-size: rem(20px);
-
-            &.active + dd {
-                padding: 30px 20px;
-            }
         }
     }
 }

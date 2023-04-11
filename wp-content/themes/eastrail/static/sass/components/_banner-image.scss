@@ -23,7 +23,11 @@ section.banner-image {
         padding: 160px 0;
 
         picture {
-            @include fill;
+            position: absolute;
+            left: 0;
+            top: -20%;
+            width: 100%;
+            height: 120%;
             z-index: 1;
         }
 

@@ -5,7 +5,7 @@ $intro = get_sub_field('intro');
 $milestones = get_sub_field('milestones');
 
 ?>
-<section class="default-content section-padding" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
+<section class="default-content section-margin" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
     <div class="container">
         <?php if ($intro) : ?>
             <div class="row justify-content-center mb-30 mb-md-40 mb-lg-50" data-scroll-fade>

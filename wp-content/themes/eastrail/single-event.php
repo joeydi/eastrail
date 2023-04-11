@@ -11,7 +11,7 @@ get_header();
 
 <?php get_template_part('partials/page-header'); ?>
 
-<section class="section-padding bg-white">
+<section class="section-margin">
     <div class="container">
         <div class="row">
             <div class="order-md-2 col-md-5 col-lg-4 offset-lg-1 mb-60 mb-md-0" data-scroll-fade-children>

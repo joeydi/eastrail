@@ -19,13 +19,13 @@ $members = get_sub_field('members');
                                 </div>
                                 <div class="col-sm-8">
                                     <?php if ($member['name']) : ?>
-                                        <h3 class="h4 mb-10"><?php echo $member['name']; ?></h3>
+                                        <h3 class="mb-10"><?php echo $member['name']; ?></h3>
                                     <?php endif; ?>
                                     <?php if ($member['title']) : ?>
-                                        <p class="font-weight-medium"><?php echo $member['title']; ?></p>
+                                        <p class="mb-10 meta text-spruce"><?php echo $member['title']; ?></p>
                                     <?php endif; ?>
                                     <?php if ($member['alternate_title']) : ?>
-                                        <p class="mt-30 font-weight-medium text-blue"><?php echo $member['alternate_title']; ?></p>
+                                        <p class="font-weight-semibold text-dark-spruce"><?php echo $member['alternate_title']; ?></p>
                                     <?php endif; ?>
                                     <?php echo $member['bio']; ?>
                                 </div>

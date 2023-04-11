@@ -62,20 +62,20 @@ html {
 }
 
 main {
-    padding-top: var(--headerHeight, 80px);
-    background-color: $evergreen;
+    border-top: var(--headerHeight, 80px) solid $evergreen;
+    background-color: $white;
     overflow: hidden;
 
     @include lg {
-        padding-top: var(--headerHeight, 100px);
+        border-top: var(--headerHeight, 100px) solid $evergreen;
     }
 
     @include xl {
-        padding-top: var(--headerHeight, 120px);
+        border-top: var(--headerHeight, 120px) solid $evergreen;
     }
 
     @include xxl {
-        padding-top: var(--headerHeight, 140px);
+        border-top: var(--headerHeight, 140px) solid $evergreen;
     }
 }
 

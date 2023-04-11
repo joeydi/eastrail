@@ -5,7 +5,7 @@ $intro = get_sub_field('intro');
 $groups = get_sub_field('groups');
 
 ?>
-<section class="section-padding" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
+<section class="section-margin" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
     <div class="container">
         <?php if ($intro) : ?>
             <div class="row justify-content-center mb-30 mb-md-40 mb-lg-50" data-scroll-fade>
@@ -32,6 +32,10 @@ $groups = get_sub_field('groups');
                                                             <?php echo wp_get_attachment_image($logo['image'], 'medium'); ?>
                                                         </picture>
                                                     </a>
+                                                <?php else : ?>
+                                                    <picture class="aspect-landscape contain bg-transparent">
+                                                        <?php echo wp_get_attachment_image($logo['image'], 'medium'); ?>
+                                                    </picture>
                                                 <?php endif; ?>
                                             </div>
                                         </div>

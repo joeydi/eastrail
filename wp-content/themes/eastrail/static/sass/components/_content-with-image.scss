@@ -4,15 +4,15 @@ section.content-with-image {
 
     @include md {
         .image {
-            height: calc(100% + 220px);
+            height: calc(100% + 160px);
         }
 
         &.align-left .image {
-            margin: -110px 0 -110px -40px;
+            margin: -80px 0 -80px -40px;
         }
 
         &.align-right .image {
-            margin: -110px -40px -110px 0;
+            margin: -80px -40px -80px 0;
         }
 
         .content {
@@ -22,15 +22,15 @@ section.content-with-image {
 
     @include lg {
         .image {
-            height: calc(100% + 280px);
+            height: calc(100% + 220px);
         }
 
         &.align-left .image {
-            margin: -140px 0 -140px -50px;
+            margin: -110px 0 -110px -50px;
         }
 
         &.align-right .image {
-            margin: -140px -50px -140px 0;
+            margin: -110px -50px -110px 0;
         }
 
         .content {
@@ -40,15 +40,33 @@ section.content-with-image {
 
     @include xl {
         .image {
-            height: calc(100% + 320px);
+            height: calc(100% + 260px);
         }
 
         &.align-left .image {
-            margin: -160px 0 -160px -60px;
+            margin: -130px 0 -130px -60px;
         }
 
         &.align-right .image {
-            margin: -160px -60px -160px 0;
+            margin: -130px -60px -130px 0;
+        }
+
+        .content {
+            padding: 0 70px;
+        }
+    }
+
+    @include xxl {
+        .image {
+            height: calc(100% + 300px);
+        }
+
+        &.align-left .image {
+            margin: -150px 0 -150px -60px;
+        }
+
+        &.align-right .image {
+            margin: -150px -60px -150px 0;
         }
 
         .content {

@@ -2105,106 +2105,6 @@
                     "min": "",
                     "max": ""
                 },
-                "layout_62a009680c04c": {
-                    "key": "layout_62a009680c04c",
-                    "name": "stories",
-                    "label": "Stories",
-                    "display": "block",
-                    "sub_fields": [
-                        {
-                            "key": "field_62a0096c0c04d",
-                            "label": "Label",
-                            "name": "label",
-                            "aria-label": "",
-                            "type": "text",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "default_value": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": "",
-                            "maxlength": ""
-                        },
-                        {
-                            "key": "field_62a009710c04e",
-                            "label": "Stories",
-                            "name": "stories",
-                            "aria-label": "",
-                            "type": "repeater",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "collapsed": "",
-                            "min": 0,
-                            "max": 0,
-                            "layout": "block",
-                            "button_label": "Add Story",
-                            "rows_per_page": 20,
-                            "sub_fields": [
-                                {
-                                    "key": "field_62a009b40c04f",
-                                    "label": "Image",
-                                    "name": "image",
-                                    "aria-label": "",
-                                    "type": "image",
-                                    "instructions": "",
-                                    "required": 0,
-                                    "conditional_logic": 0,
-                                    "wrapper": {
-                                        "width": "",
-                                        "class": "",
-                                        "id": ""
-                                    },
-                                    "return_format": "id",
-                                    "preview_size": "thumbnail",
-                                    "library": "all",
-                                    "min_width": "",
-                                    "min_height": "",
-                                    "min_size": "",
-                                    "max_width": "",
-                                    "max_height": "",
-                                    "max_size": "",
-                                    "mime_types": "",
-                                    "parent_repeater": "field_62a009710c04e"
-                                },
-                                {
-                                    "key": "field_62a009d90c050",
-                                    "label": "Content",
-                                    "name": "content",
-                                    "aria-label": "",
-                                    "type": "wysiwyg",
-                                    "instructions": "",
-                                    "required": 0,
-                                    "conditional_logic": 0,
-                                    "wrapper": {
-                                        "width": "",
-                                        "class": "",
-                                        "id": ""
-                                    },
-                                    "default_value": "",
-                                    "tabs": "all",
-                                    "toolbar": "full",
-                                    "media_upload": 0,
-                                    "delay": 0,
-                                    "parent_repeater": "field_62a009710c04e"
-                                }
-                            ]
-                        }
-                    ],
-                    "min": "",
-                    "max": ""
-                },
                 "layout_607919e4180f7": {
                     "key": "layout_607919e4180f7",
                     "name": "team_members",
@@ -2617,7 +2517,7 @@
                             "min": 0,
                             "max": 0,
                             "collapsed": "",
-                            "button_label": "Add Row",
+                            "button_label": "Add Group",
                             "rows_per_page": 20,
                             "sub_fields": [
                                 {
@@ -2656,11 +2556,10 @@
                                         "id": ""
                                     },
                                     "layout": "table",
-                                    "pagination": 0,
                                     "min": 0,
                                     "max": 0,
                                     "collapsed": "",
-                                    "button_label": "Add Row",
+                                    "button_label": "Add Logo",
                                     "rows_per_page": 20,
                                     "sub_fields": [
                                         {
@@ -2779,7 +2678,7 @@
                             "min": 0,
                             "max": 0,
                             "collapsed": "",
-                            "button_label": "Add Row",
+                            "button_label": "Add Milestone",
                             "rows_per_page": 20,
                             "sub_fields": [
                                 {
@@ -2887,5 +2786,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1681174939
+    "modified": 1681188269
 }

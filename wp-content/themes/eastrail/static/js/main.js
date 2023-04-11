@@ -457,22 +457,16 @@ ET.initBanners = function () {
     banners.each(function () {
         var banner = $(this);
 
-        gsap.fromTo(
-            banner.find("img"),
-            {
-                scale: 1.25,
+        gsap.to(banner.find("picture"), {
+            yPercent: 20,
+            ease: "none",
+            scrollTrigger: {
+                trigger: banner,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: true,
             },
-            {
-                scale: 1,
-                scrollTrigger: {
-                    trigger: banner,
-                    start: "top bottom",
-                    end: "bottom top",
-                    scrub: true,
-                    ease: "expo.out",
-                },
-            }
-        );
+        });
     });
 };
 

@@ -3,21 +3,22 @@
 $label = get_sub_field('label');
 $content = get_sub_field('content');
 $faqs = get_sub_field('faqs');
-$faq_classes = is_single() || is_singular('events') ? 'col-md-12' : 'col-md-7';
 
 ?>
 <section class="faqs section-margin" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
     <div class="container">
-        <?php if ($content) : ?>
+        <!-- <?php if ($content) : ?>
             <div class="row align-items-end mb-30 mb-md-40 mb-lg-50" data-scroll-fade-children>
                 <div class="col-md-8">
                     <?php echo $content; ?>
                 </div>
             </div>
-        <?php endif; ?>
+        <?php endif; ?> -->
 
-        <div class="row">
-            <div class="<?php echo $faq_classes; ?>" data-scroll-fade-children>
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-xl-8" data-scroll-fade-children>
+                <?php echo $content; ?>
+
                 <?php if ($faqs) : ?>
                     <dl class="faqs">
                         <?php foreach ($faqs as $faq) : ?>
