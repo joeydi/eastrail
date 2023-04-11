@@ -501,8 +501,8 @@ ET.initFooterCTA = function () {
         scrollTrigger: {
             // markers: true,
             trigger: svg1,
-            start: "top center",
-            end: "bottom center",
+            start: "top 90%",
+            // end: "bottom center",
             // scrub: true,
         },
     });
@@ -529,8 +529,8 @@ ET.initFooterCTA = function () {
         scrollTrigger: {
             // markers: true,
             trigger: svg2,
-            start: "top center",
-            end: "bottom center",
+            start: "top 90%",
+            // end: "bottom center",
             // scrub: true,
         },
     });

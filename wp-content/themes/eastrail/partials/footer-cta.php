@@ -1,10 +1,10 @@
 <?php if (!is_page('the-trail')) : ?>
     <section class="footer-cta bg-dark-evergreen text-willow section-padding">
         <div class="container">
-            <div class="row align-items-end" data-scroll-fade-children>
+            <div class="row align-items-end">
                 <div class="col-sm-10 col-md-7 offset-md-1 col-lg-8 col-xxl-9">
                     <h1 class="font-weight-light">
-                        <span class="path-wrap-1">
+                        <span class="path-wrap-1" data-scroll-fade>
                             <svg class=" footer-cta-path-1" width="100px" height="100px" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
                                 <path d="M0,0 L100,0" fill="transparent" stroke="#38D430" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
                             </svg>

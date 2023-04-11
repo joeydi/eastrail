@@ -1,5 +1,5 @@
 .page-header {
-    @include section-padding;
+    @include content-padding;
     background-color: $evergreen;
     color: $white;
     -webkit-font-smoothing: antialiased;
