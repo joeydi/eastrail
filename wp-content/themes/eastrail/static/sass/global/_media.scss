@@ -5,11 +5,15 @@ img {
 
 video,
 svg,
-iframe,
 picture {
     display: block;
     max-width: 100%;
     height: auto;
+}
+
+iframe {
+    display: block;
+    max-width: 100%;
 }
 
 .lazyload,

@@ -1,8 +1,8 @@
 <?php if (get_the_content()) : ?>
-    <section class="section-margin">
+    <section class="post-content section-padding">
         <div class="container">
-            <div class="row">
-                <div class="col-md-10 offset-md-1 col-xl-8 offset-xl-2 col-xxl-7" data-scroll-fade>
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-xl-8" data-scroll-fade>
                     <?php the_content(); ?>
                 </div>
             </div>
