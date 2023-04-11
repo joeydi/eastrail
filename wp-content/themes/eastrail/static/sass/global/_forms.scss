@@ -138,8 +138,8 @@ label {
     @include visually-hidden();
 }
 
-.gfield {
-    margin-bottom: 1rem;
+.gform_description {
+    margin-bottom: 1.5rem !important;
 }
 
 .validation_message {
@@ -151,4 +151,11 @@ label {
 .gform_submission_error {
     margin-bottom: 1em !important;
     @include lead;
+}
+
+.gform_wrapper.gravity-theme .field_description_above .description,
+.gform_wrapper.gravity-theme .field_description_above .gfield_description,
+.gform_wrapper.gravity-theme .field_description_above .gsection_description,
+.gform_wrapper.gravity-theme .field_description_above .instruction {
+    padding: 0.5rem 1rem !important;
 }

@@ -201,6 +201,10 @@ a.arrow-link {
     @include lg {
         font-size: rem(16px);
     }
+
+    @include xl {
+        font-size: rem(17px);
+    }
 }
 .medium {
     @include medium;
@@ -253,10 +257,10 @@ a.arrow-link {
     text-transform: uppercase;
     letter-spacing: letter-spacing(100);
     font-weight: $font-weight-bold;
-    font-size: rem(14px);
+    font-size: rem(13px);
 
     @include lg {
-        font-size: rem(16px);
+        font-size: rem(15px);
     }
 }
 

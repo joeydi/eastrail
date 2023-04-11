@@ -45,8 +45,6 @@ class ET
         add_action('acf/input/admin_footer',                [$this, 'action_acf_admin_footer']);
         add_action('login_enqueue_scripts',                 [$this, 'action_login_enqueue_styles']);
         add_action('admin_init',                            [$this, 'add_editor_styles']);
-        add_action('wp_ajax_nopriv_load_gravity_form',      [$this, 'action_load_gravity_form']);
-        add_action('wp_ajax_load_gravity_form',             [$this, 'action_load_gravity_form']);
 
         remove_action('wp_head',                            'print_emoji_detection_script', 7);
         remove_action('admin_print_scripts',                'print_emoji_detection_script');
@@ -212,13 +210,6 @@ class ET
         header('Content-Length: ' . filesize($attachment));
         readfile($attachment);
         exit;
-    }
-
-    function action_load_gravity_form()
-    {
-        $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
-        gravity_form($id, false, false, false, '', true);
-        die();
     }
 
     function filter_big_image_size_threshold()
