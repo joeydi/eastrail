@@ -54,6 +54,7 @@ class ET
         remove_action('admin_print_styles',                 'print_emoji_styles');
 
         add_filter('big_image_size_threshold',              [$this, 'filter_big_image_size_threshold']);
+        add_filter('image_size_names_choose',               [$this, 'filter_image_size_names_choose']);
         add_filter('wpseo_metabox_prio',                    [$this, 'filter_yoast_seo_metabox']);
         add_filter('wp_get_attachment_image_attributes',    [$this, 'filter_image_attributes']);
         add_filter('login_headertext',                      [$this, 'filter_login_headertext']);
@@ -223,6 +224,16 @@ class ET
     function filter_big_image_size_threshold()
     {
         return 2560;
+    }
+
+    function filter_image_size_names_choose($sizes)
+    {
+        return array_merge($sizes, [
+            'square' => 'Square',
+            'block' => 'Block',
+            'landscape' => 'Landscape',
+            'widescreen' => 'Widescreen',
+        ]);
     }
 
     function filter_yoast_seo_metabox()
