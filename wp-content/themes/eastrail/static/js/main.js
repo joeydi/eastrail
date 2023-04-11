@@ -493,13 +493,17 @@ ET.initFooterCTA = function () {
         path2 = section.find("svg.footer-cta-path-2 path"),
         btn = section.find(".btn");
 
-    var split = new SplitText(h1);
+    var split = new SplitText(h1, {
+        type: "words",
+    });
 
     var path1Timeline = new gsap.timeline({
         scrollTrigger: {
+            // markers: true,
             trigger: svg1,
-            start: "top bottom",
-            end: "center center",
+            start: "top center",
+            end: "bottom center",
+            // scrub: true,
         },
     });
 
@@ -513,19 +517,21 @@ ET.initFooterCTA = function () {
     //     0
     // );
 
-    path1Timeline.from(split.chars, {
+    path1Timeline.from(split.words, {
         duration: 1,
         x: -100,
         autoAlpha: 0,
-        stagger: 0.005,
+        stagger: 0.015,
         ease: "power2.out",
     });
 
     var path2Timeline = new gsap.timeline({
         scrollTrigger: {
+            // markers: true,
             trigger: svg2,
-            start: "top bottom",
-            end: "center center",
+            start: "top center",
+            end: "bottom center",
+            // scrub: true,
         },
     });
 
@@ -533,7 +539,7 @@ ET.initFooterCTA = function () {
         path2,
         {
             drawSVG: 0,
-            duration: 2,
+            duration: 3,
             ease: "power2.out",
         },
         0
