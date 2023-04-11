@@ -6,6 +6,7 @@
             "key": "field_629fa286108a3",
             "label": "All Day",
             "name": "all_day",
+            "aria-label": "",
             "type": "true_false",
             "instructions": "",
             "required": 0,
@@ -25,6 +26,7 @@
             "key": "field_61bc24845a061",
             "label": "Start Date",
             "name": "start_date",
+            "aria-label": "",
             "type": "date_picker",
             "instructions": "",
             "required": 1,
@@ -42,6 +44,7 @@
             "key": "field_629fa26f108a2",
             "label": "Start Time",
             "name": "start_time",
+            "aria-label": "",
             "type": "time_picker",
             "instructions": "",
             "required": 1,
@@ -66,6 +69,7 @@
             "key": "field_61bc249a5a062",
             "label": "End Date",
             "name": "end_date",
+            "aria-label": "",
             "type": "date_picker",
             "instructions": "",
             "required": 1,
@@ -83,6 +87,7 @@
             "key": "field_61bc24d057a7c",
             "label": "End Time",
             "name": "end_time",
+            "aria-label": "",
             "type": "time_picker",
             "instructions": "",
             "required": 1,
@@ -104,31 +109,10 @@
             "return_format": "g:i a"
         },
         {
-            "key": "field_629fa70332a93",
-            "label": "Location",
-            "name": "location",
-            "type": "post_object",
-            "instructions": "",
-            "required": 0,
-            "conditional_logic": 0,
-            "wrapper": {
-                "width": "25",
-                "class": "",
-                "id": ""
-            },
-            "post_type": [
-                "location"
-            ],
-            "taxonomy": "",
-            "allow_null": 1,
-            "multiple": 0,
-            "return_format": "object",
-            "ui": 1
-        },
-        {
-            "key": "field_629fa71932a94",
+            "key": "field_6435002fc90df",
             "label": "Location Name",
             "name": "location_name",
+            "aria-label": "",
             "type": "text",
             "instructions": "",
             "required": 0,
@@ -139,15 +123,16 @@
                 "id": ""
             },
             "default_value": "",
+            "maxlength": "",
             "placeholder": "",
             "prepend": "",
-            "append": "",
-            "maxlength": ""
+            "append": ""
         },
         {
-            "key": "field_629fa75432a95",
+            "key": "field_6435003ac90e0",
             "label": "Location Address",
             "name": "location_address",
+            "aria-label": "",
             "type": "textarea",
             "instructions": "",
             "required": 0,
@@ -158,16 +143,17 @@
                 "id": ""
             },
             "default_value": "",
-            "placeholder": "",
             "maxlength": "",
             "rows": 2,
+            "placeholder": "",
             "new_lines": "br"
         },
         {
-            "key": "field_629fa76932a96",
-            "label": "Get Directions Link",
-            "name": "get_directions_link",
-            "type": "url",
+            "key": "field_629fa71932a94",
+            "label": "Location Link",
+            "name": "location_link",
+            "aria-label": "",
+            "type": "link",
             "instructions": "",
             "required": 0,
             "conditional_logic": 0,
@@ -176,8 +162,23 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "",
-            "placeholder": ""
+            "return_format": "array"
+        },
+        {
+            "key": "field_629fa75432a95",
+            "label": "Register Link",
+            "name": "register_link",
+            "aria-label": "",
+            "type": "link",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "25",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array"
         }
     ],
     "location": [
@@ -198,5 +199,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1654631502
+    "modified": 1681195307
 }

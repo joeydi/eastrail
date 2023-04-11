@@ -1,9 +1,9 @@
 <?php
 
-$location = get_field('location');
 $location_name = get_field('location_name');
 $location_address = get_field('location_address');
-$get_directions_link = get_field('get_directions_link');
+$location_link = get_field('location_link');
+$register_link = get_field('register_link');
 
 get_header();
 
@@ -27,41 +27,39 @@ get_header();
                         </div>
                     </div>
 
-                    <hr>
-                    <div class="icon-block">
-                        <svg class="icon text-grey-3">
-                            <use xlink:href="#map-marker" />
-                        </svg>
-
-                        <div>
-                            <strong>Location:</strong>
-
-                            <?php if ($location) : $link = get_field('get_directions_link', $location); ?>
-                                <a href="<?php echo $link; ?>" target="_blank" rel="noopener noreferrer">
-                                    <strong><?php echo get_the_title($location); ?></strong><br>
-                                    <?php the_field('address', $location); ?>
-                                </a>
-                            <?php elseif ($get_directions_link && ($location_name || $location_address)) : ?>
-                                <a href="<?php echo $get_directions_link; ?>" target="_blank" rel="noopener noreferrer">
+                    <?php if ($location_name || $location_address) : ?>
+                        <hr>
+                        <div class="icon-block">
+                            <svg class="icon text-grey-3">
+                                <use xlink:href="#map-marker" />
+                            </svg>
+                            <div>
+                                <strong>Location:</strong>
+                                <?php if ($location_link && ($location_name || $location_address)) : ?>
+                                    <a href="<?php echo $location_link['url']; ?>" target="_blank" rel="noopener noreferrer">
+                                        <strong><?php echo $location_name; ?></strong><br>
+                                        <?php echo $location_address; ?>
+                                    </a>
+                                <?php elseif ($location_name || $location_address) : ?>
                                     <strong><?php echo $location_name; ?></strong><br>
                                     <?php echo $location_address; ?>
-                                </a>
-                            <?php elseif ($location_name || $location_address) : ?>
-                                <strong><?php echo $location_name; ?></strong><br>
-                                <?php echo $location_address; ?>
-                            <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
-                    <hr>
-                    <a href="" class="btn btn-outline-primary">Add to calendar</a>
+                    <?php endif; ?>
+
+                    <?php if ($register_link) : ?>
+                        <hr>
+                        <a class="btn btn-outline-primary" href="<?php echo $register_link['url']; ?>" target="_blank" rel="noopener noreferrer">
+                            <?php echo $register_link['title']; ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="order-md-1 col-md-7" data-scroll-fade-children>
-                <h1 class="h2"><?php the_title(); ?></h1>
-
                 <?php if (has_post_thumbnail()) : ?>
-                    <picture class="aspect-widescreen mb-40 mb-lg-60">
-                        <?php the_post_thumbnail('widescreen'); ?>
+                    <picture class="aspect-landscape mb-40 mb-lg-60">
+                        <?php the_post_thumbnail('landscape'); ?>
                     </picture>
                 <?php endif; ?>
 

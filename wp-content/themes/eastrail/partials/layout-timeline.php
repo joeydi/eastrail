@@ -20,7 +20,7 @@ $milestones = get_sub_field('milestones');
                 <?php foreach ($milestones as $i => $milestone) : ?>
                     <div class="milestone mb-30 mb-md-40 <?php echo $i % 2 ? 'even' : 'odd'; ?>">
                         <div class="content">
-                            <p class="meta text-spruce mb-10">
+                            <p class="meta text-dark-spruce mb-10">
                                 <?php echo $milestone['date']; ?>
                             </p>
                             <div>

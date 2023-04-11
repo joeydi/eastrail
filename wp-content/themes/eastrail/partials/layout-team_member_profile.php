@@ -22,7 +22,7 @@ $bio = get_sub_field('bio');
                     <h2 class="mb-10"><?php echo $name; ?></h2>
                 <?php endif; ?>
                 <?php if ($title) : ?>
-                    <p class="meta text-spruce"><?php echo $title; ?></p>
+                    <p class="meta text-dark-spruce"><?php echo $title; ?></p>
                 <?php endif; ?>
                 <?php if ($alternate_title) : ?>
                     <p class="mt-30 font-weight-semibold text-blue"><?php echo $alternate_title; ?></p>

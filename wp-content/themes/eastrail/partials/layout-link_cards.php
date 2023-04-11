@@ -16,7 +16,7 @@ $column_class = $column_classes[$count] ?: 'col-sm-6';
 <section class="link-cards <?php echo ET::section_classes(); ?>" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
     <div class="container">
         <?php if ($content) : ?>
-            <div class="row <?php echo $justify_content; ?>">
+            <div class="row <?php echo $justify_content; ?> mb-30 mb-md-40 mb-lg-50">
                 <div class="col-lg-10 col-xl-8" data-scroll-fade-children>
                     <?php echo $content; ?>
                 </div>
