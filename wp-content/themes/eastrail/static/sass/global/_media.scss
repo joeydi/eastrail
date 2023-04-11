@@ -132,17 +132,10 @@ a.popup-video {
 
 // WordPress Media
 
-// .wp-block-column:not(:first-child) {
-//     margin-top: 40px;
-
-//     @media (min-width: 600px) {
-//         margin-top: 0;
-//         margin-left: 20px;
-//     }
-// }
-
 .wp-block-image,
 .wp-block-embed {
+    margin-bottom: 1.5rem;
+
     figcaption {
         margin: 12px 0 0;
         font-size: rem(14px);

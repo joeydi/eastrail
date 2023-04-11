@@ -1,46 +1,12 @@
 select.form-control {
-    border-radius: rem(16px);
+    border-radius: rem(6px);
     background: white url("../img/caret-down.svg") calc(100% - 1rem) 50% no-repeat;
     background-size: 13px 10px;
 }
 
 select.form-control-sm {
-    border-radius: rem(8px);
+    border-radius: rem(4px);
     background-size: 10px 8px;
-}
-
-// Select2
-.select2-container--default .select2-selection--multiple {
-    padding: rem(10px) rem(24px) rem(12px) rem(16px);
-    border-radius: rem(16px);
-    border-color: $grey-border;
-    background: white url("../img/caret-down.svg") calc(100% - 1rem) 1.25rem no-repeat;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.select2-container--default.select2-container--focus .select2-selection--multiple {
-    border-color: $grey-border;
-    box-shadow: $input-focus-box-shadow;
-}
-
-.select2-container--default .select2-search--inline .select2-search__field {
-    margin: 0;
-    height: 1.5rem;
-    font-family: $font-family-base;
-    font-size: rem(16px);
-}
-
-.select2-container .select2-selection--multiple .select2-selection__rendered {
-    margin: 0;
-}
-
-.select2-selection__choice {
-    margin-bottom: 0;
-    font-size: rem(14px);
-}
-
-.select2-results__option {
-    margin-bottom: 0;
 }
 
 .gfield_description {

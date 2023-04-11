@@ -355,10 +355,6 @@ ET.initPostFilters = function () {
         ET.loadPosts(action + "?" + data);
     }
 
-    form.find("select[multiple]").select2({
-        placeholder: "All locations",
-    });
-
     action = action.replace(window.location.protocol + "//", "").replace(window.location.hostname, "");
 
     form.on("submit", function (e) {

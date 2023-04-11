@@ -1,6 +1,7 @@
 @use "sass:math";
 
 $enable-smooth-scroll: false;
+$enable-rounded: true;
 
 // Colors
 $white: #ffffff;
@@ -69,6 +70,7 @@ $label-margin-bottom: 0.25rem;
 $input-padding-y: 0.75rem;
 $input-padding-x: 1.25rem;
 $input-border-width: 1px;
+$input-border-radius: 6px;
 $input-border-color: $grey-border;
 
 $headings-margin-bottom: 1.5rem;
@@ -83,11 +85,10 @@ $h4-font-size: rem(16px);
 $h5-font-size: rem(16px);
 $h6-font-size: rem(16px);
 
-$enable-rounded: false;
-
 $btn-padding-y: rem(10px);
 $btn-padding-x: rem(24px);
 $btn-border-width: 2px;
+$btn-border-radius: 6px;
 $btn-font-size: 16px;
 $btn-font-weight: $font-weight-bold;
 
