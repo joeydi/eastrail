@@ -43,6 +43,7 @@
 @import "components/post-excerpt";
 @import "components/step-block";
 @import "components/testimonials";
+@import "components/timeline";
 
 html {
     scroll-padding-top: calc(var(--headerHeight, 80px) + 20px);

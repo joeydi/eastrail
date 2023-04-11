@@ -253,10 +253,10 @@ a.arrow-link {
     text-transform: uppercase;
     letter-spacing: letter-spacing(100);
     font-weight: $font-weight-bold;
-    font-size: rem(12px);
+    font-size: rem(14px);
 
     @include lg {
-        font-size: rem(13px);
+        font-size: rem(16px);
     }
 }
 

@@ -1,0 +1,117 @@
+.timeline {
+    position: relative;
+    padding: 40px 0;
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        display: block;
+        width: 4px;
+        border-radius: 2px;
+        background-color: $willow;
+        transform: translateX(-50%);
+    }
+
+    .milestone {
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        padding-left: 20px;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            display: block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 4px solid $dark-evergreen;
+            background-color: $willow;
+            transform: translateX(-50%);
+        }
+
+        .image {
+            flex-shrink: 0;
+            width: 25%;
+            margin: 1.875rem 0 0 1rem;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: $shadow-hairline, 0 2px 4px rgba(0, 0, 0, 0.35);
+        }
+    }
+
+    @include md {
+        &::before {
+            left: 50%;
+        }
+
+        .milestone {
+            width: 50%;
+        }
+
+        .milestone.odd {
+            margin-left: 50%;
+        }
+
+        .milestone.even {
+            padding-left: 0;
+            padding-right: 20px;
+
+            &::before {
+                left: 100%;
+            }
+
+            .image {
+                order: 0;
+                margin: 1.875rem 1rem 0 0;
+            }
+
+            .content {
+                order: 1;
+                text-align: right;
+            }
+        }
+    }
+
+    @include lg {
+        .milestone.odd {
+            padding-left: 30px;
+
+            .image {
+                margin: 1.875rem 0 0 1.5rem;
+            }
+        }
+
+        .milestone.even {
+            padding-right: 30px;
+
+            .image {
+                order: 0;
+                margin: 1.875rem 1.5rem 0 0;
+            }
+        }
+    }
+
+    @include xl {
+        .milestone.odd {
+            padding-left: 40px;
+
+            .image {
+                margin: 1.875rem 0 0 2rem;
+            }
+        }
+
+        .milestone.even {
+            padding-right: 40px;
+
+            .image {
+                margin: 1.875rem 2rem 0 0;
+            }
+        }
+    }
+}

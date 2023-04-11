@@ -586,6 +586,42 @@ ET.initFooterCTA = function () {
     redrawPath();
 };
 
+ET.initTimeline = function () {
+    var section = $(".timeline");
+
+    if (!section.length) {
+        return;
+    }
+
+    ScrollTrigger.matchMedia({
+        // large
+        "(min-width: 768px)": function () {
+            $(".milestone").each(function () {
+                var milestone = $(this),
+                    image = milestone.find(".image"),
+                    even = milestone.hasClass("even");
+
+                gsap.fromTo(
+                    image,
+                    {
+                        yPercent: even ? 100 : 50,
+                    },
+                    {
+                        yPercent: even ? -100 : -50,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: milestone,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: 1,
+                        },
+                    }
+                );
+            });
+        },
+    });
+};
+
 $(document).ready(function () {
     ET.initHeaderMenu();
     ET.initHeaderScrollBehavior();
@@ -603,6 +639,7 @@ $(document).ready(function () {
     ET.initPagination();
     ET.initFAQs();
     ET.initBanners();
+    ET.initTimeline();
 });
 
 $(window).on("load", function () {
