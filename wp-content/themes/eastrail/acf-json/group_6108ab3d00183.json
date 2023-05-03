@@ -2294,6 +2294,23 @@
                                     "rows": 3,
                                     "new_lines": "wpautop",
                                     "parent_repeater": "field_607919e4180fb"
+                                },
+                                {
+                                    "key": "field_64526840eb2bc",
+                                    "label": "Link",
+                                    "name": "link",
+                                    "aria-label": "",
+                                    "type": "link",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                        "width": "",
+                                        "class": "",
+                                        "id": ""
+                                    },
+                                    "return_format": "array",
+                                    "parent_repeater": "field_607919e4180fb"
                                 }
                             ]
                         },
@@ -2825,5 +2842,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1681197952
+    "modified": 1683122246
 }
