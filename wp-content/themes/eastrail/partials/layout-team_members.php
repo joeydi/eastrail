@@ -43,7 +43,7 @@ $column_class = $count >= 6 ? 'row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-x
                                     <?php if ($member['link']) : $link = $member['link']; ?>
                                         <p class="mt-10">
                                             <?php echo $member['alternate_title']; ?>
-                                            <a class="d-flex align-items-center meta text-grey-3 no-underline" href="<?php echo $link['url']; ?>" target="<?php echo $link['target']; ?>" rel="<?php echo $link['target'] == '_blank' ? 'noopener noreferrer' : ''; ?>">
+                                            <a class="d-inline-flex align-items-center meta text-grey-3 no-underline" href="<?php echo $link['url']; ?>" target="<?php echo $link['target']; ?>" rel="<?php echo $link['target'] == '_blank' ? 'noopener noreferrer' : ''; ?>">
                                                 <?php echo $link['title']; ?>
                                                 <?php if ($link['target'] == '_blank') : ?>
                                                     <svg class="ms-10 icon">
