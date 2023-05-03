@@ -1,4 +1,4 @@
-<?php if (!is_page('the-trail')) : ?>
+<?php if (!is_page('the-trail') && !is_page('who-we-are')) : ?>
     <section class="footer-cta bg-dark-evergreen text-willow section-padding">
         <div class="container">
             <div class="row align-items-end">
