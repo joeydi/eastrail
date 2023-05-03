@@ -35,13 +35,13 @@ $column_class = $count >= 6 ? 'row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-x
                                         <h3 class="mb-10"><?php echo $member['name']; ?></h3>
                                     <?php endif; ?>
                                     <?php if ($member['title']) : ?>
-                                        <p class="meta text-dark-spruce"><?php echo $member['title']; ?></p>
+                                        <p class="mb-10 meta text-dark-spruce"><?php echo $member['title']; ?></p>
                                     <?php endif; ?>
                                     <?php if ($member['alternate_title']) : ?>
-                                        <p class="mt-10 font-weight-semibold text-dark-spruce"><?php echo $member['alternate_title']; ?></p>
+                                        <p class="mb-10 font-weight-semibold text-dark-spruce"><?php echo $member['alternate_title']; ?></p>
                                     <?php endif; ?>
                                     <?php if ($member['link']) : $link = $member['link']; ?>
-                                        <p class="mt-10">
+                                        <p class="mb-10">
                                             <?php echo $member['alternate_title']; ?>
                                             <a class="d-inline-flex align-items-center meta text-grey-3 no-underline" href="<?php echo $link['url']; ?>" target="<?php echo $link['target']; ?>" rel="<?php echo $link['target'] == '_blank' ? 'noopener noreferrer' : ''; ?>">
                                                 <?php echo $link['title']; ?>
@@ -53,7 +53,11 @@ $column_class = $count >= 6 ? 'row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-x
                                             </a>
                                         </p>
                                     <?php endif; ?>
-                                    <?php echo $member['bio']; ?>
+                                    <?php if ($member['bio']) : ?>
+                                        <div class="mt-20">
+                                            <?php echo $member['bio']; ?>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
