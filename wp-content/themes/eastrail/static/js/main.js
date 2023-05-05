@@ -74,14 +74,24 @@ ET.initHeaderMenu = function () {
         }
     });
 
-    gsap.set("header .sub-menu", { height: 0 });
+    gsap.set("header .menu > li > .sub-menu", { height: 0 });
     $(".sub-menu-toggle").on("click", function () {
-        var submenu = $(this).closest("li").find(".sub-menu");
+        var thisParent = $(this).closest("li"),
+            thisMenu = thisParent.find("> .sub-menu"),
+            activeParents = $("ul.menu > li.active").not(thisParent),
+            activeMenus = activeParents.find("> .sub-menu");
 
-        $(this).closest("li").toggleClass("active");
+        activeParents.removeClass("active");
+        thisParent.toggleClass("active");
 
-        gsap.to(submenu, {
-            height: $(this).closest("li").hasClass("active") ? "auto" : 0,
+        gsap.to(activeMenus, {
+            height: 0,
+            duration: 0.5,
+            ease: "power2.out",
+        });
+
+        gsap.to(thisMenu, {
+            height: thisParent.hasClass("active") ? "auto" : 0,
             duration: 0.5,
             ease: "power2.out",
         });
@@ -98,6 +108,8 @@ ET.initHeaderMenu = function () {
     header_links.on("click", function (e) {
         $(this).trigger("blur");
         submenu_items.removeClass("hover");
+        html.removeClass("menu-active");
+        bodyScrollLock.clearAllBodyScrollLocks();
     });
 };
 

@@ -51,7 +51,7 @@
                             <span class="visually-hidden">Hide Menu</span>
                         </button>
                     </div>
-                    <?php wp_nav_menu(['menu' => 'Header', 'container' => false, 'depth' => 2]); ?>
+                    <?php wp_nav_menu(['menu' => 'Header', 'container' => false, 'depth' => 3]); ?>
                     <?php wp_nav_menu(['menu' => 'Header Utility', 'menu_class' => 'utility', 'container' => false, 'depth' => 1]); ?>
                 </div>
             </div>
