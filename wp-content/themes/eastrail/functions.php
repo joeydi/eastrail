@@ -26,6 +26,7 @@ class ET
         add_theme_support('menus');
         add_theme_support('post-thumbnails');
         add_theme_support('title-tag');
+        add_theme_support('woocommerce');
 
         add_image_size('square', 1280, 1280, true);
         add_image_size('square-sm', 640, 640, true);
