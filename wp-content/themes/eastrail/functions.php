@@ -6,6 +6,7 @@ require 'inc/gravityforms.php';
 require 'inc/news.php';
 require 'inc/simple_html_dom.php';
 require 'inc/shortcodes.php';
+require 'inc/woo.php';
 
 new ET();
 
