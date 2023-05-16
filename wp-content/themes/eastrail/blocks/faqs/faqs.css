@@ -1,82 +1,82 @@
 .wp-admin section.faqs {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 .wp-admin .wp-admin section.faqs dl.faqs.is-selected {
-  opacity: 1;
-  transition: opacity 0.5s;
+    opacity: 1;
+    transition: opacity 0.5s;
 }
 
 .wp-admin section.faqs dl.faqs dt {
-  height: 30px;
-  display: flex;
-  align-items: center;
-  background-color: #efefef;
-  padding: 5px 10px 5px 20px;
-  color: #8c2865;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    background-color: #efefef;
+    padding: 5px 10px 5px 20px;
+    color: #8c2865;
+    cursor: pointer;
 }
 
 .wp-admin section.faqs dl.faqs dt button {
-  display: none;
+    display: none;
 }
 
 .wp-admin section.faqs dl.faqs dt button::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: block;
-  width: 20px;
-  height: 4px;
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: block;
+    width: 20px;
+    height: 4px;
 }
 
 .wp-admin section.faqs dl.faqs dt button::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) rotate(90deg);
-  display: block;
-  width: 20px;
-  height: 4px;
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    display: block;
+    width: 20px;
+    height: 4px;
 }
 
 .wp-admin section.faqs dl.faqs dt .icon {
-  font-size: 0.75em;
+    font-size: 0.75em;
 }
 
 .wp-admin section.faqs dl.faqs dt.active {
-  border-bottom-color: transparent;
+    border-bottom-color: transparent;
 }
 
 .wp-admin section.faqs dl.faqs dt.active button {
-  transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 .wp-admin section.faqs dl.faqs dt.active button::after {
-  transform: translate(-50%, -50%) rotate(0);
+    transform: translate(-50%, -50%) rotate(0);
 }
 
 .wp-admin section.faqs dl.faqs dt.active + dd {
-  height: auto;
-  padding: 20px;
-  opacity: 1;
-  transform: translateY(0);
+    height: auto;
+    padding: 20px;
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .wp-admin section.faqs dl.faqs dd {
-  background-color: #efefef;
+    background-color: #efefef;
 }
 
 .wp-admin section.faqs dl.faqs dd {
-  height: 30px;
-  display: flex;
-  align-items: center;
-  background-color: #efefef;
-  padding: 5px 10px 5px 20px;
-  margin-left: 15px;
-  margin-top: 5px;
-  cursor: pointer;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    background-color: #efefef;
+    padding: 5px 10px 5px 20px;
+    margin-left: 15px;
+    margin-top: 5px;
+    cursor: pointer;
 }

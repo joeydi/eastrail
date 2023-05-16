@@ -7,17 +7,17 @@
 // Support custom "anchor" values.
 
 $anchor = '';
-if ( ! empty( $block['anchor'] ) ) {
-    $anchor = 'id="' . esc_attr( $block['anchor'] ) . '" ';
+if (!empty($block['anchor'])) {
+    $anchor = 'id="' . esc_attr($block['anchor']) . '" ';
 }
 
 // Create class attribute allowing for custom "className" and "align" values.
 
 $class_name = 'faqs-block';
-if ( ! empty( $block['className'] ) ) {
+if (!empty($block['className'])) {
     $class_name .= ' ' . $block['className'];
 }
-if ( ! empty( $block['align'] ) ) {
+if (!empty($block['align'])) {
     $class_name .= ' align' . $block['align'];
 }
 
@@ -38,9 +38,11 @@ $faqs = get_field('faqs'); ?>
                                     <span class="visually-hidden">Show Answer</span>
                                 </button>
                             </dt>
-                            <dd>
-                                <?php echo $faq['answer']; ?>
-                            </dd>
+                            <?php if (!is_admin()) : ?>
+                                <dd>
+                                    <?php echo $faq['answer']; ?>
+                                </dd>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </dl>
                 <?php else : ?>
