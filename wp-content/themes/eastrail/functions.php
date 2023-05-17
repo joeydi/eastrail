@@ -124,10 +124,6 @@ class ET
 
     function action_enqueue_scripts()
     {
-        // Header
-        wp_deregister_script('jquery');
-        wp_enqueue_script('jquery', 'https://code.jquery.com/jquery-3.6.0.min.js');
-
         // Footer
         wp_enqueue_script('main', get_stylesheet_directory_uri() . '/static/js/main.min.js', ['jquery'], $this->version, true);
 
