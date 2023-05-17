@@ -624,6 +624,53 @@ ET.initTimeline = function () {
     });
 };
 
+ET.initMapEmbed = function () {
+    var container = $("main.map-embed");
+
+    if (!container.length) {
+        return;
+    }
+
+    var infowindow = new google.maps.InfoWindow();
+    // var bounds = new google.maps.LatLngBounds();
+
+    var mapNode = container.find(".map")[0];
+    var options = {
+        center: {
+            lat: 47.63,
+            lng: -122.18,
+        },
+        zoom: 12,
+        maxZoom: 18,
+        // mapId: "5f57204fb11ce09d",
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+    };
+
+    var map = new google.maps.Map(mapNode, options);
+    ET.map = map;
+
+    var geojson = container.data("geojson");
+    console.log(geojson);
+    map.data.loadGeoJson(geojson);
+
+    google.maps.event.addListener(map, "click", function () {
+        infowindow.close();
+    });
+
+    var groups = container.find(".group-layer"),
+        visibiltyToggles = container.find(".visibility");
+
+    groups.on("click", function (e) {
+        if (!$(e.target).is("button") && !$(e.target).closest("button").length) {
+            $(this).closest("li").find("ul").slideToggle();
+        }
+    });
+
+    visibiltyToggles.on("click", function (e) {
+        $(this).closest("li").toggleClass("hidden");
+    });
+};
+
 $(document).ready(function () {
     ET.initHeaderMenu();
     ET.initHeaderScrollBehavior();

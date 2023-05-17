@@ -36,6 +36,7 @@
 @import "components/icon-block";
 @import "components/image-slider";
 @import "components/link-cards";
+@import "components/map-embed";
 @import "components/modals";
 @import "components/page-header";
 @import "components/pagination";
@@ -59,6 +60,11 @@ html {
     @include xxl {
         scroll-padding-top: calc(var(--headerHeight, 140px) + 80px);
     }
+}
+
+html,
+body {
+    height: 100%;
 }
 
 main {

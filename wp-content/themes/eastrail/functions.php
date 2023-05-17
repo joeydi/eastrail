@@ -67,6 +67,7 @@ class ET
         add_filter('tiny_mce_before_init',                  [$this, 'filter_tiny_mce_before_init']);
         add_filter('wp_nav_menu_objects',                   [$this, 'filter_wp_nav_menu_objects'], 10, 2);
         add_filter('wp_nav_menu_items',                     [$this, 'filter_wp_nav_menu_items'], 10, 2);
+        add_filter('upload_mimes',                          [$this, 'filter_upload_mimes']);
     }
 
     function add_editor_styles()
@@ -126,6 +127,10 @@ class ET
     {
         // Footer
         wp_enqueue_script('main', get_stylesheet_directory_uri() . '/static/js/main.min.js', ['jquery'], $this->version, true);
+
+        if (is_page('map')) {
+            wp_enqueue_script('google-maps-api', 'https://maps.googleapis.com/maps/api/js?callback=ET.initMapEmbed&key=' . GOOGLE_MAPS_API_KEY, [], false, true);
+        }
 
         $data = [
             'ajaxurl' => admin_url('admin-ajax.php'),
@@ -535,6 +540,13 @@ class ET
         }
 
         return $html;
+    }
+
+    function filter_upload_mimes($mimes)
+    {
+        $mimes['geojson'] = 'application/geo+json';
+
+        return $mimes;
     }
 
     static function theme_url($path)
