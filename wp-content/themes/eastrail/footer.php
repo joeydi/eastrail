@@ -1,25 +1,3 @@
-<?php
-
-$social_links = [
-    [
-        'icon' => '#facebook',
-        'title' => 'Facebook',
-        'url' => get_field('facebook_url', 'options'),
-    ],
-    [
-        'icon' => '#twitter',
-        'title' => 'Twitter',
-        'url' => get_field('twitter_url', 'options'),
-    ],
-    [
-        'icon' => '#linkedin',
-        'title' => 'LinkedIn',
-        'url' => get_field('linkedin_url', 'options'),
-    ],
-];
-
-?>
-
 <?php get_template_part('partials/footer-cta'); ?>
 
 </main>
