@@ -86,7 +86,7 @@ function get_feature_color($feature)
                             <ul>
                                 <?php foreach ($features as $feature) : ?>
                                     <li>
-                                        <div class="feature-layer">
+                                        <div class="feature-layer" data-feature="<?php echo $feature->id; ?>">
                                             <button style="color: <?php echo get_feature_color($feature); ?>">
                                                 <?php if ($feature->geometry->type === 'LineString') : ?>
                                                     <svg class="icon">
@@ -110,7 +110,7 @@ function get_feature_color($feature)
                 <?php $ungrouped_featured = get_group_features($geojson); ?>
                 <?php foreach ($ungrouped_featured as $feature) : ?>
                     <li>
-                        <div class="feature-layer">
+                        <div class="feature-layer" data-feature="<?php echo $feature->id; ?>">
                             <button style="color: <?php echo get_feature_color($feature); ?>">
                                 <?php if ($feature->geometry->type === 'LineString') : ?>
                                     <svg class="icon">

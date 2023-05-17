@@ -683,8 +683,6 @@ ET.initMapEmbed = function () {
     map.data.setStyle(function (feature) {
         var group = feature.getProperty("group");
 
-        console.log(group);
-
         return {
             strokeColor: feature.getProperty("stroke"),
             strokeWeight: 4,
@@ -706,6 +704,7 @@ ET.initMapEmbed = function () {
     // Set up click handlers for data layers UI
 
     var groups = container.find(".group-layer"),
+        features = container.find(".feature-layer"),
         visibiltyToggles = container.find(".visibility");
 
     groups.on("click", function (e) {
@@ -714,9 +713,37 @@ ET.initMapEmbed = function () {
         }
     });
 
+    features.on("click", function (e) {
+        var id = $(this).data("feature"),
+            feature = map.data.getFeatureById(id);
+
+        if (!feature) {
+            console.error("Feature with ID " + id + " not found.");
+            return;
+        }
+
+        var bounds = new google.maps.LatLngBounds();
+        feature.getGeometry().forEachLatLng(function (latLng) {
+            bounds.extend(latLng);
+        });
+        map.fitBounds(bounds);
+    });
+
     visibiltyToggles.on("click", function (e) {
         $(this).closest("li").toggleClass("hidden");
     });
+
+    function processPoints(geometry, callback, thisArg) {
+        if (geometry instanceof google.maps.LatLng) {
+            callback.call(thisArg, geometry);
+        } else if (geometry instanceof google.maps.Data.Point) {
+            callback.call(thisArg, geometry.get());
+        } else {
+            geometry.getArray().forEach(function (g) {
+                processPoints(g, callback, thisArg);
+            });
+        }
+    }
 };
 
 $(document).ready(function () {
