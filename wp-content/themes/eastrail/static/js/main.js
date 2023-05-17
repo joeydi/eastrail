@@ -649,13 +649,32 @@ ET.initMapEmbed = function () {
     var map = new google.maps.Map(mapNode, options);
     ET.map = map;
 
+    // Import the GeoJSON data and style programmatically
+
     var geojson = container.data("geojson");
-    console.log(geojson);
     map.data.loadGeoJson(geojson);
 
-    google.maps.event.addListener(map, "click", function () {
-        infowindow.close();
+    map.data.setStyle(function (feature) {
+        var ascii = feature.getProperty("ascii");
+        var color = ascii > 91 ? "red" : "blue";
+        return {
+            fillColor: color,
+            strokeWeight: 1,
+        };
     });
+
+    map.data.setStyle(function (feature) {
+        return {
+            strokeColor: feature.getProperty("stroke"),
+            strokeWeight: 4,
+        };
+    });
+
+    // google.maps.event.addListener(map, "click", function () {
+    //     infowindow.close();
+    // });
+
+    // Set up click handlers for data layers UI
 
     var groups = container.find(".group-layer"),
         visibiltyToggles = container.find(".visibility");
