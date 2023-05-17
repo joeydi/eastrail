@@ -663,10 +663,39 @@ ET.initMapEmbed = function () {
         };
     });
 
+    var colors = {
+        // Open Trail Sections (Green/Yellow/Blue)
+        133408389: "blue",
+        // Connections
+        752318534: "blue",
+        // Parks
+        499410108: "blue",
+        // Other Trail Systems
+        2333824518: "blue",
+        // Future Trails & Projects (Red)
+        1160417020: "red",
+        // Parking
+        3979213705: "blue",
+        // Restrooms
+        603738419: "blue",
+    };
+
     map.data.setStyle(function (feature) {
+        var group = feature.getProperty("group");
+
+        console.log(group);
+
         return {
             strokeColor: feature.getProperty("stroke"),
             strokeWeight: 4,
+            icon: [
+                ET.template_directory_url,
+                "/static/img/map-marker-",
+                feature.getProperty("marker-symbol"),
+                "-",
+                colors[group],
+                ".svg",
+            ].join(""),
         };
     });
 
