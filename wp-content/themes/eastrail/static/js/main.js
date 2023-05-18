@@ -639,8 +639,7 @@ ET.initMapEmbed = function () {
         },
         zoom: 12,
         maxZoom: 18,
-        mapId: "5f57204fb11ce09d",
-        // mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapId: "9f1e644298b32b70",
     };
 
     var map = new google.maps.Map(mapNode, options);
