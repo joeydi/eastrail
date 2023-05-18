@@ -704,9 +704,14 @@ ET.initMapEmbed = function () {
             description = event.feature.getProperty("description"),
             html = [title ? "<strong>" + title + "</strong><br/>" : "", description].join("");
 
+        if (typeof event.feature.getGeometry().get !== "undefined") {
+            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
+        } else if (typeof event.feature.getGeometry().getLength !== "undefined") {
+            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, 0) });
+        }
+
         infowindow.setContent(html);
         infowindow.setPosition(event.latLng);
-        infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
         infowindow.open(map);
     });
 
