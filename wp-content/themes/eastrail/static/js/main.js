@@ -634,8 +634,8 @@ ET.initMapEmbed = function () {
     var mapNode = container.find(".map")[0];
     var options = {
         center: {
-            lat: 47.63,
-            lng: -122.18,
+            lat: 47.6469,
+            lng: -122.1753,
         },
         zoom: 12,
         maxZoom: 18,
@@ -644,6 +644,16 @@ ET.initMapEmbed = function () {
 
     var map = new google.maps.Map(mapNode, options);
     ET.map = map;
+
+    // Fit project bounds once fractional zoom is enabled
+    map.addListener("isfractionalzoomenabled_changed", function () {
+        map.fitBounds({
+            south: 47.498949,
+            west: -122.304718,
+            north: 47.794493,
+            east: -122.045891,
+        });
+    });
 
     // Import the GeoJSON data and style programmatically
 
