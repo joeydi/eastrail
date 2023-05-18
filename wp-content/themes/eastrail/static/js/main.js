@@ -772,19 +772,23 @@ ET.initMapEmbed = function () {
             description = feature.getProperty("description"),
             html = [title ? "<strong>" + title + "</strong><br/>" : "", description].join("");
 
-        var latLng;
-        if (typeof feature.getGeometry().get !== "undefined") {
-            latLng = feature.getGeometry().get();
-            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
-        } else if (typeof feature.getGeometry().getLength !== "undefined") {
-            var length = feature.getGeometry().getLength();
-            latLng = feature.getGeometry().getAt(Math.floor(length / 2));
-            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, 0) });
-        }
+        if (title === "Eastrail System") {
+            infowindow.close();
+        } else {
+            var latLng;
+            if (typeof feature.getGeometry().get !== "undefined") {
+                latLng = feature.getGeometry().get();
+                infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
+            } else if (typeof feature.getGeometry().getLength !== "undefined") {
+                var length = feature.getGeometry().getLength();
+                latLng = feature.getGeometry().getAt(Math.floor(length / 2));
+                infowindow.setOptions({ pixelOffset: new google.maps.Size(0, 0) });
+            }
 
-        infowindow.setContent(html);
-        infowindow.setPosition(latLng);
-        infowindow.open(map);
+            infowindow.setContent(html);
+            infowindow.setPosition(latLng);
+            infowindow.open(map);
+        }
     });
 };
 
