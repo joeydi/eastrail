@@ -53,6 +53,7 @@ class ET
         remove_action('wp_print_styles',                    'print_emoji_styles');
         remove_action('admin_print_styles',                 'print_emoji_styles');
 
+        add_filter('show_admin_bar',                        [$this, 'filter_show_admin_bar']);
         add_filter('big_image_size_threshold',              [$this, 'filter_big_image_size_threshold']);
         add_filter('image_size_names_choose',               [$this, 'filter_image_size_names_choose']);
         add_filter('wpseo_metabox_prio',                    [$this, 'filter_yoast_seo_metabox']);
@@ -213,6 +214,15 @@ class ET
         header('Content-Length: ' . filesize($attachment));
         readfile($attachment);
         exit;
+    }
+
+    function filter_show_admin_bar($show)
+    {
+        if (is_page('map')) {
+            return false;
+        }
+
+        return $show;
     }
 
     function filter_big_image_size_threshold()
