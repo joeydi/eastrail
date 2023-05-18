@@ -10,7 +10,7 @@ $background = get_sub_field('background');
 <section class="default-content <?php echo ET::section_classes(); ?>" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
     <div class="container">
         <div class="row <?php echo $justify_content; ?>">
-            <div class="<?php echo $width; ?>" data-scroll-fade-children>
+            <div class="<?php echo $width; ?>" data-scroll-fade>
                 <?php echo $content; ?>
             </div>
         </div>
