@@ -631,9 +631,6 @@ ET.initMapEmbed = function () {
         return;
     }
 
-    var infowindow = new google.maps.InfoWindow();
-    // var bounds = new google.maps.LatLngBounds();
-
     var mapNode = container.find(".map")[0];
     var options = {
         center: {
@@ -642,8 +639,8 @@ ET.initMapEmbed = function () {
         },
         zoom: 12,
         maxZoom: 18,
-        // mapId: "5f57204fb11ce09d",
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapId: "5f57204fb11ce09d",
+        // mapTypeId: google.maps.MapTypeId.ROADMAP,
     };
 
     var map = new google.maps.Map(mapNode, options);
@@ -697,6 +694,11 @@ ET.initMapEmbed = function () {
         };
     });
 
+    // Set up infowindows
+    var infowindow = new google.maps.InfoWindow({
+        maxWidth: 400,
+    });
+
     map.data.addListener("click", function (event) {
         var title = event.feature.getProperty("title"),
             description = event.feature.getProperty("description"),
@@ -708,17 +710,33 @@ ET.initMapEmbed = function () {
         infowindow.open(map);
     });
 
-    // Set up click handlers for data layers UI
-
-    var groups = container.find(".group-layer"),
-        features = container.find(".feature-layer"),
-        visibiltyToggles = container.find(".visibility");
+    // Set up click handler for group layers expand / collapse
+    var groups = container.find(".group-layer");
 
     groups.on("click", function (e) {
         if (!$(e.target).is("button") && !$(e.target).closest("button").length) {
             $(this).closest("li").find("ul").slideToggle();
         }
     });
+
+    // Set up click handlers for group layers visibility
+    var visibiltyToggles = container.find(".visibility");
+
+    visibiltyToggles.on("click", function (e) {
+        $(this).closest("li").toggleClass("hidden");
+
+        var group = $(this).closest(".group-layer").data("group"),
+            visible = !$(this).closest("li").hasClass("hidden");
+
+        map.data.forEach(function (feature) {
+            if (feature.getProperty("group") === group) {
+                map.data.overrideStyle(feature, { visible: visible });
+            }
+        });
+    });
+
+    // Set up click handlers for feature zoom and infowindow
+    var features = container.find(".feature-layer");
 
     features.on("click", function (e) {
         var id = $(this).data("feature"),
@@ -729,15 +747,44 @@ ET.initMapEmbed = function () {
             return;
         }
 
+        // Show group features if necessary
+        var group = feature.getProperty("group");
+
+        $('.group-layer[data-group="' + group + '"]')
+            .closest("li")
+            .removeClass("hidden");
+
+        map.data.forEach(function (feature) {
+            if (feature.getProperty("group") === group) {
+                map.data.overrideStyle(feature, { visible: true });
+            }
+        });
+
+        // Fit features bounds
         var bounds = new google.maps.LatLngBounds();
         feature.getGeometry().forEachLatLng(function (latLng) {
             bounds.extend(latLng);
         });
         map.fitBounds(bounds);
-    });
 
-    visibiltyToggles.on("click", function (e) {
-        $(this).closest("li").toggleClass("hidden");
+        // Populate inforwindow content
+        var title = feature.getProperty("title"),
+            description = feature.getProperty("description"),
+            html = [title ? "<strong>" + title + "</strong><br/>" : "", description].join("");
+
+        var latLng;
+        if (typeof feature.getGeometry().get !== "undefined") {
+            latLng = feature.getGeometry().get();
+            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
+        } else if (typeof feature.getGeometry().getLength !== "undefined") {
+            var length = feature.getGeometry().getLength();
+            latLng = feature.getGeometry().getAt(Math.floor(length / 2));
+            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, 0) });
+        }
+
+        infowindow.setContent(html);
+        infowindow.setPosition(latLng);
+        infowindow.open(map);
     });
 };
 

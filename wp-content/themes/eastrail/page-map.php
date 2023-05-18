@@ -71,7 +71,7 @@ function get_feature_color($feature)
             <ul>
                 <?php foreach ($geojson->groups as $group) : $features = get_group_features($geojson, $group->id); ?>
                     <li>
-                        <div class="group-layer">
+                        <div class="group-layer" data-group="<?php echo $group->id; ?>">
                             <button class="visibility">
                                 <svg class="icon show">
                                     <use xlink:href="#show" />
