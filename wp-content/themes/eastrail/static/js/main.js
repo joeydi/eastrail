@@ -697,9 +697,16 @@ ET.initMapEmbed = function () {
         };
     });
 
-    // google.maps.event.addListener(map, "click", function () {
-    //     infowindow.close();
-    // });
+    map.data.addListener("click", function (event) {
+        var title = event.feature.getProperty("title"),
+            description = event.feature.getProperty("description"),
+            html = [title ? "<strong>" + title + "</strong><br/>" : "", description].join("");
+
+        infowindow.setContent(html);
+        infowindow.setPosition(event.latLng);
+        infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
+        infowindow.open(map);
+    });
 
     // Set up click handlers for data layers UI
 
@@ -732,18 +739,6 @@ ET.initMapEmbed = function () {
     visibiltyToggles.on("click", function (e) {
         $(this).closest("li").toggleClass("hidden");
     });
-
-    function processPoints(geometry, callback, thisArg) {
-        if (geometry instanceof google.maps.LatLng) {
-            callback.call(thisArg, geometry);
-        } else if (geometry instanceof google.maps.Data.Point) {
-            callback.call(thisArg, geometry.get());
-        } else {
-            geometry.getArray().forEach(function (g) {
-                processPoints(g, callback, thisArg);
-            });
-        }
-    }
 };
 
 $(document).ready(function () {
