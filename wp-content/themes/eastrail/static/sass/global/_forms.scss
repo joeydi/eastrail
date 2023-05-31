@@ -114,6 +114,10 @@ label {
     color: $danger;
 }
 
+.gform_required_legend {
+    display: none;
+}
+
 .gform_submission_error {
     margin-bottom: 1em !important;
     @include lead;
