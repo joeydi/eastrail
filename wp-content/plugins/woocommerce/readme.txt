@@ -1,10 +1,10 @@
 === WooCommerce ===
-Contributors: automattic, mikejolley, jameskoster, claudiosanches, rodrigosprimo, peterfabian1000, vedjain, jamosova, obliviousharmony, konamiman, sadowski, wpmuguru, royho, barryhughes-1, leifsinger
+Contributors: automattic, mikejolley, jameskoster, claudiosanches, rodrigosprimo, peterfabian1000, vedjain, jamosova, obliviousharmony, konamiman, sadowski, wpmuguru, royho, barryhughes-1
 Tags: online store, ecommerce, shop, shopping cart, sell online, storefront, checkout, payments, woo, woo commerce, e-commerce, store
 Requires at least: 6.0
 Tested up to: 6.2
-Requires PHP: 7.2
-Stable tag: 7.6.1
+Requires PHP: 7.3
+Stable tag: 7.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -163,14 +163,10 @@ WooCommerce comes with some sample data you can use to see how products look; im
 
 == Changelog ==
 
-= 7.6.1 2023-04-26 =
+= 7.7.1 2023-05-26 =
 
 **WooCommerce**
 
-* Fix - Fix regression in supporting nested date query arguments in HPOS. [#37827](https://github.com/woocommerce/woocommerce/pull/37827)
-* Fix - Sync up date_column_name default for orders table, between stats and table data. [#37927](https://github.com/woocommerce/woocommerce/pull/37927)
-* Fix - Revert "Change Variations form shown in Variations tab when there are no variations created (#36957)" [#37889](https://github.com/woocommerce/woocommerce/pull/37889)
-* Fix – Revert changes to use window.fetch in legacy cart JS [#37463](https://github.com/woocommerce/woocommerce/pull/37463)
-* Update - Update WooCommerce Blocks to 9.8.5 [#37921](https://github.com/woocommerce/woocommerce/pull/37921)
+* Update - Update WooCommerce Blocks to 10.0.5 [#38427](https://github.com/woocommerce/woocommerce/pull/38427)
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/woocommerce/trunk/changelog.txt).
