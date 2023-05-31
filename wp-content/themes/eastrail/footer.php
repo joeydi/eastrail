@@ -11,9 +11,9 @@
         <div class="row">
             <div class="col-md-8 order-md-2 col-xl-6">
                 <div class="d-sm-flex justify-content-between">
-                    <?php wp_nav_menu(['menu' => 'Footer Column 1', 'container' => false]); ?>
-                    <?php wp_nav_menu(['menu' => 'Footer Column 2', 'container' => false]); ?>
-                    <?php wp_nav_menu(['menu' => 'Footer Column 3', 'container' => false]); ?>
+                    <?php wp_nav_menu(['menu' => 'Footer Column 1', 'container' => false, 'menu_class' => 'menu me-15']); ?>
+                    <?php wp_nav_menu(['menu' => 'Footer Column 2', 'container' => false, 'menu_class' => 'menu me-15']); ?>
+                    <?php wp_nav_menu(['menu' => 'Footer Column 3', 'container' => false, 'menu_class' => 'menu']); ?>
                 </div>
             </div>
             <div class="col-md-4 order-md-1 col-xl-6">
