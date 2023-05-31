@@ -8,6 +8,7 @@ class ET_Woo
     {
         remove_action('woocommerce_sidebar', 'woocommerce_get_sidebar', 10);
         remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20, 0);
+        remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
 
         add_action('woocommerce_before_main_content',   [$this, 'action_woocommerce_before_main_content']);
         add_action('woocommerce_after_main_content',    [$this, 'action_woocommerce_after_main_content']);
