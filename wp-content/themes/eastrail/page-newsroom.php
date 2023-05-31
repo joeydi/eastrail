@@ -8,7 +8,7 @@ $featured_news_cta = get_field('featured_news_cta');
 $paged = get_query_var('paged') ?: 1;
 $categories = get_terms([
     'taxonomy' => 'category',
-    'hide_empty' => false,
+    'exclude' => 1,
 ]);
 $selected_category = get_query_var('category_name');
 
