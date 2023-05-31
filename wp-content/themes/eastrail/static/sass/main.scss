@@ -111,6 +111,12 @@ section {
     }
 }
 
+// WooCommerce
+
+.woocommerce-Tabs-panel--description h2:first-child {
+    display: none;
+}
+
 // Default Focus State
 
 :focus-visible {
