@@ -1,4 +1,8 @@
-<?php if (!is_page('the-trail') && !is_page('who-we-are')) : ?>
+<?php
+
+$footer_cta = get_field('footer_cta', 'options');
+
+if ($footer_cta && !is_page('the-trail') && !is_page('who-we-are')) : ?>
     <section class="footer-cta bg-dark-evergreen text-willow section-padding">
         <div class="container">
             <div class="row align-items-end">
@@ -9,8 +13,7 @@
                                 <path d="M0,0 L100,0" fill="transparent" stroke="#38D430" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
                             </svg>
                         </span>
-                        <span>More than a trail! The Eastrail now serves as a home for many services that you rely on every day including sewer, power, internet and</span>
-                        <span class="nowrap">light&nbsp;rail.
+                        <span><?php echo $footer_cta; ?>
                             <span class="path-wrap-2">
                                 <svg class=" footer-cta-path-2" width="1000px" height="100px" viewBox="0 0 1000 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">
                                     <path d="M0,0 L480,0 C490,0 500,9 500,20 L500,80 C500,90 509,100 520,100 L1000,100" fill="transparent" stroke="#38D430" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path>
