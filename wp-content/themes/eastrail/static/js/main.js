@@ -624,6 +624,19 @@ ET.initTimeline = function () {
     });
 };
 
+ET.getInfoWindowContent = function (feature) {
+    var title = feature.getProperty("title"),
+        url = feature.getProperty("url"),
+        description = feature.getProperty("description"),
+        linkFormat = '<a href="$url" target="_blank" rel="noopener noreferrer"><strong>$title</strong></a><br/>',
+        link = linkFormat.replace("$url", url).replace("$title", title),
+        headingFormat = "<strong>$title</strong><br/>",
+        heading = headingFormat.replace("$title", title),
+        html = [url && title ? link : "", !url && title ? heading : "", description].join("");
+
+    return html;
+};
+
 ET.initMapEmbed = function () {
     var container = $("main.map-embed");
 
@@ -709,9 +722,7 @@ ET.initMapEmbed = function () {
     });
 
     map.data.addListener("click", function (event) {
-        var title = event.feature.getProperty("title"),
-            description = event.feature.getProperty("description"),
-            html = [title ? "<strong>" + title + "</strong><br/>" : "", description].join("");
+        var html = ET.getInfoWindowContent(event.feature);
 
         if (typeof event.feature.getGeometry().get !== "undefined") {
             infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
@@ -782,14 +793,14 @@ ET.initMapEmbed = function () {
         map.fitBounds(bounds);
 
         // Populate inforwindow content
-        var title = feature.getProperty("title"),
-            description = feature.getProperty("description"),
-            html = [title ? "<strong>" + title + "</strong><br/>" : "", description].join("");
+        var html = ET.getInfoWindowContent(feature),
+            title = feature.getProperty("title");
 
         if (title === "Eastrail System") {
             infowindow.close();
         } else {
             var latLng;
+
             if (typeof feature.getGeometry().get !== "undefined") {
                 latLng = feature.getGeometry().get();
                 infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
