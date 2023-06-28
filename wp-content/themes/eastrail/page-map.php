@@ -1,6 +1,8 @@
 <?php
 
 // Template Name: Map
+$groups = get_field('groups') ?: [];
+$groupNames = wp_list_pluck($groups, 'name');
 $geojson = get_field('geojson');
 $geojson_url = $geojson['url'];
 $geojson_file = get_attached_file($geojson['id']);
@@ -8,7 +10,6 @@ $geojson_file = get_attached_file($geojson['id']);
 if (file_exists($geojson_file)) {
     $contents = file_get_contents($geojson_file);
     $geojson = json_decode($contents);
-    $groups = get_feature_groups($geojson);
 }
 
 function get_feature_groups($geojson)
@@ -84,7 +85,7 @@ function get_feature_color($feature)
     <main id="main" class="map-embed" data-geojson="<?php echo $geojson_url; ?>">
         <div class="layers">
             <ul>
-                <?php foreach ($groups as $group) : $features = get_group_features($geojson, $group); ?>
+                <?php foreach ($groupNames as $group) : $features = get_group_features($geojson, $group); ?>
                     <li>
                         <div class="group-layer" data-group="<?php echo $group; ?>">
                             <button class="visibility">
