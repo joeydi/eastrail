@@ -682,35 +682,19 @@ ET.initMapEmbed = function () {
         };
     });
 
-    var colors = {
-        // Open Trail Sections (Green/Yellow/Blue)
-        133408389: "blue",
-        // Connections
-        752318534: "blue",
-        // Parks
-        499410108: "blue",
-        // Other Trail Systems
-        2333824518: "blue",
-        // Future Trails & Projects (Red)
-        1160417020: "red",
-        // Parking
-        3979213705: "blue",
-        // Restrooms
-        603738419: "blue",
-    };
-
     map.data.setStyle(function (feature) {
-        var group = feature.getProperty("group");
+        var color = feature.getProperty("marker-color") || 'blue';
 
         return {
+            zIndex: feature.getProperty("zIndex") || 1,
             strokeColor: feature.getProperty("stroke"),
-            strokeWeight: 4,
+            strokeWeight: feature.getProperty("strokeWeight") || 4,
             icon: [
                 ET.template_directory_url,
                 "/static/img/map-marker-",
                 feature.getProperty("marker-symbol"),
                 "-",
-                colors[group],
+                color,
                 ".svg",
             ].join(""),
         };
@@ -724,15 +708,17 @@ ET.initMapEmbed = function () {
     map.data.addListener("click", function (event) {
         var html = ET.getInfoWindowContent(event.feature);
 
-        if (typeof event.feature.getGeometry().get !== "undefined") {
-            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
-        } else if (typeof event.feature.getGeometry().getLength !== "undefined") {
-            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, 0) });
-        }
+        if (html) {
+            if (typeof event.feature.getGeometry().get !== "undefined") {
+                infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -32) });
+            } else if (typeof event.feature.getGeometry().getLength !== "undefined") {
+                infowindow.setOptions({ pixelOffset: new google.maps.Size(0, 0) });
+            }
 
-        infowindow.setContent(html);
-        infowindow.setPosition(event.latLng);
-        infowindow.open(map);
+            infowindow.setContent(html);
+            infowindow.setPosition(event.latLng);
+            infowindow.open(map);
+        }
     });
 
     // Set up click handler for group layers expand / collapse
@@ -765,7 +751,13 @@ ET.initMapEmbed = function () {
 
     features.on("click", function (e) {
         var id = $(this).data("feature"),
-            feature = map.data.getFeatureById(id);
+            feature;
+
+        map.data.forEach(function (f) {
+            if (f.getProperty("id") === id) {
+                feature = f;
+            }
+        });
 
         if (!feature) {
             console.error("Feature with ID " + id + " not found.");
@@ -798,7 +790,7 @@ ET.initMapEmbed = function () {
 
         if (title === "Eastrail System") {
             infowindow.close();
-        } else {
+        } else if (html) {
             var latLng;
 
             if (typeof feature.getGeometry().get !== "undefined") {

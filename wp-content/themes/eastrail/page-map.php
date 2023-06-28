@@ -8,6 +8,21 @@ $geojson_file = get_attached_file($geojson['id']);
 if (file_exists($geojson_file)) {
     $contents = file_get_contents($geojson_file);
     $geojson = json_decode($contents);
+    $groups = get_feature_groups($geojson);
+}
+
+function get_feature_groups($geojson)
+{
+    $groups = [];
+
+    foreach ($geojson->features as $feature) {
+        $group = $feature->properties->group;
+        if (!empty($group) && !in_array($group, $groups)) {
+            $groups[] = $group;
+        }
+    }
+
+    return $groups;
 }
 
 function get_group_features($geojson, $group_id = null)
@@ -25,7 +40,7 @@ function get_group_features($geojson, $group_id = null)
 
 function get_feature_color($feature)
 {
-    if ($feature->geometry->type === 'LineString' && !empty($feature->properties->stroke)) {
+    if (in_array($feature->geometry->type, ['LineString', 'MultiLineString']) && !empty($feature->properties->stroke)) {
         return $feature->properties->stroke;
     }
 
@@ -69,9 +84,9 @@ function get_feature_color($feature)
     <main id="main" class="map-embed" data-geojson="<?php echo $geojson_url; ?>">
         <div class="layers">
             <ul>
-                <?php foreach ($geojson->groups as $group) : $features = get_group_features($geojson, $group->id); ?>
+                <?php foreach ($groups as $group) : $features = get_group_features($geojson, $group); ?>
                     <li>
-                        <div class="group-layer" data-group="<?php echo $group->id; ?>">
+                        <div class="group-layer" data-group="<?php echo $group; ?>">
                             <button class="visibility">
                                 <svg class="icon show">
                                     <use xlink:href="#show" />
@@ -80,15 +95,15 @@ function get_feature_color($feature)
                                     <use xlink:href="#hide" />
                                 </svg>
                             </button>
-                            <span><?php echo $group->title; ?></span>
+                            <span><?php echo $group; ?></span>
                         </div>
                         <?php if ($features) : ?>
                             <ul>
                                 <?php foreach ($features as $feature) : ?>
                                     <li>
-                                        <div class="feature-layer" data-feature="<?php echo $feature->id; ?>">
+                                        <div class="feature-layer" data-feature="<?php echo $feature->properties->id; ?>">
                                             <button style="color: <?php echo get_feature_color($feature); ?>">
-                                                <?php if ($feature->geometry->type === 'LineString') : ?>
+                                                <?php if (in_array($feature->geometry->type, ['LineString', 'MultiLineString'])) : ?>
                                                     <svg class="icon">
                                                         <use xlink:href="#route" />
                                                     </svg>
@@ -110,7 +125,7 @@ function get_feature_color($feature)
                 <?php $ungrouped_featured = get_group_features($geojson); ?>
                 <?php foreach ($ungrouped_featured as $feature) : ?>
                     <li>
-                        <div class="feature-layer" data-feature="<?php echo $feature->id; ?>">
+                        <div class="feature-layer" data-feature="<?php echo $feature->properties->id; ?>">
                             <button style="color: <?php echo get_feature_color($feature); ?>">
                                 <?php if ($feature->geometry->type === 'LineString') : ?>
                                     <svg class="icon">
