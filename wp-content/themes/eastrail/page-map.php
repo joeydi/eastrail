@@ -41,6 +41,10 @@ function get_group_features($geojson, $group_id = null)
 
 function get_feature_color($feature)
 {
+    if ($feature->properties->title === 'Eastrail System') {
+        return 'black';
+    }
+
     if (in_array($feature->geometry->type, ['LineString', 'MultiLineString']) && !empty($feature->properties->stroke)) {
         return $feature->properties->stroke;
     }
@@ -128,7 +132,11 @@ function get_feature_color($feature)
                     <li>
                         <div class="feature-layer" data-feature="<?php echo $feature->properties->id; ?>">
                             <button style="color: <?php echo get_feature_color($feature); ?>">
-                                <?php if ($feature->geometry->type === 'LineString') : ?>
+                                <?php if ($feature->properties->title === 'Eastrail System') : ?>
+                                    <svg class="icon">
+                                        <use xlink:href="#search" />
+                                    </svg>
+                                <?php elseif ($feature->geometry->type === 'LineString') : ?>
                                     <svg class="icon">
                                         <use xlink:href="#route" />
                                     </svg>
