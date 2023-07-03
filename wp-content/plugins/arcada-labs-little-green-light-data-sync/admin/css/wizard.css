@@ -1,0 +1,175 @@
+.arcada-lgl-wizard {
+    max-width: 750px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: auto;
+    background-color: #fafafa;
+    border: 1px solid #CCCCCC;
+    border-bottom-color: #DFDFDF;
+}
+
+.arcada-labs-lgl-form >h2 {
+    display: none;
+}
+
+#arcada-lgl-wizard-step-4 .arcada-labs-lgl-form >h2 {
+    display: block;
+}
+
+.arcada-labs-lgl-form >table >tbody >tr {
+    display: flex;
+    flex-direction: column;
+}
+
+.arcada-labs-lgl-form >table >tbody >tr >th {
+    padding: 20px 10px 0 0;
+}
+.arcada-labs-wizard--anchor {
+    text-decoration: none;
+}
+
+.arcada-lgl-wizard--content {
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.lgl-form-group-fields-container:first-of-type hr {
+    display: none;
+}
+
+.arcada-lgl-wizard--content-closed {
+    max-height: 0 !important;
+}
+
+.arcada-lgl-wizard--content >:first-child {
+    margin-top: 0;
+}
+
+.arcada-lgl-wizard .lgl-button {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+#arcada-lgl-wizard-step-0 {
+    margin-top: 50px;
+    position: relative;
+}
+
+.arcada-lgl-wizard-code-block {
+    background-color: #dfdfdf;
+    padding: 15px;
+    border-radius: 5px;
+    max-height: 150px;
+    overflow: auto;
+}
+
+.arcada-lgl-wizard ol >li {
+    margin-bottom: 14px;
+    line-height: 1.6;
+}
+
+.arcada-lgl-wizard ol >li:last-of-type {
+    margin-bottom: 20px;
+}
+
+.arcada-lgl-wizard-code-block li {
+    margin-bottom: 0;
+}
+
+.arcada-lgl-wizard--content p.submit {
+    padding: 0;
+    margin: 0;
+}
+
+#arcada-labs-lgl-forms-button {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+    text-decoration: none;
+    text-shadow: none;
+    vertical-align: top;
+    font-size: 13px;
+    line-height: 2.15384615;
+    min-height: 30px;
+    margin: 0 0 15px 0;
+    padding: 0 10px;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    -webkit-appearance: none;
+    border-radius: 3px;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.arcada-lgl-wizard-code-block-container {
+    position: relative;
+    margin-top: 18px;
+}
+
+.arcada-lgl-wizard--content .arcada-labs-lgl-form {
+    overflow-y: auto;
+}
+
+.arcada-lgl-wizard-block-container {
+    display: flex;
+}
+
+.lgl-sync-copy {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    text-decoration: none;
+    background-color: #010E13;
+    font-size: 14px;
+    color: white;
+    padding: 4px 9px;
+    border-radius: 8px;
+}
+
+.lgl-sync-paste {
+    text-decoration: none;
+    background-color: #010E13;
+    font-size: 14px;
+    color: white;
+    padding: 4px 9px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.lgl-sync-paste:focus,
+.lgl-sync-copy:focus {
+    color: white;
+    text-decoration: underline;
+}
+
+.lgl-sync-paste:hover,
+.lgl-sync-copy:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.arcada-lgl-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 99999;
+}
+
+.arcada-lgl-video-container {
+    border: 2px solid #010E13;
+    margin: 30px auto;
+    font-size: 36px !important;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.lgl-wizard-instruction {
+    margin-bottom: 13px;
+}

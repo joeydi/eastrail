@@ -1,0 +1,22 @@
+.arcada-lgl-modal {
+    background-color: rgba(0,0,0,0.5);
+    position: fixed;
+    bottom: 0;
+    top: 0;
+    right: 0;
+    left: -20px;
+    z-index: 1;
+}
+
+.arcada-lgl-modal__container {
+    background-color: #fff;
+    padding: 30px 50px;
+    max-width: 650px;
+    margin: calc(50vh - 190px) auto auto;
+}
+
+.arcada-lgl-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 25px;
+}

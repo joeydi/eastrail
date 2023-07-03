@@ -1,0 +1,63 @@
+
+.lgl-gf-forms-form .form-table th {
+    padding-top: 15px;
+}
+
+.lgl-gf-forms-form >h2 {
+    display: none;
+}
+
+.lgl-form-group-fields-container hr {
+    flex-basis: 100%;
+    margin-bottom: 20px;
+}
+
+.lgl-form-group {
+    display: flex;
+    max-width: 600px;
+    column-gap: 25px;
+    flex-wrap: wrap;
+}
+
+.lgl-form-group >button.lgl-button {
+    align-self: center;
+}
+
+.lgl-form-group label {
+    margin-bottom: 7px;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.lgl-form-group .lgl-input-instructions {
+    margin-top: 4px;
+}
+
+.lgl-form-group >div {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    flex-basis: calc(50% - 13px);
+}
+
+.lgl-form-group >div.lgl-gf-form {
+    flex-basis: 100%;
+}
+
+.lgl-form-group >div.lgl-gf-form select {
+    max-width: unset;
+}
+
+.lgl-form-group >div label {
+    flex: 1;
+}
+
+.lgl-gf-forms-form .form-table td p.lgl-disclaimer {
+    margin-top: 14px;
+}
+
+.lgl-form-group >div input,
+.lgl-form-group >div select {
+    width: 100%;
+    flex: 4;
+}

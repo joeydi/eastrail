@@ -1,0 +1,15 @@
+{
+  "name": "gutenberg_tabs_block",
+  "version": "1.0.0",
+  "description": "Gutenberg Block for donation tabs.",
+  "main": "index.js",
+  "scripts": {
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
+  },
+  "author": "WPEXPERTS",
+  "license": "ISC",
+  "devDependencies": {
+    "@wordpress/scripts": "22.1.0"
+  }
+}

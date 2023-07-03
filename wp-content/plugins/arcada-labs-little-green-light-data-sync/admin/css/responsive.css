@@ -1,0 +1,5 @@
+@media only screen and (max-width: 500px) {
+    .lgl-form-group >div {
+        flex-basis: 100%;
+    }
+}
