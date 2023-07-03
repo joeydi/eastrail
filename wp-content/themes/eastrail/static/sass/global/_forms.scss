@@ -9,6 +9,34 @@ select.form-control-sm {
     background-size: 10px 8px;
 }
 
+input.input-text,
+textarea.input-text {
+    @extend .form-control;
+}
+
+.select2-container .select2-selection--single {
+    height: 48px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding: 10px 1.25rem;
+}
+
+button.wc-donation-f-submit-donation {
+    padding: $btn-padding-y $btn-padding-x;
+    font-family: $btn-font-family;
+    font-size: $btn-font-size;
+    font-weight: $btn-font-weight;
+    line-height: $btn-line-height;
+    border: $btn-border-width solid $dark-evergreen;
+    border-radius: $btn-border-radius;
+    text-transform: uppercase;
+}
+
 .gfield_description {
     margin-bottom: 1rem;
 }
