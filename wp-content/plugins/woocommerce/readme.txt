@@ -1,10 +1,10 @@
 === WooCommerce ===
 Contributors: automattic, mikejolley, jameskoster, claudiosanches, rodrigosprimo, peterfabian1000, vedjain, jamosova, obliviousharmony, konamiman, sadowski, wpmuguru, royho, barryhughes-1
 Tags: online store, ecommerce, shop, shopping cart, sell online, storefront, checkout, payments, woo, woo commerce, e-commerce, store
-Requires at least: 6.0
+Requires at least: 6.1
 Tested up to: 6.2
 Requires PHP: 7.3
-Stable tag: 7.7.1
+Stable tag: 7.8.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -163,10 +163,14 @@ WooCommerce comes with some sample data you can use to see how products look; im
 
 == Changelog ==
 
-= 7.7.1 2023-05-26 =
+= 7.8.1 2023-06-27 =
 
 **WooCommerce**
 
-* Update - Update WooCommerce Blocks to 10.0.5 [#38427](https://github.com/woocommerce/woocommerce/pull/38427)
+* Update - Update WooCommerce Blocks to 10.2.4 [#38891](https://github.com/woocommerce/woocommerce/pull/38891)
+* Fix - Do not show "Adding new attribute failed" error message when loading of product screens is interrupted by page unload. [[#38815]](https://github.com/woocommerce/woocommerce/pull/38815)
+* Tweak - Always pass default product type options to product_type_options filter. [[#38854]](https://github.com/woocommerce/woocommerce/pull/38854)
+
+
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/woocommerce/trunk/changelog.txt).
