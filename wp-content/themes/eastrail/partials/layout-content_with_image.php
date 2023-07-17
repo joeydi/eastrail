@@ -18,7 +18,7 @@ if ($image_alignment == 'left') {
 ?>
 <section class="content-with-image align-<?php echo $image_alignment; ?> <?php echo ET::section_classes(); ?>" id="<?php echo sanitize_title($label); ?>" aria-label="<?php echo $label; ?>">
     <div class="container">
-        <div data-scroll-fade-children class="row">
+        <div class="row" data-scroll-fade-children>
             <div class="<?php echo $image_class; ?> mb-40 mb-md-0">
                 <div class="image">
                     <?php if ($media_url) : ?>
