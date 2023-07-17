@@ -4,7 +4,7 @@ Tags: credit card, square, woocommerce, inventory sync
 Requires at least: 5.8
 Tested up to: 6.2.0
 Requires PHP: 7.4
-Stable tag: 3.9.0
+Stable tag: 4.0.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -71,6 +71,22 @@ If you get stuck, you can ask for help in the [Plugin Forum](https://wordpress.o
 2. The payment gateway settings.
 
 == Changelog ==
+
+= 4.0.0 - 2023-07-05 =
+* Add - Store Owner details in the `Additional Content` field to the `Sync Complete` and `Access Token` email notifications.
+* Dev - Project maintenance automation via GitHub Actions.
+* Dev - Refactored logic for how HTML description on product import and sync are handled.
+* Dev - Remove WooCommerce copyright from source code.
+* Dev - Removed redundant `WP_Job_Batch_Handler` code.
+* Dev - Resolve PHP warning caused due to running foreach on `null`.
+* Dev - `wc_square_enable_html_description` filter to toggle support for HTML descriptions.
+* Fix - Compatibility issue with the Automatic Order Printing extension.
+* Fix - Inventory sync for orders placed via other payment gateways using Block based checkout.
+* Fix - Inventory sync for stock updates through product editing from Woo store.
+* Fix - Issue caused by using correct type while sanitizing payment tokens.
+* Fix - Issue that allowed adding non-numeric characters in the "last 4" and "expiry date" fields in the token editor.
+* Fix - Issue that caused some simple and variable products to be excluded from sync.
+* Fix - Issue that caused the "Sync with Square" checkbox to be unchecked for variable products.
 
 = 3.9.0 - 2023-06-19 =
 * Add - Support for splitting payments between a Square Gift Card and a Credit Card.

@@ -116,8 +116,6 @@ class Products {
 	 */
 	private function add_product_edit_screen_hooks() {
 
-		add_action( 'woocommerce_variation_options', array( $this, 'add_variation_manage_stock' ) );
-
 		// handle individual products input fields for setting sync status
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_product_data_fields' ) );
 		add_action( 'woocommerce_admin_process_product_object', array( $this, 'process_product_data' ), 20 );
@@ -125,28 +123,6 @@ class Products {
 
 		add_action( 'admin_notices', array( $this, 'add_notice_product_hidden_from_catalog' ) );
 	}
-
-
-	/**
-	 * Adds our own hidden "manage stock" input to the variation fields.
-	 *
-	 * We disable the core checkbox, but this causes stock management to be disabled for the variations because the
-	 * disabled field doesn't get POSTed. This overrides the checkbox value so that we can still disable it in the UI.
-	 *
-	 * @since 2.0.2
-	 *
-	 * @param int $loop currently looped variation
-	 */
-	public function add_variation_manage_stock( $loop ) {
-
-		if ( ! wc_square()->get_settings_handler()->is_inventory_sync_enabled() ) {
-			return;
-		}
-
-		?> <input type="hidden" id="wc_square_variation_manage_stock" name="variable_manage_stock[<?php echo esc_attr( $loop ); ?>]" value="1" />
-		<?php
-	}
-
 
 	/**
 	 * Adds hooks to sync products that have been updated.

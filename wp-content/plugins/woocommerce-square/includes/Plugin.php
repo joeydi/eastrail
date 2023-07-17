@@ -136,7 +136,6 @@ class Plugin extends Payment_Gateway_Plugin {
 
 		// background export must be loaded all the time, because otherwise background jobs simply won't work
 		require_once $this->get_framework_path() . '/Utilities/WP_Background_Job_Handler.php';
-		require_once $this->get_framework_path() . '/Utilities/WP_Job_Batch_Handler.php';
 
 		$this->background_job_handler = new Background_Job();
 

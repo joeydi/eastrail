@@ -114,9 +114,10 @@ class Access_Token_Email extends Base_Email {
 		return array_merge(
 			$args,
 			array(
-				'email'         => $this,
-				'email_heading' => $this->heading,
-				'email_body'    => $email_body,
+				'email'              => $this,
+				'email_heading'      => $this->heading,
+				'email_body'         => $email_body,
+				'additional_content' => $this->get_additional_content(),
 			)
 		);
 	}

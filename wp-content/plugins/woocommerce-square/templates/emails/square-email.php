@@ -33,9 +33,24 @@ defined( 'ABSPATH' ) || exit;
  * @version 2.0.0
  * @since 2.0.0
  */
-
 do_action( 'woocommerce_email_header', $email_heading, $email );
 
 echo wp_kses_post( wpautop( wptexturize( $email_body ) ) );
 
+/**
+ * Show user-defined additional content - this is set in each email's settings.
+ */
+if ( $additional_content ) {
+	echo wp_kses_post( wpautop( wptexturize( $additional_content ) ) );
+}
+
+/**
+ * Square html email template.
+ *
+ * @type string $email_body email body (may contain HTML)
+ * @type \WooCommerce\Square\Emails\Sync_Completed $email email object
+ *
+ * @version 2.0.0
+ * @since 2.0.0
+ */
 do_action( 'woocommerce_email_footer', $email );

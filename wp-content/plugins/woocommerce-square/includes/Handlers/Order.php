@@ -64,6 +64,7 @@ class Order {
 
 		// ADD hooks for stock syncs based on changes from orders not from this gateway
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'maybe_sync_stock_for_order_via_other_gateway' ), 10, 3 );
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'maybe_sync_stock_for_store_api_order_via_other_gateway' ), 10, 1 );
 
 		// Add specific hook for paypal IPN callback
 		add_action( 'valid-paypal-standard-ipn-request', array( $this, 'maybe_sync_stock_for_order_via_paypal' ), 10, 1 );
@@ -137,6 +138,26 @@ class Order {
 	 * @param WC_Order $order       Order object.
 	 */
 	public function maybe_sync_stock_for_order_via_other_gateway( $order_id, $posted_data, $order ) {
+
+		// Confirm we are not processing the order through the Square gateway.
+		if ( ! $order instanceof \WC_Order || Plugin::GATEWAY_ID === $order->get_payment_method() ) {
+			return;
+		}
+
+		$this->sync_stock_for_order( $order );
+	}
+
+	/**
+	 * Checks if we should sync stock for this order.
+	 * We only sync for other gateways that Square will not be aware of.
+	 *
+	 * This functions sets a process in motion that gathers products that will be processed on shutdown.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param \WC_Order $order Order object.
+	 */
+	public function maybe_sync_stock_for_store_api_order_via_other_gateway( $order ) {
 
 		// Confirm we are not processing the order through the Square gateway.
 		if ( ! $order instanceof \WC_Order || Plugin::GATEWAY_ID === $order->get_payment_method() ) {
@@ -556,7 +577,7 @@ class Order {
 	 * @return string
 	 */
 	public function filter_gateway_title( $value, $id ) {
-		if ( Plugin::GATEWAY_ID !== $id || ! is_admin() ) {
+		if ( Plugin::GATEWAY_ID !== $id || ! is_admin() || ! function_exists( 'get_current_screen' ) ) {
 			return $value;
 		}
 

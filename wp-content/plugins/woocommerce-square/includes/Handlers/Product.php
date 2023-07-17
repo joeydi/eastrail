@@ -192,6 +192,8 @@ class Product {
 			$product->set_name( wc_clean( $product_name ) );
 		}
 
+		$product_description = self::get_catalog_item_description( $catalog_item );
+
 		/**
 		 * Allow overriding product description during import from Square
 		 *
@@ -205,7 +207,7 @@ class Product {
 		 *                      and keep existing description.
 		 * @since 3.3.0
 		 */
-		$product_description = apply_filters( 'wc_square_update_product_set_description', $catalog_item->getDescription(), $catalog_item, $product );
+		$product_description = apply_filters( 'wc_square_update_product_set_description', $product_description, $catalog_item, $product );
 		if ( false !== $product_description ) {
 			$product->set_description( $product_description );
 		}
@@ -253,6 +255,35 @@ class Product {
 		 * @param \Square\Models\CatalogItem $catalog_item Square API catalog item object
 		 */
 		do_action( 'wc_square_updated_product_from_square', $product, $catalog_item );
+	}
+
+	/**
+	 * Returns description of a catalog item.
+	 *
+	 * @since 3.9.1
+	 *
+	 * @param \Square\Models\CatalogItem $catalog_item
+	 * @return string
+	 */
+	public static function get_catalog_item_description( $catalog_item ) {
+		/**
+		 * Filter to import HTML description with HTML.
+		 * Enabled by default.
+		 *
+		 * @since 3.9.1
+		 *
+		 * @param boolean 'is_enabled' Boolean to toggle support for HTML descriptions.
+		 */
+		if ( apply_filters( 'wc_square_enable_html_description', true ) ) {
+			$product_description = wp_specialchars_decode( $catalog_item->getDescriptionHtml() );
+		} else {
+			// For some reason, `getDescriptionPlaintext` returns description with HTML.
+			// We use wp_strip_all_tags to strip HTML and preserve white spaces.
+			// Not sure if this is a bug.
+			$product_description = wp_strip_all_tags( $catalog_item->getDescriptionPlaintext() );
+		}
+
+		return $product_description;
 	}
 
 
@@ -463,6 +494,11 @@ class Product {
 		$set_term = wp_set_post_terms( $product->get_id(), array( $synced ), self::SYNCED_WITH_SQUARE_TAXONOMY );
 		$success  = is_array( $set_term );
 
+		if ( wc_square()->get_settings_handler()->is_inventory_sync_enabled() && 'external' !== $product->get_type() ) {
+			// Trigger a sync inventory from Woo to Square if product stock is updated from admin.
+			$product->save();
+		}
+
 		return $success;
 	}
 
@@ -527,10 +563,11 @@ class Product {
 		}
 
 		/**
-		 * Filter hook to set whether a product can be synced with Square.
+		 * Filter hook to set whether a product can sync with Square.
 		 *
 		 * @since 2.0.2
-		 * @param boolean     $can_sync Whether product should be synced.
+		 *
+		 * @param boolean     $can_sync Says whether product can be synced with square.
 		 * @param \WC_Product $product  WooCommerce product.
 		 */
 		return (bool) apply_filters( 'wc_square_product_can_sync_with_square', $can_sync, $product );
@@ -1494,9 +1531,15 @@ class Product {
 	 * @param \Square\Models\CatalogObject $catalog_variation
 	 */
 	private static function update_price_money( $product, \Square\Models\CatalogObject $catalog_variation ) {
+		$location_overrides = $catalog_variation->getItemVariationData()->getLocationOverrides();
+
+		if ( is_null( $location_overrides ) ) {
+			return;
+		}
+
 		$location_id = wc_square()->get_settings_handler()->get_location_id();
 
-		foreach ( $catalog_variation->getItemVariationData()->getLocationOverrides() as $location_override ) {
+		foreach ( $location_overrides as $location_override ) {
 
 			if ( $location_id === $location_override->getLocationId() ) {
 

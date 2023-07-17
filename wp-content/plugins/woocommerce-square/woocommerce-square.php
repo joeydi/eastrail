@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WooCommerce Square
- * Version: 3.9.0
+ * Version: 4.0.0
  * Plugin URI: https://woocommerce.com/products/square/
  * Requires at least: 5.8
  * Tested up to: 6.2.0
@@ -12,8 +12,6 @@
  * Author URI: https://www.woocommerce.com/
  * Text Domain: woocommerce-square
  * Domain Path: /i18n/languages/
- *
- * Copyright: © 2023 WooCommerce
  *
  * License: GPL-3.0-or-later
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0 or later
@@ -31,7 +29,7 @@ defined( 'ABSPATH' ) || exit;
 require_once plugin_dir_path( __FILE__ ) . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
 
 if ( ! defined( 'WC_SQUARE_PLUGIN_VERSION' ) ) {
-	define( 'WC_SQUARE_PLUGIN_VERSION', '3.9.0' ); // WRCS: DEFINED_VERSION.
+	define( 'WC_SQUARE_PLUGIN_VERSION', '4.0.0' ); // WRCS: DEFINED_VERSION.
 }
 
 if ( ! defined( 'WC_SQUARE_PLUGIN_URL' ) ) {

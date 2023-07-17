@@ -207,18 +207,18 @@ class Sync_Completed extends Base_Email {
 		$sync_completed_date = '';
 		$sync_completed_time = '';
 		if ( isset( $job->completed_at ) ) {
-			$sync_completed_date = date( wc_date_format(), strtotime( $job->completed_at ) );
-			$sync_completed_time = date( wc_time_format(), strtotime( $job->completed_at ) );
+			$sync_completed_date = gmdate( wc_date_format(), strtotime( $job->completed_at ) );
+			$sync_completed_time = gmdate( wc_time_format(), strtotime( $job->completed_at ) );
 		} elseif ( isset( $job->failed_at ) ) {
-			$sync_completed_date = date( wc_date_format(), strtotime( $job->failed_at ) );
-			$sync_completed_time = date( wc_time_format(), strtotime( $job->failed_at ) );
+			$sync_completed_date = gmdate( wc_date_format(), strtotime( $job->failed_at ) );
+			$sync_completed_time = gmdate( wc_time_format(), strtotime( $job->failed_at ) );
 		}
 
 		// placeholders
 		$email_merge_tags = array(
 			'product_count'       => $product_count,
-			'sync_started_date'   => isset( $job->started_at ) ? date( wc_date_format(), strtotime( $job->started_at ) ) : '',
-			'sync_started_time'   => isset( $job->started_at ) ? date( wc_time_format(), strtotime( $job->started_at ) ) : '',
+			'sync_started_date'   => isset( $job->started_at ) ? gmdate( wc_date_format(), strtotime( $job->started_at ) ) : '',
+			'sync_started_time'   => isset( $job->started_at ) ? gmdate( wc_time_format(), strtotime( $job->started_at ) ) : '',
 			'sync_completed_date' => $sync_completed_date,
 			'sync_completed_time' => $sync_completed_time,
 		);
@@ -251,9 +251,10 @@ class Sync_Completed extends Base_Email {
 		return array_merge(
 			$args,
 			array(
-				'email'         => $this,
-				'email_heading' => $email_heading,
-				'email_body'    => $email_body,
+				'email'              => $this,
+				'email_heading'      => $email_heading,
+				'email_body'         => $email_body,
+				'additional_content' => $this->get_additional_content(),
 			)
 		);
 	}

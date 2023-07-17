@@ -69,6 +69,7 @@ class Manual_Synchronization extends Stepped_Job {
 					'include' => $product_ids,
 					'return'  => 'ids',
 					'type'    => wc_square()->get_sync_handler()->supported_product_types(),
+					'limit'   => -1,
 				)
 			);
 
@@ -1079,7 +1080,7 @@ class Manual_Synchronization extends Stepped_Job {
 						$child            = wc_get_product( $child_id );
 						$inventory_change = Product::get_inventory_change_physical_count_type( $child );
 
-						if ( $child instanceof \WC_Product && $inventory_change ) {
+						if ( $child instanceof \WC_Product && $child->get_manage_stock() && $inventory_change ) {
 
 							$product_inventory_changes[] = $inventory_change;
 						}
@@ -1088,16 +1089,17 @@ class Manual_Synchronization extends Stepped_Job {
 
 					$inventory_change = Product::get_inventory_change_physical_count_type( $product );
 
-					if ( $inventory_change ) {
+					if ( $inventory_change && $product->get_manage_stock() ) {
 
 						$product_inventory_changes[] = $inventory_change;
 					}
 				}
 
 				if ( self::BATCH_CHANGE_INVENTORY_LIMIT >= $inventory_change_count + count( $product_inventory_changes ) ) {
-
-					$inventory_changes[]     = $product_inventory_changes;
-					$inventory_change_count += count( $product_inventory_changes );
+					if ( ! empty( $product_inventory_changes ) ) {
+						$inventory_changes[]     = $product_inventory_changes;
+						$inventory_change_count += count( $product_inventory_changes );
+					}
 					unset( $product_ids[ $key ] );
 
 				} else {

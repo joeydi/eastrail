@@ -224,7 +224,15 @@ class Woo_SOR extends \WooCommerce\Square\Handlers\Product {
 		}
 
 		if ( wc_square()->get_settings_handler()->is_inventory_sync_enabled() ) {
-			$variation_data->setTrackInventory( true );
+			/*
+			 * Only update track_inventory if it's not set.
+			 * This will only update inventory tracking on new variations.
+			 * inventory tracking will remain the same for existing variations.
+			 */
+			$track_inventory = $variation_data->getTrackInventory();
+			if ( is_null( $track_inventory ) ) {
+				$variation_data->setTrackInventory( $product->get_manage_stock() );
+			}
 		}
 
 		$variation_data->setSku( $product->get_sku() );

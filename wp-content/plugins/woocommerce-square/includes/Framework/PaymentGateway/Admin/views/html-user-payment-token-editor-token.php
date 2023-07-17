@@ -12,7 +12,6 @@
  *
  * @since     3.0.0
  * @author    WooCommerce / SkyVerge
- * @copyright Copyright (c) 2021-2022, WooCommerce.
  * @copyright Copyright (c) 2013-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0 or later
  *
@@ -82,7 +81,7 @@
 				$attributes = array();
 
 				foreach ( $field['attributes'] as $name => $value ) {
-					$attributes[] = esc_attr( $name ) . '="' . esc_attr( $value ) . '"';
+					$attributes[] = esc_attr( $name ) . '=' . esc_attr( $value );
 				}
 				?>
 

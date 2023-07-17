@@ -12,7 +12,6 @@
  *
  * @since     3.0.0
  * @author    WooCommerce / SkyVerge
- * @copyright Copyright (c) 2021-2022, WooCommerce.
  * @copyright Copyright (c) 2013-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0 or later
  *
@@ -170,13 +169,27 @@ class Payment_Gateway_Admin_Payment_Token_Editor {
 	 * @param int $user_id the user ID
 	 */
 	public function save( $user_id ) {
+		$token_key = $this->get_input_name();
+		$tokens    = filter_input( INPUT_POST, $token_key, FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$tokens    = is_array( $tokens ) ? $tokens : null;
 
-		/** Ignoring nonce verification as the permission check is already taken care of in Payment_Gateway_Admin_User_Handler::save_profile_fields. */
-		$tokens = ( isset( $_POST[ $this->get_input_name() ] ) ) ? sanitize_text_field( wp_unslash( $_POST[ $this->get_input_name() ] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( is_null( $tokens ) ) {
+			return;
+		}
+
+		$sanitized_tokens = array();
+
+		foreach ( $tokens as $token ) {
+			if ( ! is_array( $token ) ) {
+				continue;
+			}
+
+			$sanitized_tokens[] = array_map( 'sanitize_text_field', $token );
+		}
 
 		$customer_tokens = \WC_Payment_Tokens::get_customer_tokens( $user_id, wc_square()->get_gateway()->get_id() );
 
-		foreach ( $tokens as $data ) {
+		foreach ( $sanitized_tokens as $data ) {
 
 			$token_id = $data['id'];
 

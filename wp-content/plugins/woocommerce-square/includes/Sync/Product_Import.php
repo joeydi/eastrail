@@ -552,8 +552,8 @@ class Product_Import extends Stepped_Job {
 		$data = array(
 			'title'       => $catalog_object->getItemData()->getName(),
 			'type'        => ( 1 === count( $variations ) && ! ( $product && $product instanceof \WC_Product_Variable ) ) ? 'simple' : 'variable',
-			'sku'         => '', // make sure to reset SKU when simple product is updated to variable
-			'description' => $catalog_object->getItemData()->getDescription(),
+			'sku'         => '', // make sure to reset SKU when simple product is updated to variable.
+			'description' => Product::get_catalog_item_description( $catalog_object->getItemData() ),
 			'image_id'    => Product::get_catalog_item_thumbnail_id( $catalog_object ),
 			'categories'  => array( $category_id ),
 			'square_meta' => array(
@@ -1344,18 +1344,11 @@ class Product_Import extends Stepped_Job {
 			throw new \Exception( sprintf( __( 'Invalid product type - the product type must be any of these: %s', 'woocommerce-square' ), implode( ', ', array_keys( wc_get_product_types() ) ) ) );
 		}
 
-		// set description
-		$post_content = isset( $data['description'] ) ? wc_clean( $data['description'] ) : '';
-
-		if ( $post_content && isset( $data['enable_html_description'] ) && true === $data['enable_html_description'] ) {
-			$post_content = $data['description'];
-		}
-
 		$new_product = array(
 			'post_title'   => wc_clean( $data['title'] ),
 			'post_status'  => isset( $data['status'] ) ? wc_clean( $data['status'] ) : 'publish',
 			'post_type'    => 'product',
-			'post_content' => isset( $data['description'] ) ? $post_content : '',
+			'post_content' => isset( $data['description'] ) ? $data['description'] : '',
 			'post_author'  => get_current_user_id(),
 			'menu_order'   => isset( $data['menu_order'] ) ? (int) $data['menu_order'] : 0,
 		);

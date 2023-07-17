@@ -113,7 +113,7 @@ class Base_Email extends \WC_Email {
 				'recipient' => array(
 					'title'       => __( 'Recipient(s)', 'woocommerce-square' ),
 					'type'        => 'text',
-					/* translatorsPlaceholder: %s default email address */
+					/* translators: %s default email address */
 					'description' => sprintf( __( 'Enter recipients (comma separated) for this email. Defaults to admin email: %s', 'woocommerce-square' ), '<code>' . esc_attr( get_option( 'admin_email' ) ) . '</code>' ),
 					'placeholder' => get_bloginfo( 'admin_email' ),
 					'default'     => get_bloginfo( 'admin_email' ),
@@ -170,9 +170,10 @@ class Base_Email extends \WC_Email {
 		return array_merge(
 			$args,
 			array(
-				'email'         => $this,
-				'email_heading' => '',
-				'email_body'    => '',
+				'email'              => $this,
+				'email_body'         => '',
+				'email_heading'      => '',
+				'additional_content' => '',
 			)
 		);
 	}

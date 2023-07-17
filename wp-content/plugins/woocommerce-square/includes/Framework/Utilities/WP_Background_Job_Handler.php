@@ -12,7 +12,6 @@
  *
  * @since     3.0.0
  * @author    WooCommerce / SkyVerge / Delicious Brains
- * @copyright Copyright (c) 2021-2022 WooCommerce.
  * @copyright Copyright (c) 2015-2016 Delicious Brains Inc.
  * @copyright Copyright (c) 2013-2019, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0 or later
