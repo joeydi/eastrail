@@ -37,6 +37,9 @@ $groups = get_sub_field('groups');
                                                         <?php echo wp_get_attachment_image($logo['image'], 'medium'); ?>
                                                     </picture>
                                                 <?php endif; ?>
+                                                <?php if ($caption = wp_get_attachment_caption($logo['image'])) : ?>
+                                                    <p class="meta text-center text-grey-4 mb-10"><?php echo $caption; ?></p>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                         <?php if ($count < 3) : ?>
