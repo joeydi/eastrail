@@ -263,6 +263,7 @@ class ET
 
         if (isset($attributes['srcset'])) {
             $attributes['data-srcset'] = $attributes['srcset'];
+            unset($attributes['srcset']);
         }
 
         $attributes['class'] .= ' lazyload';
