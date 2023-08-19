@@ -258,11 +258,11 @@ class ET
 
         if (isset($attributes['src'])) {
             $attributes['data-src'] = $attributes['src'];
+            $attributes['src'] = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
         }
 
         if (isset($attributes['srcset'])) {
             $attributes['data-srcset'] = $attributes['srcset'];
-            $attributes['srcset'] = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
         }
 
         $attributes['class'] .= ' lazyload';
