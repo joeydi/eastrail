@@ -5,7 +5,7 @@
 <footer>
     <div class="container">
         <a class="logo" href="<?php echo site_url(); ?>" title="<?php bloginfo('sitename'); ?>">
-            <img src="<?php echo ET::theme_url('static/img/eastrail-partners-logo.jpg'); ?>" alt="Eastrail Partners">
+            <img width="170" height="100" src="<?php echo ET::theme_url('static/img/eastrail-partners-logo.jpg'); ?>" alt="Eastrail Partners">
         </a>
 
         <div class="row">
