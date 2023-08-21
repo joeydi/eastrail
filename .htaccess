@@ -1,4 +1,3 @@
-
 # BEGIN WordPress
 # The directives (lines) between "BEGIN WordPress" and "END WordPress" are
 # dynamically generated, and should only be modified via WordPress filters.
@@ -12,5 +11,16 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
-
 # END WordPress
+
+<Files xmlrpc.php>
+order allow,deny
+deny from all
+</Files>
+
+<IfModule mod_headers.c>
+# Expires after 1 year
+<filesMatch ".(gif|png|jpg|jpeg|ico|pdf|svg|js|css|woff|woff2)$">
+Header set Cache-Control "max-age=31536000"
+</filesMatch>
+</IfModule>
