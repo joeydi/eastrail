@@ -6,6 +6,7 @@ $media_url = get_sub_field('media_url');
 $content = get_sub_field('content');
 $image_alignment = get_sub_field('image_alignment');
 $image_size = get_sub_field('image_size');
+$image_loading = get_row_index() === 1 ? 'eager' : 'lazy';
 
 if ($image_alignment == 'left') {
     $image_class = 'col-md-6';
@@ -25,7 +26,7 @@ if ($image_alignment == 'left') {
                         <?php echo wp_oembed_get($media_url); ?>
                     <?php elseif ($image) : ?>
                         <picture class="h-100 aspect-<?php echo $image_size; ?> bg-grey-2">
-                            <?php echo wp_get_attachment_image($image, $image_size); ?>
+                            <?php echo wp_get_attachment_image($image, $image_size, false, ['loading' => $image_loading]); ?>
                         </picture>
                     <?php endif; ?>
                 </div>
