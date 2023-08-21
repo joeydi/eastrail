@@ -543,7 +543,6 @@
                                 "id": ""
                             },
                             "choices": {
-                                "icon": "Icon",
                                 "widescreen": "Widescreen",
                                 "landscape": "Landscape",
                                 "block": "Block",
@@ -1270,7 +1269,6 @@
                                 "id": ""
                             },
                             "choices": {
-                                "icon": "Icon",
                                 "widescreen": "Widescreen",
                                 "landscape": "Landscape",
                                 "block": "Block",
@@ -2617,6 +2615,7 @@
                                     "collapsed": "",
                                     "button_label": "Add Logo",
                                     "rows_per_page": 20,
+                                    "parent_repeater": "field_64346203cfae6",
                                     "sub_fields": [
                                         {
                                             "key": "field_6434621ecfae9",
@@ -2661,8 +2660,7 @@
                                             "return_format": "array",
                                             "parent_repeater": "field_64346212cfae8"
                                         }
-                                    ],
-                                    "parent_repeater": "field_64346203cfae6"
+                                    ]
                                 }
                             ]
                         }
@@ -2842,5 +2840,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1683122246
+    "modified": 1692629971
 }
