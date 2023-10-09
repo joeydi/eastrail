@@ -8,16 +8,47 @@ main.map-embed {
     .layers {
         overflow: auto;
         flex-shrink: 0;
-        width: 260px;
+        width: 40px;
         height: 100%;
         padding-top: 10px;
         transition: width 0.25s $ease-out;
 
         &.active {
-            width: 260px;
+            width: 100%;
+
+            button.expand .icon {
+                transform: scaleX(-1);
+            }
+
+            > ul {
+                display: block;
+            }
+        }
+
+        button.expand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            margin-top: 12px;
+            margin-left: 10px;
+            padding: 0;
+            border: none;
+            border-radius: 3px;
+            background: $white;
+            color: $grey-4;
+
+            .icon {
+                width: 20px;
+                height: 20px;
+                transition: transform 0.5s $ease-out;
+            }
         }
 
         ul {
+            display: none;
             margin: 0;
             padding: 0;
             list-style-type: none;
@@ -127,9 +158,28 @@ main.map-embed {
 
     .map {
         width: 100%;
+        min-width: 260px;
         height: calc(100% - 20px);
-        margin: 10px 10px 10px 0;
+        margin: 10px;
         border-radius: 5px;
         border: 1px solid darken($grey-1, 10%);
+    }
+
+    @include md {
+        .layers {
+            width: 260px;
+
+            &.active {
+                width: 260px;
+            }
+
+            button.expand {
+                display: none;
+            }
+
+            > ul {
+                display: block;
+            }
+        }
     }
 }

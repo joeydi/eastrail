@@ -88,6 +88,12 @@ function get_feature_color($feature)
 
     <main id="main" class="map-embed" data-geojson="<?php echo $geojson_url; ?>">
         <div class="layers">
+            <button class="expand">
+                <span class="visually-hidden">Expand Sidebar</span>
+                <svg class="icon">
+                    <use xlink:href="#menu" />
+                </svg>
+            </button>
             <ul>
                 <?php foreach ($groupNames as $group) : $features = get_group_features($geojson, $group); ?>
                     <li>

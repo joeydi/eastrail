@@ -683,7 +683,7 @@ ET.initMapEmbed = function () {
     });
 
     map.data.setStyle(function (feature) {
-        var color = feature.getProperty("marker-color") || 'blue';
+        var color = feature.getProperty("marker-color") || "blue";
 
         return {
             zIndex: feature.getProperty("zIndex") || 1,
@@ -721,6 +721,14 @@ ET.initMapEmbed = function () {
         }
     });
 
+    // Set up click handler for sidebar expand / collapse
+    var sidebarExpand = container.find("button.expand"),
+        layers = container.find(".layers");
+
+    sidebarExpand.on("click", function () {
+        layers.toggleClass("active");
+    });
+
     // Set up click handler for group layers expand / collapse
     var groups = container.find(".group-layer");
 
@@ -752,6 +760,9 @@ ET.initMapEmbed = function () {
     features.on("click", function (e) {
         var id = $(this).data("feature"),
             feature;
+
+        // Hide the sidebar on mobile
+        layers.removeClass("active");
 
         map.data.forEach(function (f) {
             if (f.getProperty("id") === id) {
