@@ -18,7 +18,9 @@ abstract class GFUtils
                 $value = array('type'=>'first_name', 'id'=>$field['id']);
             }
         } elseif (str_contains($label, 'address')) {
-            if (str_contains($label, '2')) {
+            if (str_contains($label, '3')) {
+                $value = array('type' => 'address_line_3', 'id' => $field['id']);
+            } else if (str_contains($label, '2')) {
                 $value = array('type'=>'address_line_2', 'id'=>$field['id']);
             } else {
                 $value = array('type'=>'street', 'id'=>$field['id']);
@@ -70,6 +72,15 @@ abstract class GFUtils
             if (str_contains($inputName, 'street')) {
                 $fields['street'] = $input['id'];
                 $fields['address_line_1'] = $input['id'];
+            }
+            if (str_contains($inputName, 'address_line_1')) {
+                $fields['address_line_1'] = $input['id'];
+            }
+            if (str_contains($inputName, 'address_line_2')) {
+                $fields['address_line_2'] = $input['id'];
+            }
+            if (str_contains($inputName, 'address_line_3')) {
+                $fields['address_line_3'] = $input['id'];
             }
             if (str_contains($inputName, 'city')) {
                 $fields['city'] = $input['id'];

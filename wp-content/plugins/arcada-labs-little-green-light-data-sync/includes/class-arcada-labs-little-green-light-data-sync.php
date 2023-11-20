@@ -98,7 +98,7 @@ class Arcada_Labs_Little_Green_Light_Data_Sync {
 	 * @access   private
 	 */
 	private function load_dependencies() {
-        require 'vendor/autoload.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/vendor/autoload.php';
 
         require 'utils/gf_utils.php';
         require 'LGL/LGLCore.php';

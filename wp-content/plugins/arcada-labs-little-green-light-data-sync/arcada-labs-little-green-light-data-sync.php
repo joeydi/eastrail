@@ -16,7 +16,7 @@
  * Plugin Name:       CRM Sync for Little Green Light
  * Plugin URI:        https://arcadalabs.com/wordpress-woocommerce-and-gravity-forms-sync-for-lgl/
  * Description:       Sync all your customer's information to your Little Green Light account.
- * Version:           1.0.4
+ * Version:           1.0.5
  * Author:            Arcada Labs
  * Author URI:        https://arcadalabs.com/about/
  * License:           GPL-2.0+
@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 0.1.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'ARCADA_LABS_LITTLE_GREEN_LIGHT_DATA_SYNC_VERSION', '1.0.4' );
+define( 'ARCADA_LABS_LITTLE_GREEN_LIGHT_DATA_SYNC_VERSION', '1.0.5' );
 
 /**
  * The code that runs during plugin activation.
@@ -102,7 +102,7 @@ if( ! class_exists( 'ArcadaLGLUpdateChecker' ) ) {
 		public function __construct() {
 
 			$this->plugin_slug = plugin_basename( __DIR__ );
-			$this->version = '1.0.4';
+			$this->version = '1.0.5';
 			$this->cache_key = 'misha_custom_upd';
 			$this->cache_allowed = false;
 

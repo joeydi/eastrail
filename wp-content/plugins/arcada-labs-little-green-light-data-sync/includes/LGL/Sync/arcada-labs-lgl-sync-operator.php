@@ -51,10 +51,14 @@ class Arcada_Labs_LGL_Sync_Operator
             'first_name'=>$constituent['first_name'] ?? null,
             'last_name'=>$constituent['last_name'] ?? null,
             'street'=>$constituent['street'] ?? null,
+            'address_line_1'=>$constituent['address_line_1'] ?? null,
+            'address_line_2'=>$constituent['address_line_2'] ?? null,
+            'address_line_3'=>$constituent['address_line_3'] ?? null,
             'city'=>$constituent['city'] ?? null,
             'postal_code'=>$constituent['postal_code'] ?? null,
             'country'=>$constituent['country'] ?? null,
             'state'=>$constituent['state'] ?? null,
+            'phone_number'=>$constituent['phone'] ?? null,
             'email'=>$constituent['email'] ?? null,
         );
     }
@@ -213,6 +217,22 @@ class Arcada_Labs_LGL_Sync_Operator
     }
 
     /**
+     * Creates a Constituent object to be created or updated on LGL
+     * @param $user
+     * @return array
+     * @throws \Exception
+     */
+    public function makeConstituentFromWPUser($user): array
+    {
+        return [
+            'external_constituent_id'=>$user->ID,
+            'first_name'=>$user->data->display_name ? $user->data->display_name : $user->data->user_login,
+            'last_name'=>'',
+            'email'=>$user->data->user_email,
+        ];
+    }
+
+    /**
      * Make the constituent part of the information for the webhook post from a Gravity Form entry
      * @param $entry
      * @param $fields
@@ -223,12 +243,14 @@ class Arcada_Labs_LGL_Sync_Operator
         $constituent = [
             'first_name'=>$entry[$fields['first_name']],
             'last_name'=>$entry[($fields['last_name']  ?? '')] ?? '',
+            'phone'=>$entry[($fields['phone']  ?? '')] ?? '',
             'email' => $entry[$fields['email']],
         ];
 
         if($fields['street'] ?? false) {
             if ($street = $entry[$fields['street']]) {
                 $constituent['street'] = $street;
+                $constituent['address_line_1'] = $street;
 
                 if ($city = $entry[$fields['city']]) {
                     $constituent['city'] = $city;
@@ -265,7 +287,7 @@ class Arcada_Labs_LGL_Sync_Operator
 	/**
 	 * Gets data from lgl or cache
 	 * @return mixed|string|void
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws \Exception
 	 */
 	private function getLglInfo($data_name, $force = false)
 	{
@@ -284,19 +306,19 @@ class Arcada_Labs_LGL_Sync_Operator
 
 		$this->lgl->get($data_name, array('limit'=>'200'));
 
-		if (get_option(Names::DATA_SETS[$data_name])) {
+		if (get_option(Names::DATA_SETS[$data_name]) || get_option(Names::DATA_SETS[$data_name]) === '') {
 			update_option(Names::DATA_SETS[$data_name], $this->lgl->getResponse());
 		} else {
 			add_option(Names::DATA_SETS[$data_name], $this->lgl->getResponse());
 		}
 
-		return get_option(Names::DATA_SETS[$data_name]);
+        return get_option(Names::DATA_SETS[$data_name]);
 	}
 
     /**
      * Gets the funds options list
      * @return mixed|string|void
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     public function getFunds()
     {
@@ -306,7 +328,7 @@ class Arcada_Labs_LGL_Sync_Operator
     /**
      * Gets the Campaigns options list
      * @return mixed|string|void
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     public function getCampaigns()
     {
@@ -316,7 +338,7 @@ class Arcada_Labs_LGL_Sync_Operator
     /**
      * Gets the Gift Types options list
      * @return mixed|string|void
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     public function getGiftTypes()
     {
@@ -326,7 +348,7 @@ class Arcada_Labs_LGL_Sync_Operator
     /**
      * Gets the Payment Types options list
      * @return mixed|string|void
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     public function getPaymentTypes()
     {
@@ -336,43 +358,71 @@ class Arcada_Labs_LGL_Sync_Operator
     /**
      * Gets the Categories options list
      * @return mixed|string|void
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     public function getCategories()
     {
 	    return $this->getLglInfo('gift_categories');
     }
 
+
+    public function run_constituent_count()
+    {
+        $userObject = count_users();
+        $totalUsers = ($userObject['avail_roles']['subscriber'] ?? 0) + ($userObject['avail_roles']['customer'] ?? 0);
+        $raw_response = array('count'=>$totalUsers);
+        $response = new WP_REST_Response($raw_response);
+        $response->set_status(200);
+
+        return $response;
+    }
+
     /**
      * Run the Constituent sync to LGL, creating a constituent per each customer and subscriber users on the WP
-     * @return void
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return WP_REST_Response
+     * @param $request
+     * @throws \Exception
      */
-    public function run_constituent_sync()
+    public function run_constituent_sync($request)
     {
-        $constituents = get_users(array('role__in'=>array('customer', 'subscriber')));
+        $hasWC = in_array( 'woocommerce/woocommerce.php',
+            apply_filters( 'active_plugins', get_option( 'active_plugins' )));
+        $params = $request->get_params();
+        $page = $params['page'];
 
-        header('Content-Type: text/plain');
-        ob_start();
+        $constituents = get_users(
+            array(
+                'role__in'=>array('customer', 'subscriber'),
+                'offset' => $page * 50,
+                'number'=>50,
+            )
+        );
+
+        $raw_response = [];
 
         foreach ($constituents as $user) {
-            $constituent = $this->makeConstituentFromWCUser($user->ID);
-            $data = new WC_Customer($user->ID);
+            if ($hasWC) {
+                $constituent = $this->makeConstituentFromWCUser($user->ID);
+                // continue your WooCommerce related processing here
+            } else {
+                // WooCommerce is not active, handle accordingly
+                $constituent = $this->makeConstituentFromWPUser($user);
+            }
 
-            $hook_data = $this->makeWebHookData($constituent, []);
-            $this->lgl->hookCall($hook_data);
+            if ($constituent['email']) {
 
-            $chunk = json_encode(array($hook_data)) . "\n";
+                $hook_data = $this->makeWebHookData($constituent, []);
+                $raw_response[$user->ID] = $hook_data;
+                $this->lgl->hookCall($hook_data);
 
-            // Send the current chunk
-            echo $chunk . "\r\n";
 
-            // Flush the output buffer
-            flush();
-            ob_flush();
+            }
         }
 
-        ob_end_flush();
+        $response = new WP_REST_Response($raw_response);
+        $response->set_status(200);
+
+        return $response;
     }
 
     /**
@@ -381,49 +431,63 @@ class Arcada_Labs_LGL_Sync_Operator
      * @return WP_REST_Response
      */
     public function activate_license_key($request) {
-        $params = $request->get_params();
-        $license = $params['license'];
+        try {
+            $params = $request->get_params();
+            $license = $params['license'];
 
-        if (get_option(Names::LICENSES['license']) || (get_option(Names::LICENSES['license']) == '')) {
-            $raw_response['updated'] = update_option(Names::LICENSES['license'], $license);
-        } else {
-            $raw_response['added'] = add_option(Names::LICENSES['license'], $license);
-        }
-        $raw_response['url'] = $this->lgl->license($license);
-        $data = $this->lgl->getResponse();
-        $raw_response['data'] = $data;
-
-        if ($data->pair ?? false) {
-            if (get_option(Names::LICENSES['pair'])) {
-                update_option(Names::LICENSES['pair'], $data->pair);
-                update_option(Names::ACCESS_LEVELS['GF_LICENSE'], $data->access->GF_LICENSE);
-                update_option(Names::ACCESS_LEVELS['WC_LICENSE'], $data->access->WC_LICENSE);
+            if (get_option(Names::LICENSES['license']) || (get_option(Names::LICENSES['license']) == '')) {
+                $raw_response['updated'] = update_option(Names::LICENSES['license'], $license);
             } else {
-                add_option(Names::LICENSES['pair'], $data->pair);
-                add_option(Names::ACCESS_LEVELS['GF_LICENSE'], $data->access->GF_LICENSE);
-                add_option(Names::ACCESS_LEVELS['WC_LICENSE'], $data->access->WC_LICENSE);
+                $raw_response['added'] = add_option(Names::LICENSES['license'], $license);
             }
-        } else {
+            $raw_response['url'] = $this->lgl->license($license);
+            $data = $this->lgl->getResponse();
+            $raw_response['data'] = $data;
 
-			if ($data->message ?? false) {
-				if ($data->message === 'Invalid license') {
-					update_option(Names::ACCESS_LEVELS['GF_LICENSE'], false);
-					update_option(Names::ACCESS_LEVELS['WC_LICENSE'], false);
-					$raw_response['goner'] = 'all false';
-				}
-				$raw_response['message'] = $data->message;
-			}
+            if ($data->pair ?? false) {
+                if (get_option(Names::LICENSES['pair'])) {
+                    update_option(Names::LICENSES['pair'], $data->pair);
+                    update_option(Names::ACCESS_LEVELS['GF_LICENSE'], $data->access->GF_LICENSE);
+                    update_option(Names::ACCESS_LEVELS['WC_LICENSE'], $data->access->WC_LICENSE);
+                } else {
+                    add_option(Names::LICENSES['pair'], $data->pair);
+                    add_option(Names::ACCESS_LEVELS['GF_LICENSE'], $data->access->GF_LICENSE);
+                    add_option(Names::ACCESS_LEVELS['WC_LICENSE'], $data->access->WC_LICENSE);
+                }
+            } else {
+
+                if ($data->message ?? false) {
+                    if ($data->message === 'Invalid license') {
+                        update_option(Names::ACCESS_LEVELS['GF_LICENSE'], false);
+                        update_option(Names::ACCESS_LEVELS['WC_LICENSE'], false);
+                        $raw_response['goner'] = 'all false';
+                    }
+                    $raw_response['message'] = $data->message;
+                }
+
+                $response = new WP_REST_Response($raw_response);
+                $response->set_status(400);
+
+                return $response;
+            }
 
             $response = new WP_REST_Response($raw_response);
-            $response->set_status(400);
+            $response->set_status(200);
 
             return $response;
+        } catch (\Exception $e) {
+            $response = new WP_REST_Response(array('ERROR' => 'Exception ' . $e->getMessage()));
+            $response->set_status(400);
+            return $response;
+        } catch (\Error $e) {
+            $response = new WP_REST_Response(array('ERROR' => 'Error ' . $e->getMessage()));
+            $response->set_status(400);
+            return $response;
+        } catch (\Throwable $e) {
+            $response = new WP_REST_Response(array('ERROR' => 'Throwable ' . $e->getMessage()));
+            $response->set_status(400);
+            return $response;
         }
-
-        $response = new WP_REST_Response($raw_response);
-        $response->set_status(200);
-
-        return $response;
     }
 
     public function deactivate_license_key($request) {
@@ -437,36 +501,58 @@ class Arcada_Labs_LGL_Sync_Operator
         return $response;
     }
 
+    public function run_forms_count()
+    {
+
+        $raw_response = array('count'=>array());
+        if ($this->access[\ArcadaLabs\Constants\Names::TIERS['GF_LICENSE']]
+            && ($gv_forms = get_option('arcada_labs_lgl_sync_settings_field_forms'))) {
+            $selected_forms = $gv_forms['form'] ?? [];
+            foreach ($selected_forms as $form_id) {
+                $count = GFAPI::count_entries( $form_id, array('status'=>'active') );
+                if (!is_wp_error($count)) {
+                    $raw_response['count'][$form_id] = $count;
+                }
+            }
+        }
+
+        $response = new WP_REST_Response($raw_response);
+        $response->set_status(200);
+
+        return $response;
+    }
+
     /**
      * Run the Constituent and Gift sync to LGL from the selected forms, per form search the proper fields
      * if the structure is correct then each entry will try and sync as a constituent and gift
      * searching first if either already exists to prevent duplicates
      * @return WP_REST_Response | void
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
-    public function run_forms_sync()
+    public function run_forms_sync($request)
     {
         if ($this->access[\ArcadaLabs\Constants\Names::TIERS['GF_LICENSE']]) {
-            header('Content-Type: text/plain');
-            ob_start();
+            $params = $request->get_params();
+
             $raw_response = [];
             if ($gv_forms = get_option('arcada_labs_lgl_sync_settings_field_forms')) {
+                $page = $params['page'];
+
                 $selected_forms = $gv_forms['form'] ?? [];
                 $selected_categories = $gv_forms['category'] ?? [];
                 $selected_campaigns = $gv_forms['campaign'] ?? [];
                 $selected_funds = $gv_forms['fund'] ?? [];
                 $selected_gift_types = $gv_forms['gift_type'] ?? [];
                 $selected_payment_types = $gv_forms['payment_type'] ?? [];
+
                 foreach ($selected_forms as $index => $form_id) {
+                    if ($form_id == $params['form_id']) {
 
-                    $fields = GFUtils::getFieldsFromForm($form_id);
+                        $fields = GFUtils::getFieldsFromForm($form_id);
 
-                    // if it has a first_name, email and a total then it can be synced
-                    if ($this->gFormFieldsValid($fields)) {
-                        $page = 1;
-                        $page_size = 100;
-
-                        do {
+                        // if it has a first_name, email and a total then it can be synced
+                        if ($this->gFormFieldsValid($fields)) {
+                            $page_size = 50;
 
                             $entries = GFAPI::get_entries(
                                 $form_id,
@@ -497,25 +583,21 @@ class Arcada_Labs_LGL_Sync_Operator
                                     $hook_data = $this->makeWebHookData($constituent, []);
                                 }
 
-
                                 $raw_response[$entry['id']] = $hook_data;
 
                                 $this->lgl->hookCall($hook_data);
 
-                                $chunk = json_encode(array($hook_data)) . "\n";
-                                // Send the current chunk
-                                echo $chunk . "\r\n";
-
-                                // Flush the output buffer
-                                flush();
-                                ob_flush();
-
                             }
-                        } while(count($entries) >= $page_size);
+                        }
                     }
                 }
             }
-            ob_end_flush();
+
+            $response = new WP_REST_Response($raw_response);
+            $response->set_status(200);
+
+            return $response;
+
         } else {
             $response = new WP_REST_Response('Invalid License');
             $response->set_status(403);
@@ -523,70 +605,71 @@ class Arcada_Labs_LGL_Sync_Operator
         }
     }
 
+    public function run_transaction_count()
+    {
+        $totalOrders = wc_orders_count('completed');
+
+        $raw_response = array('count'=>$totalOrders);
+        $response = new WP_REST_Response($raw_response);
+        $response->set_status(200);
+
+        return $response;
+    }
+
     /**
      * Transactions sync of all orders that don't have an LGL id but do have a user
      * Constituents sync should have been run previously
      * @return WP_REST_Response | void
      */
-    public function run_transaction_sync()
+    public function run_transaction_sync($request)
     {
         if ($this->access[\ArcadaLabs\Constants\Names::TIERS['WC_LICENSE']]) {
-            header('Content-Type: text/plain');
-            ob_start();
+            $params = $request->get_params();
+            $page = $params['page'];
 
             $raw_response = [];
-            $page = 1;
-            $per_page = 100;
+            $per_page = 50;
 
 
-            do {
-                $args = array(
-                    'status'         => array('wc-completed'),
-                    'limit'          => $per_page,
-                    'page'           => $page,
-                    'paginate'       => true,
-                );
+            $args = array(
+                'status'         => array('wc-completed'),
+                'limit'          => $per_page,
+                'page'           => $page,
+                'paginate'       => true,
+            );
 
-                $page++;
-                $orders = wc_get_orders($args);
+            $orders = wc_get_orders($args);
 
-                foreach ($orders->orders as $order) {
-                    if (is_a($order, 'WC_Order')) {
+            foreach ($orders->orders as $order) {
+                if (is_a($order, 'WC_Order')) {
 
-                        if ($user_id = $order->get_user_id()) {
-                            $constituent_data = $this->makeConstituentFromWCUser($user_id);
-                        } else {
-                            $constituent_data = $this->makeConstituentFromWCOrder($order);
-                        }
-                        $order_id = $order->get_id();
+                    if ($user_id = $order->get_user_id()) {
+                        $constituent_data = $this->makeConstituentFromWCUser($user_id);
+                    } else {
+                        $constituent_data = $this->makeConstituentFromWCOrder($order);
+                    }
+                    $order_id = $order->get_id();
 
 
-                        if ($gifts = $this->makeGiftFromWCOrder($order)) {
+                    if ($gifts = $this->makeGiftFromWCOrder($order)) {
 
-                            foreach ($gifts as $gift) {
-                                $hook_data = $this->makeWebHookData($constituent_data, $gift);
-                                $hook_data['received_date'] = $order->get_date_completed()->date_i18n();
-                                $raw_response[$order_id] = $hook_data;
+                        foreach ($gifts as $gift) {
+                            $hook_data = $this->makeWebHookData($constituent_data, $gift);
+                            $hook_data['received_date'] = $order->get_date_completed()->date_i18n();
 
-                                $this->lgl->hookCall($hook_data);
+                            $this->lgl->hookCall($hook_data);
 
-                                $chunk = json_encode(array($hook_data)) . "\n";
-
-                                // Send the current chunk
-                                echo $chunk . "\r\n";
-
-                                // Flush the output buffer
-                                flush();
-                                ob_flush();
-
-                            }
+                            $raw_response[$order_id] = $hook_data;
                         }
                     }
                 }
+            }
 
-            } while (is_countable($orders->orders) && count($orders->orders) >= $per_page);
 
-            ob_end_flush();
+            $response = new WP_REST_Response($raw_response);
+            $response->set_status(200);
+
+            return $response;
         } else {
             $response = new WP_REST_Response('Invalid license');
             $response->set_status(403);

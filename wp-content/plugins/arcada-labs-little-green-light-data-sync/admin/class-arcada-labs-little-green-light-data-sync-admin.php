@@ -165,10 +165,31 @@ class Arcada_Labs_Little_Green_Light_Data_Sync_Admin {
             'permission_callback' => array($this, 'rest_permissions_check'),
         ));
 
+        register_rest_route('arcada-lgl-sync/v1', 'sync/constituent-count', array(
+            'methods' => 'POST',
+            'args' => ['data'],
+            'callback' => array($this->sync_operator, 'run_constituent_count'),
+            'permission_callback' => array($this, 'rest_permissions_check'),
+        ));
+
+        register_rest_route('arcada-lgl-sync/v1', 'sync/transaction-count', array(
+            'methods' => 'POST',
+            'args' => ['data'],
+            'callback' => array($this->sync_operator, 'run_transaction_count'),
+            'permission_callback' => array($this, 'rest_permissions_check'),
+        ));
+
         register_rest_route('arcada-lgl-sync/v1', 'sync/transaction', array(
             'methods' => 'POST',
             'args' => ['data'],
             'callback' => array($this->sync_operator, 'run_transaction_sync'),
+            'permission_callback' => array($this, 'rest_permissions_check'),
+        ));
+
+        register_rest_route('arcada-lgl-sync/v1', 'sync/forms-count', array(
+            'methods' => 'POST',
+            'args' => ['data'],
+            'callback' => array($this->sync_operator, 'run_forms_count'),
             'permission_callback' => array($this, 'rest_permissions_check'),
         ));
 
@@ -733,7 +754,7 @@ class Arcada_Labs_Little_Green_Light_Data_Sync_Admin {
 
     /**
      * Action to sync a user to LGL after profile update
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     function arcada_labs_lgl_user_update($user_id, $old_data)
     {
@@ -819,7 +840,7 @@ class Arcada_Labs_Little_Green_Light_Data_Sync_Admin {
     /**
      * Action to sync the order to LGL if at least one product is selected to be synced
      * @param $order_id
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     function arcada_labs_lgl_order_sync($order_id)
     {
@@ -853,7 +874,7 @@ class Arcada_Labs_Little_Green_Light_Data_Sync_Admin {
 
     /**
      * On subscriptions renewal run a new sync as it is a new Gift record
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
      */
     function arcada_labs_lgl_recurring_sync($subscription, $last_order)
     {

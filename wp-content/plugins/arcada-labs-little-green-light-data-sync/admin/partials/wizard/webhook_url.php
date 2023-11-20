@@ -63,9 +63,33 @@
                 </div>
             </li>
             <li>From the Custom Integrations page you'll see the button to map the fields you've just added, click on the "Update field map" button</li>
-            <li>Map the fields to match what each entry field will represent</li>
+            <li>
+                <div class="lgl-wizard-instruction">
+                    Map the fields to match what each entry field will represent
+                </div>
+                <div modal-target="arcada-lgl-demo-img" class="arcada-lgl-wizard-block-container arcada-lgl-modal-open">
+                    <img class="arcada-lgl-demo-mini" src="<?php echo $url; ?>images/LGL-field-map-mini.jpg"
+                         alt="Miniature demo image on how to map the fields on your Little Green Light">
+                </div>
+            </li>
         </ol>
 
+        <div id="arcada-lgl-demo-img" class="arcada-lgl-modal lgl-hide">
+            <div class="arcada-lgl-modal__container arcada-lgl-modal__container--large">
+                <h2>Map fields from source</h2>
+
+                <p class="arcada-lgl-modal__content">
+                    Make sure that your "Map fields from source" matches the following.
+                </p>
+
+                <img src="<?php echo $url; ?>images/LGL-field-map.jpg"
+                     alt="Demo image on how to map the fields on your Little Green Light">
+
+                <div class="arcada-lgl-modal__actions">
+                    <button type="button" class="lgl-button arcada-lgl-modal-close">Close</button>
+                </div>
+            </div>
+        </div>
 
 
         <button class="lgl-form-sync-spinner lgl-button lgl-button-primary lgl-spinner-container lgl-hide">

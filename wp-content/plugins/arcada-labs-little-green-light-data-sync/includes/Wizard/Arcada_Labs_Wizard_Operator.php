@@ -202,10 +202,6 @@ class Arcada_Labs_Wizard_Operator
             return $response;
         }
 
-        $this->sync_operator->run_constituent_sync();
-        $this->sync_operator->run_transaction_sync();
-        $this->sync_operator->run_forms_sync();
-
         $raw_response['params'] = $params;
         $response = new WP_REST_Response($raw_response);
         $response->set_status(200);

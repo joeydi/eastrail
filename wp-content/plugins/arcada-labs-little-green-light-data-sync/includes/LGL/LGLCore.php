@@ -3,10 +3,6 @@
 namespace ArcadaLabs\LGL;
 
 use ArcadaLabs\Constants\Names;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Client;
-use Exception;
 
 class LGLCore
 {
@@ -53,20 +49,21 @@ class LGLCore
     private function setHomeHeaders()
     {
         $this->options['headers'] = [
-            'Origin'=>get_site_url()
+            'Origin: ' . get_site_url(),
+            'Accept: application/json'
         ];
     }
 
     /**
      * Handle a Request error
-     * @param Exception $exception
-     * @return false|\Psr\Http\Message\ResponseInterface|null
+     * @param \Exception $exception
+     * @return false
      */
-    protected function handleError(Exception $exception)
+    protected function handleError(\Exception $exception)
     {
-        if ($exception instanceof ClientException) {
-            if ($exception->hasResponse()) {
-                return $exception->getResponse();
+        if ($exception instanceof \Exception) {
+            if ($exception->getMessage() !== null) {
+                return $exception->getMessage();
             }
         }
         return false;
@@ -76,28 +73,44 @@ class LGLCore
      * Makes the Request to LGL and sets the result on the response property
      * @param $path
      * @param $method
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function sendRequest($path, $method)
     {
         $url = $this->makeUrl($path);
-        $this->setHeaders();
 
-        $client = new Client();
+        $ch = curl_init($url);
+
+        // Set the request method
+        curl_setopt($ch, CURLOPT_HTTPGET, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // Set the request headers
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization'=>'Authorization: Bearer '.$this->api_key,
+            'Accept'=>'application/json'
+        ]);
 
         try {
-            $response = $client->request($method, $url, $this->options);
-        } catch (ClientException | ServerException $e) {
-            $response = $this->handleError($e);
+            // Execute the request
+            $response = curl_exec($ch);
+
+            if ($response === false) {
+                throw new \Exception(curl_error($ch));
+            }
+
+            // Handle the response
+            $this->response = $response;
+        } catch (\Exception $e) {
+            $this->handleError($e);
+        } finally {
+            // Close the cURL session
+            curl_close($ch);
         }
-        $this->response = $response;
     }
 
     /**
      * Makes a GET request to LGL
      * @param $path
      * @param array $params
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function get($path, $params = array())
     {
@@ -109,7 +122,6 @@ class LGLCore
      * Makes a POST request to LGL
      * @param $path
      * @param array $params
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function post($path, $params = array())
     {
@@ -121,7 +133,6 @@ class LGLCore
      * Makes a PUT request to LGL
      * @param $path
      * @param array $params
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function put($path, $params = array())
     {
@@ -136,10 +147,16 @@ class LGLCore
     public function getResponse()
     {
         if ($this->response) {
-            $response = json_decode((string) $this->response->getBody());
-            if (json_last_error() !== 0) {
-                $response = (string) $this->response->getBody();
+            $response = $this->response;
+
+            if (is_string($response)) {
+                // Handle the response as a string (cURL version)
+                $decodedResponse = json_decode($response);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $response = $decodedResponse;
+                }
             }
+
             return $response;
         } else {
             error_log('No response available. Did you send the request using sendRequest()?');
@@ -148,90 +165,152 @@ class LGLCore
 
     public function license($license)
     {
-        $client = new Client();
-        $data = array('license'=>$license);
+        $url = $this->home_url . 'activate';
+        $data = array('license' => $license);
         $this->options['json'] = $data;
         $this->setHomeHeaders();
 
+        $ch = curl_init($url);
+
+        // Set the request method
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // Set the request body
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+        // Set the request headers
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->options['headers']);
+
         try {
-            $response = $client->request('post', $this->home_url . 'activate', $this->options);
-        } catch (ClientException | ServerException $e) {
+            // Execute the request
+            $response = curl_exec($ch);
+
+            if ($response === false) {
+                throw new \Exception(curl_error($ch));
+            }
+
+            // Handle the response
+            $this->response = $response;
+            return $url;
+        } catch (\Exception $e) {
             $response = $this->handleError($e);
+            $this->response = $response;
+            return $url;
+        } finally {
+            // Close the cURL session
+            curl_close($ch);
         }
-        $this->response = $response;
-        return $this->home_url . 'activate';
     }
 
     public function removeLicense()
     {
-        $client = new Client();
+        $url = $this->home_url . 'deactivate';
         $data = array(
-            'license'=>get_option(Names::LICENSES['license']),
-            'pair'=>get_option(Names::LICENSES['pair']),
+            'license' => get_option(Names::LICENSES['license']),
+            'pair' => get_option(Names::LICENSES['pair']),
         );
         $this->options['json'] = $data;
         $this->setHomeHeaders();
 
+        $ch = curl_init($url);
+
+        // Set the request method
+        curl_setopt($ch, CURLOPT_POST, true);
+
+        // Set the request body
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+        // Set the request headers
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->options['headers']);
+
         try {
-            $response = $client->request('post', $this->home_url . 'deactivate', $this->options);
+            // Execute the request
+            $response = curl_exec($ch);
+
+            if ($response === false) {
+                throw new \Exception(curl_error($ch));
+            }
+
+            // Handle the response
+            $this->response = $response;
             delete_option(Names::LICENSES['license']);
             delete_option(Names::LICENSES['pair']);
-        } catch (ClientException | ServerException $e) {
+        } catch (\Exception $e) {
             $response = $this->handleError($e);
+            $this->response = $response;
+        } finally {
+            // Close the cURL session
+            curl_close($ch);
         }
-        $this->response = $response;
     }
 
     public function licenseActive($partial = false)
     {
         if (($license = get_option(Names::LICENSES['license'])) && ($pair = get_option(Names::LICENSES['pair']))) {
-	        if ( $last_check = get_option( Names::DATA_CHECKS[ 'license' ] ) ) {
-		        if ( $last_check === date( "Y-m-d" ) ) {
-			        return array(
-				        Names::TIERS['GF_LICENSE'] => get_option(Names::ACCESS_LEVELS['GF_LICENSE']),
-				        Names::TIERS['WC_LICENSE'] => get_option(Names::ACCESS_LEVELS['WC_LICENSE']),
-			        );
-		        } else {
-			        update_option( Names::DATA_CHECKS[ 'license' ], date( 'Y-m-d' ) );
-		        }
-	        } else {
-		        add_option( Names::DATA_CHECKS[ 'license' ], date( 'Y-m-d' ) );
-	        }
+            if ($last_check = get_option(Names::DATA_CHECKS['license'])) {
+                if ($last_check === date('Y-m-d')) {
+                    return array(
+                        Names::TIERS['GF_LICENSE'] => get_option(Names::ACCESS_LEVELS['GF_LICENSE']),
+                        Names::TIERS['WC_LICENSE'] => get_option(Names::ACCESS_LEVELS['WC_LICENSE']),
+                    );
+                } else {
+                    update_option(Names::DATA_CHECKS['license'], date('Y-m-d'));
+                }
+            } else {
+                add_option(Names::DATA_CHECKS['license'], date('Y-m-d'));
+            }
 
-            $client = new Client();
-            $data = array('license'=>$license, 'pair'=>$pair);
+            $url = $this->home_url . 'validate';
+            $data = array('license' => $license, 'pair' => $pair);
             $this->options['json'] = $data;
             $this->setHomeHeaders();
 
+            $ch = curl_init($url);
+
+            // Set the request method
+            curl_setopt($ch, CURLOPT_POST, true);
+
+            // Set the request body
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+            // Set the request headers
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $this->options['headers']);
+
             try {
-                $response = $client->request('post', $this->home_url . 'validate', $this->options);
-            } catch (ClientException | ServerException $e) {
+                // Execute the request
+                $response = curl_exec($ch);
+
+                if ($response === false) {
+                    throw new \Exception(curl_error($ch));
+                }
+
+                // Handle the response
+                $this->response = $response;
+                $licenses = $this->getResponse();
+
+                if (isset($licenses->message)) {
+                    return array(
+                        Names::TIERS['GF_LICENSE'] => false,
+                        Names::TIERS['WC_LICENSE'] => false,
+                    );
+                }
+
+                if (isset($licenses->access)) {
+                    update_option(Names::ACCESS_LEVELS['GF_LICENSE'], $licenses->access->GF_LICENSE);
+                    update_option(Names::ACCESS_LEVELS['WC_LICENSE'], $licenses->access->WC_LICENSE);
+
+                    return array(
+                        Names::TIERS['GF_LICENSE'] => $licenses->access->GF_LICENSE,
+                        Names::TIERS['WC_LICENSE'] => $licenses->access->WC_LICENSE,
+                    );
+                }
+            } catch (\Exception $e) {
                 $this->handleError($e);
-                return array(
-                    Names::TIERS['GF_LICENSE'] => get_option(Names::ACCESS_LEVELS['GF_LICENSE']),
-                    Names::TIERS['WC_LICENSE'] => get_option(Names::ACCESS_LEVELS['WC_LICENSE']),
-                );
+            } finally {
+                // Close the cURL session
+                curl_close($ch);
             }
-            $this->response = $response;
-            $licenses = $this->getResponse();
-
-            if ($licenses->message ?? false) {
-                return array(
-                    Names::TIERS['GF_LICENSE'] => false,
-                    Names::TIERS['WC_LICENSE'] => false,
-                );
-            }
-
-            if ($licenses->access ?? false) {
-				update_option(Names::ACCESS_LEVELS['GF_LICENSE'], $licenses->access->GF_LICENSE);
-				update_option(Names::ACCESS_LEVELS['WC_LICENSE'], $licenses->access->WC_LICENSE);
-
-                return array(
-                    Names::TIERS['GF_LICENSE'] => $licenses->access->GF_LICENSE,
-                    Names::TIERS['WC_LICENSE'] => $licenses->access->WC_LICENSE,
-                );
-            }
-
         }
 
         return array(
@@ -244,25 +323,46 @@ class LGLCore
     {
         $url = get_option('arcada_labs_lgl_webhook_url');
 
-        $client = new Client();
-        $this->options['json'] = $data;
+        $ch = curl_init($url);
+
+        // Set the request method
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // Set the request body
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+        // Set the request headers
+        $this->setHeaders();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->options['headers']);
 
         try {
-            $result = $client->request('post', $url, $this->options);
-			if ($result) {
-				$response = json_decode( (string) $result->getBody() );
+            // Execute the request
+            $result = curl_exec($ch);
 
-				if ($response) {
-					if ( json_last_error() !== 0 ) {
-						$response = (string) $this->response->getBody();
-					}
+            if ($result === false) {
+                throw new \Exception(curl_error($ch));
+            }
 
-					return $response;
-				}
-			}
-        } catch (ClientException | ServerException $e) {
+            // Handle the response
+            if ($result) {
+                $response = json_decode($result);
+
+                if ($response) {
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        $response = $result;
+                    }
+
+                    return $response;
+                }
+            }
+        } catch (\Exception $e) {
             $response = $this->handleError($e);
+        } finally {
+            // Close the cURL session
+            curl_close($ch);
         }
+
         $this->response = $response;
         return $data;
     }

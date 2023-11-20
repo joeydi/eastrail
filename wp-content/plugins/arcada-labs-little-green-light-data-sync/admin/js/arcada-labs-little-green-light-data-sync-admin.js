@@ -462,18 +462,61 @@
 				data: {step: 'initialSyncButton'},
 				timeout: 0,
 				success: function (result) {
-					lglSuccessMsg.find('span').text('Your data has been synced successfully')
-					lglSuccessMsg.css('height', '38px');
-					console.log(result);
+					localStorage.setItem("totalCount", '0');
+					localStorage.setItem("totalMatch", '0');
+					$.ajax({
+						type: 'POST',
+						url: '/wp-json/arcada-lgl-sync/v1/sync/forms-count',
+						data: {},
+						timeout: 0,
+						success: function (result) {
+							Object.keys(result.count).forEach(function (form_id, index) {
+								const totalCount = parseInt(localStorage.getItem('totalCount'));
+								localStorage.setItem('totalCount', (totalCount + 1).toString());
+								syncPage(0, result.count[form_id], '/wp-json/arcada-lgl-sync/v1/sync/forms', '', {form_id}, false);
+							});
+						},
+						error: function (result) {
+							console.log("lglFormCount Error", result);
+						}
+					});
+
+					$.ajax({
+						type: 'POST',
+						url: '/wp-json/arcada-lgl-sync/v1/sync/constituent-count',
+						data: {},
+						timeout: 0,
+						success: function (result) {
+							const totalCount = parseInt(localStorage.getItem('totalCount'));
+							localStorage.setItem('totalCount', (totalCount + 1).toString());
+							syncPage(0, result.count, '/wp-json/arcada-lgl-sync/v1/sync/constituent', '', {}, false);
+						},
+						error: function (result) {
+							console.log("lglConstituentCount Error", result);
+						}
+					});
+
+					$.ajax({
+						type: 'POST',
+						url: '/wp-json/arcada-lgl-sync/v1/sync/transaction-count',
+						data: {},
+						timeout: 0,
+						success: function (result) {
+							const totalCount = parseInt(localStorage.getItem('totalCount'));
+							localStorage.setItem('totalCount', (totalCount + 1).toString());
+							syncPage(0, result.count, '/wp-json/arcada-lgl-sync/v1/sync/transaction', '', {}, false);
+						},
+						error: function (result) {
+							console.log("lglTransactionCount Error", result);
+						}
+					});
+
+					// lglSuccessMsg.find('span').text('Your data has been synced successfully');
+					// lglSuccessMsg.css('height', '38px');
 				},
 				error: function (error) {
 					console.log(error);
 					overlay.addClass('lgl-hide');
-				},
-				complete: function() {
-					setTimeout(() => {
-						window.location.reload();
-					}, 5000);
 				}
 			});
 		});
@@ -547,13 +590,14 @@
 
 			$.ajax({
 				type: 'POST',
-				url: '/wp-json/arcada-lgl-sync/v1/sync/forms',
+				url: '/wp-json/arcada-lgl-sync/v1/sync/forms-count',
 				data: {},
 				timeout: 0,
 				success: function (result) {
-					lglSuccessMsg.find('span').text('From entries successfully synced')
-					lglSuccessMsg.css('height', '44px');
-					console.log("lglFormBtn Success");
+					console.log('Records:', result);
+					Object.keys(result.count).forEach(function (form_id, index) {
+						syncPage(0, result.count[form_id], '/wp-json/arcada-lgl-sync/v1/sync/forms', 'From entries successfully synced', {form_id}, index === Object.keys(result.count).length - 1);
+					});
 				},
 				error: function (result) {
 					try {
@@ -566,17 +610,14 @@
 						lglErrorMsg.find('span').text('There was an error processing the sync.');
 						Bugsnag.notify(e);
 					}
-
 					lglErrorMsg.css('height', '44px');
-					console.log("lglFormBtn Error", result);
-				},
-				complete: function () {
 					overlay.addClass('lgl-hide');
-					console.log("lglFormBtn Completed");
+					console.log("lglFormCount Error", result);
 				}
 			});
 
 		});
+
 
 		lglConstituentBtn.click(function (e) {
 			e.preventDefault();
@@ -587,13 +628,12 @@
 
 			$.ajax({
 				type: 'POST',
-				url: '/wp-json/arcada-lgl-sync/v1/sync/constituent',
+				url: '/wp-json/arcada-lgl-sync/v1/sync/constituent-count',
 				data: {},
 				timeout: 0,
 				success: function (result) {
-					lglSuccessMsg.find('span').text('Users successfully synced as constituents');
-					lglSuccessMsg.css('height', '44px');
-					console.log("lglConstituentBtn Success");
+					console.log('Records:', result.count);
+					syncPage(0, result.count, '/wp-json/arcada-lgl-sync/v1/sync/constituent', 'Users successfully synced as constituents');
 				},
 				error: function (result) {
 					try {
@@ -606,13 +646,8 @@
 						lglErrorMsg.find('span').text('There was an error processing the sync.');
 						Bugsnag.notify(e);
 					}
-
 					lglErrorMsg.css('height', '44px');
-					console.log("lglConstituentBtn Error", result);
-				},
-				complete: function () {
-					overlay.addClass('lgl-hide');
-					console.log("lglConstituentBtn Completed");
+					console.log("lglConstituentCount Error", result);
 				}
 			});
 
@@ -627,14 +662,12 @@
 
 			$.ajax({
 				type: 'POST',
-				url: '/wp-json/arcada-lgl-sync/v1/sync/transaction',
+				url: '/wp-json/arcada-lgl-sync/v1/sync/transaction-count',
 				data: {},
-				dataType: 'text',
 				timeout: 0,
 				success: function (result) {
-					lglSuccessMsg.find('span').text('Transactions successfully synced')
-					lglSuccessMsg.css('height', '44px');
-					console.log("lglTransactionBtn Success");
+					console.log('Records:', result.count);
+					syncPage(0, result.count, '/wp-json/arcada-lgl-sync/v1/sync/transaction', 'Transactions successfully synced');
 				},
 				error: function (result) {
 					try {
@@ -647,17 +680,64 @@
 						lglErrorMsg.find('span').text('There was an error processing the sync.');
 						Bugsnag.notify(e);
 					}
-
 					lglErrorMsg.css('height', '44px');
-					console.log("lglTransactionBtn Error", result);
-				},
-				complete: function () {
-					overlay.addClass('lgl-hide');
-					console.log("lglTransactionBtn Completed");
+					overlay.addClass('lgl-hide')
+					console.log("lglTransactionCount Error", result);
 				}
 			});
 
 		});
+
+		function syncPage(page, limit, endpoint, message, params={}, clearLoader = true) {
+			if (page * 50 < limit) {
+				$.ajax({
+					type: 'POST',
+					url: endpoint,
+					data: {page, ...params},
+					timeout: 0,
+					success: function (result) {
+						syncPage(page + 1, limit, endpoint, message, params, clearLoader);
+					},
+					error: function (result) {
+						try {
+							if (result.responseJSON.message) {
+								lglErrorMsg.find('span').text(result.responseJSON.message);
+							} else {
+								lglErrorMsg.find('span').text('There was an error processing the sync.');
+							}
+						} catch (e) {
+							lglErrorMsg.find('span').text('There was an error processing the sync.');
+							Bugsnag.notify(e);
+						}
+
+						lglErrorMsg.css('height', '44px');
+						console.log("Error", result);
+						overlay.addClass('lgl-hide');
+					}
+				})
+			} else {
+				if (clearLoader) {
+					overlay.addClass('lgl-hide');
+					lglSuccessMsg.find('span').text(message);
+					lglSuccessMsg.css('height', '44px');
+				} else {
+					if (localStorage.getItem('totalCount')) {
+						const totalMatch = parseInt(localStorage.getItem('totalMatch'));
+						localStorage.setItem('totalMatch', (totalMatch + 1).toString());
+
+						if (localStorage.getItem('totalMatch') === localStorage.getItem('totalCount')) {
+							lglSuccessMsg.find('span').text('Your data has been synced successfully');
+							lglSuccessMsg.css('height', '38px');
+							setTimeout(() => {
+								localStorage.removeItem('totalMatch');
+								localStorage.removeItem('totalCount');
+								window.location.reload();
+							}, 5000);
+						}
+					}
+				}
+			}
+		}
 		/* endregion */
 
 		/* region Settings page js */
@@ -672,13 +752,6 @@
 			cloneElement.removeClass('lgl-hide');
 			addRemoveInstanceAbility(cloneElement);
 			cloneElement.insertAfter($('.lgl-form-group-fields-container').last());
-
-			// increment the size of the wizard content if it exists on screen
-			/*if ($('.arcada-lgl-wizard--content').length) {
-				const height = $('.lgl-form-group-fields-container').first().height();
-				const container = cloneTarget.closest('.arcada-lgl-wizard--content');
-				container.css('max-height', (container.height() + height) + 'px');
-			}*/
 
 			$('.lgl-remove').each(function () {
 				$(this).removeAttr('disabled');
