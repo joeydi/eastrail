@@ -36,7 +36,7 @@
 </footer>
 
 <?php wp_footer(); ?>
-<?php the_field('body_close_tracking_codes', 'options'); ?>
+<?php echo get_field('body_close_tracking_codes', 'options'); ?>
 </body>
 
 </html>

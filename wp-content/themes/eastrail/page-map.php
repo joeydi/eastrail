@@ -76,11 +76,11 @@ function get_feature_color($feature)
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <?php wp_head(); ?>
-    <?php the_field('head_tracking_codes', 'options'); ?>
+    <?php echo get_field('head_tracking_codes', 'options'); ?>
 </head>
 
 <body <?php body_class(); ?>>
-    <?php the_field('body_open_tracking_codes', 'options'); ?>
+    <?php echo get_field('body_open_tracking_codes', 'options'); ?>
 
     <div style="display: none;">
         <?php include_once(ET::theme_path('static/icons/symbol/svg/sprite.symbol.svg')); ?>
@@ -162,7 +162,7 @@ function get_feature_color($feature)
     </main>
 
     <?php wp_footer(); ?>
-    <?php the_field('body_close_tracking_codes', 'options'); ?>
+    <?php echo get_field('body_close_tracking_codes', 'options'); ?>
 </body>
 
 </html>
