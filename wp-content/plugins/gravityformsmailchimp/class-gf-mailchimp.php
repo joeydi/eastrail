@@ -361,6 +361,10 @@ class GFMailChimp extends GFFeedAddOn {
 	 * @return void
 	 */
 	public function maybe_update_auth_creds() {
+		if ( rgget( 'subview' ) !== $this->_slug ) {
+			return;
+		}
+
 		$payload = $this->get_oauth_payload();
 
 		// No payload, bail.
@@ -1770,9 +1774,15 @@ class GFMailChimp extends GFFeedAddOn {
 		 */
 		$subscription = gf_apply_filters( array( 'gform_mailchimp_subscription', $form['id'] ), $subscription, $list_id, $form, $entry, $feed, $member );
 
-		// Remove merge_fields if none are defined.
+		// Remove merge_fields if none are defined, otherwise allows merge_fields to be decoded.
 		if ( empty( $subscription['merge_fields'] ) ) {
 			unset( $subscription['merge_fields'] );
+		} else {
+			foreach ( $subscription['merge_fields'] as $key => $value ) {
+				if ( is_string( $value ) ) {
+					$subscription['merge_fields'][ $key ] = html_entity_decode( $value );
+				}
+			}
 		}
 
 		// Remove interests if none are defined.
@@ -1785,11 +1795,11 @@ class GFMailChimp extends GFFeedAddOn {
 			unset( $subscription['vip'] );
 		}
 
-		// Remove tags from subscription object.
-		$tags = $subscription['tags'];
-		unset( $subscription['tags'] );
-		foreach ( $tags as &$tag ) {
-			$tag = array( 'name' => $tag, 'status' => 'active' );
+		// Remove or reindex the tags.
+		if ( empty( $subscription['tags'] ) ) {
+			unset( $subscription['tags'] );
+		} else {
+			$subscription['tags'] = array_values( $subscription['tags'] );
 		}
 
 		// Add Marketing Permissions.
@@ -1849,10 +1859,10 @@ class GFMailChimp extends GFFeedAddOn {
 			$this->log_debug( __METHOD__ . "(): Subscriber to be {$action}: " . print_r( $subscription, true ) );
 
 			// Add or update subscriber.
-			$this->api->update_list_member( $list_id, $subscription['email_address'], $subscription );
+			$result = $this->api->update_list_member( $list_id, $subscription['email_address'], $subscription );
 
 			// Log that the subscription was added or updated.
-			$this->log_debug( __METHOD__ . "(): Subscriber successfully {$action}." );
+			$this->log_debug( __METHOD__ . "(): Subscriber successfully {$action}. Result: " . json_encode( $result ) );
 
 		} catch ( Exception $e ) {
 
@@ -1865,24 +1875,6 @@ class GFMailChimp extends GFFeedAddOn {
 			}
 
 			return $entry;
-
-		}
-
-		try {
-
-			// Log the subscriber tags to be added or updated.
-			$this->log_debug( __METHOD__ . "(): Subscriber tags to be {$action}: " . print_r( $tags, true ) );
-
-			// Update tags.
-			$this->api->update_member_tags( $list_id, $subscription['email_address'], $tags );
-
-			// Log that the subscriber tags was added or updated.
-			$this->log_debug( __METHOD__ . "(): Subscriber tags successfully {$action}." );
-
-		} catch ( Exception $e ) {
-
-			// Log that subscription could not be added or updated.
-			$this->add_feed_error( sprintf( esc_html__( 'Unable to add/update subscriber tags: %s', 'gravityformsmailchimp' ), $e->getMessage() ), $feed, $entry, $form );
 
 		}
 
@@ -3097,7 +3089,7 @@ class GFMailChimp extends GFFeedAddOn {
 				$settings_url = admin_url( 'admin.php?page=gf_settings&subview=' . $this->_slug );
 
 				// translators: %1 is an opening <a> tag, and %2 is a closing </a> tag.
-				$message = sprintf( __( 'It looks like you\'re using an API Key to connect to Mailchimp. Please visit the %1$sMailchimp settings page%2$s in order to connect to the Mailchimp API.', 'gravityformsmailchimp' ), "<a href='${settings_url}'>", '</a>' );
+				$message = sprintf( __( 'It looks like you\'re using an API Key to connect to Mailchimp. Please visit the %1$sMailchimp settings page%2$s in order to connect to the Mailchimp API.', 'gravityformsmailchimp' ), "<a href='{$settings_url}'>", '</a>' );
 
 				printf( '<div class="notice below-h1 notice-error gf-notice"><p>%1$s</p></div>', $message );
 			}

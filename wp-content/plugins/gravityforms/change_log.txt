@@ -1,3 +1,91 @@
+### 2.8.4 | 2024-02-21
+- Fixed an issue that causes fields like the signature field to not render correctly in hidden interfaces such as tabs or modals.
+- Fixed an issue where the merge tag dropdown in the product field shows the incorrect options.
+- Fixed an issue which causes the incorrect confirmation to display when deleting a "display only" field.
+- Fixed an issue that displays the Consent field description value in the {all_fields} merge tag.
+- Fixed the display of the name field tooltip in the form editor in Safari.
+- Fixed an issue where the post selector dropdown is not displaying for form confirmations using the Page confirmation type.
+- Updated the log files section of the system report to list older files that have been rotated out.
+- Updated File Upload field to display correct values on the form review page.
+
+### 2.8.3 | 2024-02-01
+- Added telemetry data points.
+- Fixed an issue where the honeypot was not working on forms using the Stripe Field with additional payment methods enabled.
+- Fixed an issue where under certain conditions, an error saying "undefined index 'page_instance'" is shown when rendering a form.
+- AF: Updated the Settings API so that form meta saved in a settings field save callback will not be lost.
+
+### 2.8.2 | 2024-01-18
+- Added security enhancements.
+- Fixed an issue where the datepicker does not work in the repeater field.
+- Fixed an issue that sometimes causes extra spacers to be added to forms.
+- Fixed an issue where conditional logic rules based on anything but the first choice of a radio or checkbox field do not work in forms created in Gravity Forms 2.8.1.  Users will need to delete and re-create the conditional logic rules to fix the issue.
+- AF: Fixed an issue where the readonly attribute is not added to settings fields.
+
+### 2.8.1 | 2024-01-04
+- Added support for conditional logic rules based on Survey fields for confirmations, notifications, and feeds.
+- Fixed various warnings and notices in PHP 8.1 and 8.2.
+- Fixed an issue where address inputs are sometimes vertically mis-aligned in the Gravity Forms 2.5 theme.
+- Fixed display issues with the merge tag dropdown in Firefox.
+- Fixed the display of tooltips in the form editor in Safari.
+- Fixed an issue that prevents conditional logic from working on the submit button on multi-page forms if the last page is also hidden with conditional logic.
+- Fixed an issue that prevents the conditional logic UI from displaying on duplicates of the default confirmation.
+- Fixed an issue where it is difficult to access the field admin icons with the mouse in the form editor.
+- Fixed an issue where users without the `gravityforms_edit_entries` capability can mark entries as read/unread.
+- Fixed conditional logic on the product option field.
+- Updated the format of telemetry data.
+- AF: Added feed processing when entries are marked as "not spam".
+- Updated merge tag dropdown on number field to allow live preview before saving form.
+
+### 2.8.0 | 2023-12-07
+- Added a compact view to the form editor.
+- Added the default theme to the system report.
+- Added performance improvements by only enqueueing necessary styles on the front end.
+- Added support for field sidebar messages.
+- Added the `gform_display_disable_css_setting` filter to allow the display of the Output Default CSS setting.
+- Updated the telemetry background processor to log when it fails to send data.
+- Updated the field accordions in the form editor to all be open by default.
+- Updated the minimum WordPress version on the System Status page to 6.3.
+- Removed deprecated function `string.format()`.
+- Removed several unused images.
+- Removed the "Output Default CSS" setting from the settings page and replaced it with the [`gform_disable_css`](https://docs.gravityforms.com/gform_disable_css/) filter.
+- Removed the HTML5 setting from the settings page.
+- API: Removed the deprecated form Theme Framework global CSS API color system properties.
+- API: Updated and refactored the form Theme Framework CSS API to reduce stylesheet size for better performance.
+
+### 2.7.17 | 2023-11-09
+- Fixed an issue that prevents the post category selector from appearing correctly in WordPress 6.4.
+- Fixed an issue where multipage forms with conditional logic display the wrong text on the "next" button.
+
+### 2.7.16 | 2023-10-25
+- Updated the API endpoint for telemetry data.
+- Fixed a bug that causes values of checkbox fields to appear twice on the entry list page.
+- Fixed a bug that prevents form block style settings from being applied.
+- Fixed jQuery deprecation notices in the form preview for the following fields: email, product, total, and stripe fields, as well as some conditional logic.
+- Fixed "undefined index" errors that sometimes appear when a form is embedded with a shortcode.  Credit: The GravityKit team.
+- AF: Updated the background processor to include additional logging statements around batch processing.
+- API: Added a new JavaScript action hook [gform_post_set_field_property](https://docs.gravityforms.com/gform_post_set_field_property/) in the form editor to listen for field property changes.
+
+### 2.7.15 | 2023-10-05
+- Added a new global setting to select the default form theme.  On new sites, "Orbital" will be the default theme.
+- Added a 'theme' parameter to the Gravity Forms shortcode.
+- Added a new [`gform_default_styles`](https://docs.gravityforms.com/gform_default_styles/) filter to apply the same styles to all forms on a site.
+- Fixed an issue where the setup wizard saves an empty license key if the user clicks the "Skip" button.
+- Fixed an issue that causes fatal errors on some sites during the background processing of telemetry data.
+- Fixed an issue where feed settings for ActiveCampaign, Agile CRM, Breeze, Mailchimp, Trello, Twilio, and ZohoCRM display a deprecation warning when using PHP 8.1.
+- Updated the appearance of the template library.
+- Updated the name of "Gravity" theme to "Gravity Forms 2.5 Theme."
+- AF: Fixed the `Creation of dynamic property CLASS::$delayed_payment_integration is deprecated` notice with PHP 8.2.
+- AF: Fixed an issue where the background feed processor uses a stale instance of the add-on to process the feed preventing the {apc_media} merge tags from outputting values.
+
+### 2.7.14 | 2023-09-19
+- Added validation to name, post title, post body, single line text, paragraph text & address fields to prevent empty entries when fields are filled with text encoded with invalid charset for the database table.
+- Fixed an issue where editing an entry with a multifile upload field could result in broken links to files.
+- AF: Fixed the `strpos(): Passing null to parameter #1 ($haystack) of type string is deprecated` notice that can occur with PHP 8.1 when getting a setting value.
+
+### 2.7.13 | 2023-08-23
+- Updated the minimum WordPress version on the System Status page to 6.2.
+- Updated product usage data so it is processed in the background.
+
 ### 2.7.12 | 2023-08-08
 - Fixed a fatal error that occurs when a mapped setup_fee field is hidden by conditional logic.
 - AF: Added the [`$_min_compatible_gravityforms_version`](https://docs.gravityforms.com/gfaddon/#h-the-class-variables) property to the `GFFAddOn` class, enabling add-ons to specify the minimum Gravity Forms version that is compatible with all the add-on features.
@@ -24,6 +112,7 @@
 - Updated the Orbital theme to support max-height/scroll for the consent field.
 - Updated the thumbnail image in the template library for the eCommerce template.
 - Updated the name of the form block to "Form" to make it easier to find in the block inserter.
+
 
 ### 2.7.9 | 2023-06-22
 - Fixed an issue where an empty Number type Quantity field fails validation with a decimals-related error message.

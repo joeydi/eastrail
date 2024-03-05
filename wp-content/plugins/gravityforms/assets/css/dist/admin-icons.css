@@ -6,7 +6,7 @@ Gravity Forms Administration Icon Kit
 http: //www.gravityforms.com
 
 Gravity Forms is a Rocketgenius project
-copyright 2008-2021 Rocketgenius Inc.
+copyright 2008-2024 Rocketgenius Inc.
 http: //www.rocketgenius.com
 this may not be re-distributed without the
 express written permission of the author.
@@ -33,10 +33,10 @@ AND ANY CHANGES MADE HERE WILL BE OVERWRITTEN.
 @font-face {
 	font-family: 'gform-icons-admin';
 	src:
-		url('../../../fonts/gform-icons-admin.woff2?vjyciz') format('woff2'),
-		url('../../../fonts/gform-icons-admin.ttf?vjyciz') format('truetype'),
-		url('../../../fonts/gform-icons-admin.woff?vjyciz') format('woff'),
-		url('../../../fonts/gform-icons-admin.svg?vjyciz#gform-icons-admin') format('svg');
+		url('../../../fonts/gform-icons-admin.woff2?9s4gpq') format('woff2'),
+		url('../../../fonts/gform-icons-admin.ttf?9s4gpq') format('truetype'),
+		url('../../../fonts/gform-icons-admin.woff?9s4gpq') format('woff'),
+		url('../../../fonts/gform-icons-admin.svg?9s4gpq#gform-icons-admin') format('svg');
 	font-weight: normal;
 	font-style: normal;
 	font-display: block;
@@ -56,6 +56,14 @@ AND ANY CHANGES MADE HERE WILL BE OVERWRITTEN.
 	/* Better Font Rendering =========== */
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+}
+
+.gform-icon--salesforce:before {
+	content: "\e9a3";
+}
+
+.gform-icon--conditional-logic:before {
+	content: "\e9a2";
 }
 
 .gform-icon--cloudflare-turnstile:before {
@@ -176,6 +184,26 @@ AND ANY CHANGES MADE HERE WILL BE OVERWRITTEN.
 
 .gform-icon--chevron:before {
 	content: "\e911";
+}
+
+.gform-icon--checkmark-simple:before {
+	content: "\e99d";
+}
+
+.gform-icon--exclamation-simple:before {
+	content: "\e99e";
+}
+
+.gform-icon--information-simple:before {
+	content: "\e99f";
+}
+
+.gform-icon--question-mark-simple:before {
+	content: "\e9a0";
+}
+
+.gform-icon--x-simple:before {
+	content: "\e9a1";
 }
 
 .gform-icon--expand:before {

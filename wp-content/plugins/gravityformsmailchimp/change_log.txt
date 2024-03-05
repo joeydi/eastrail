@@ -1,3 +1,9 @@
+### 5.3.0 | 2024-02-29
+- Updated feed processing to include the tags in the request to the add/update member endpoint instead of making a separate request to the member tags endpoint.
+- Fixed an issue where an "Unable to add/update subscriber: Invalid Resource" error occurs when mapped field values include HTML entities.
+- Fixed a `Using ${var} in strings is deprecated, use {$var} instead` deprecation notice with PHP 8.2.
+- Fixed an error where the Mailchimp connection alerts appear when attempting to connect other add-ons.
+
 ### 5.2 | 2023-02-15
 - Added Gravity Forms license key to oAuth process.
 - Added support for async (background) feed processing to improve form submission performance.

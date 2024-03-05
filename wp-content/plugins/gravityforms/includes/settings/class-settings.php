@@ -1453,6 +1453,10 @@ class Settings {
 			return false;
 		}
 
+		if ( ! rgars( $section['fields'], '0/type' ) ) {
+			return false;
+		}
+
 		if ( 'card' !== $section['fields'][0]['type'] ) {
 			return false;
 		}
@@ -2547,6 +2551,10 @@ class Settings {
 	 * @return bool|array|string
 	 */
 	public function get_value( $name, $default_value = '', $values = false ) {
+
+		if ( empty( $name ) ) {
+			return '';
+		}
 
 		// Get current values.
 		if ( ! $values || ! is_array( $values ) ) {
