@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * The Create PayOrder API response object.
  *
- * @since x.x.x
+ * @since 3.9.0
  *
  * @method \Square\Models\CreatePayOrderResponse get_data()
  */
@@ -16,7 +16,7 @@ class Create_PayOrder extends \WooCommerce\Square\Gateway\API\Response {
 	/**
 	 * Gets the Square payment object.
 	 *
-	 * @since x.x.x
+	 * @since 3.9.0
 	 * @return \Square\Models\Order|null
 	 */
 	public function get_order() {
@@ -26,7 +26,7 @@ class Create_PayOrder extends \WooCommerce\Square\Gateway\API\Response {
 	/**
 	 * Returns true if the order status is completed.
 	 *
-	 * @since x.x.x
+	 * @since 3.9.0
 	 * @return boolean
 	 */
 	public function transaction_approved() {
@@ -37,7 +37,7 @@ class Create_PayOrder extends \WooCommerce\Square\Gateway\API\Response {
 	 * Returns array of trasaction IDs when payment is done using multiple payment methods.
 	 * For example, Square Gift card + Square credit card.
 	 *
-	 * @since x.x.x
+	 * @since 3.9.0
 	 * @return array
 	 */
 	public function get_transaction_ids() {

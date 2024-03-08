@@ -264,24 +264,6 @@ class Plugin_Dependencies {
 
 			$this->add_admin_notice( 'sv-wc-deprecated-php-version', $message, 'error' );
 		}
-
-		// display a notice that WC < 6.8 support will soon be dropped
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended - Nonce none required, only showing a notice.
-		if ( isset( $_GET['page'] ) && 'wc-settings' === $_GET['page'] && Plugin_Compatibility::is_wc_version_lt( '6.8' ) ) { 
-
-			$message = sprintf(
-				/* translators: Placeholders: %1$s - WooCommerce version number, %2$s - <strong>, %3$s - </strong>, %4$s - Plugin name, %5$s - <a> tag, %6$s - </a> tag */
-				__( 'Hey there! We\'ve noticed that your site is running version %1$s of WooCommerce, but %2$sWooCommerce 6.8 or higher will soon be required%3$s by %4$s. We recommend you %5$supdate WooCommerce%6$s to the latest version as soon as possible.', 'woocommerce-square' ),
-				esc_html( Plugin_Compatibility::get_wc_version() ),
-				'<strong>',
-				'</strong>',
-				esc_html( $this->get_plugin()->get_plugin_name() ),
-				'<a href="' . esc_url( admin_url( 'update-core.php' ) ) . '">',
-				'</a>'
-			);
-
-			$this->add_admin_notice( 'sv-wc-deprecated-wc-version', $message, 'warning' );
-		}
 	}
 
 

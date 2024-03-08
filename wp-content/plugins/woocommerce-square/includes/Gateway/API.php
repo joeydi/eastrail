@@ -26,6 +26,7 @@ namespace WooCommerce\Square\Gateway;
 defined( 'ABSPATH' ) || exit;
 
 use Square\Models\Order;
+use WooCommerce\Square\WC_Order_Square;
 
 /**
  * The base Square gateway API class.
@@ -41,6 +42,8 @@ class API extends \WooCommerce\Square\API {
 	/** @var \WC_Order order object associated with a request, if any */
 	protected $order;
 
+	/** @var string API ID */
+	protected $api_id;
 
 	/**
 	 * Constructs the class.
@@ -147,6 +150,26 @@ class API extends \WooCommerce\Square\API {
 		return $this->perform_request( $request );
 	}
 
+	/**
+	 * Performs a Cash App Pay charge for the given order.
+	 *
+	 * @since 4.5.0
+	 *
+	 * @param \WC_Order $order order object
+	 * @return \WooCommerce\Square\Gateway\API\Responses\Create_Payment
+	 * @throws \Exception
+	 */
+	public function cash_app_pay_charge( \WC_Order $order ) {
+
+		$request = new API\Requests\Payments( $this->get_location_id(), $this->client );
+
+		$request->set_charge_data( $order, true, true );
+
+		$this->set_response_handler( API\Responses\Create_Payment::class );
+
+		return $this->perform_request( $request );
+	}
+
 
 	/**
 	 * Performs a refund for the given order.
@@ -210,11 +233,11 @@ class API extends \WooCommerce\Square\API {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WC_Order $order the order object
+	 * @param \WC_Order|WC_Order_Square $order the order object
 	 * @return API\Responses\Create_Customer_Card|API\Responses\Create_Customer
 	 * @throws \Exception
 	 */
-	public function tokenize_payment_method( \WC_Order $order ) {
+	public function tokenize_payment_method( $order ) {
 
 		// a customer ID should've already been created, but there may be cases where the customer id is deleted/corrupted at Square
 		if ( ! empty( $order->customer_id ) ) {
@@ -471,7 +494,7 @@ class API extends \WooCommerce\Square\API {
 	 *
 	 * @param array  $payment_ids Array of payment IDs.
 	 * @param string $order_id    Square order ID.
-	 * @since x.x.x
+	 * @since 3.9.0
 	 */
 	public function pay_order( $payment_ids, $order_id ) {
 		$request = new API\Requests\Orders( $this->client );
@@ -511,6 +534,81 @@ class API extends \WooCommerce\Square\API {
 
 
 	/**
+	 * Creates a Gift Card.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param $order_id Line item order ID.
+	 * @return API\Responses\Get_Gift_Card
+	 */
+	public function create_gift_card( $order_id ) {
+		$request = new API\Requests\Gift_Card( $this->location_id, $this->client );
+
+		$request->set_create_gift_card_data( $order_id );
+
+		$this->set_response_handler( API\Responses\Get_Gift_Card::class );
+
+		return $this->perform_request( $request );
+	}
+
+	/**
+	 * Activates a Gift Card which is in a pending state.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $gift_card_id The ID of the inactive Gift Card.
+	 * @param string $order_id     Square Order ID associated with the Gift Card.
+	 * @param string $line_item_id Line Item ID for the Gift Card.
+	 */
+	public function activate_gift_card( $gift_card_id, $order_id, $line_item_id ) {
+		$request = new API\Requests\Gift_Card_Activities( $this->location_id, $this->client );
+
+		$request->set_activate_gift_card_data( $gift_card_id, $order_id, $line_item_id );
+
+		$this->set_response_handler( \WooCommerce\Square\API\Response::class );
+
+		return $this->perform_request( $request );
+	}
+
+	/**
+	 * Loads an existing gift card with an amount.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $gan          The gift card number.
+	 * @param string $order_id     The Square order ID.
+	 * @param string $line_item_id The line item order ID for the gift card.
+	 */
+	public function load_gift_card( $gan, $order ) {
+		$request = new API\Requests\Gift_Card_Activities( $this->location_id, $this->client );
+
+		$request->set_load_gift_card_data( $gan, $order );
+
+		$this->set_response_handler( \WooCommerce\Square\API\Response::class );
+
+		return $this->perform_request( $request );
+	}
+
+	/**
+	 * Sets data to refund/adjust decrement funds in a gift card.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string               $gan          Gift card number.
+	 * @param \Square\Models\Money $amount_money The amount to be refunded.
+	 * @param \WC_Order            $order        WooCommerce order.
+	 */
+	public function refund_gift_card( $gan, $amount_money, $order ) {
+		$request = new API\Requests\Gift_Card_Activities( $this->location_id, $this->client );
+
+		$request->set_gift_card_refund_data( $gan, $amount_money, $order );
+
+		$this->set_response_handler( \WooCommerce\Square\API\Response::class );
+
+		return $this->perform_request( $request );
+	}
+
+	/**
 	 * Gets an existing payment.
 	 *
 	 * @since 2.2.0
@@ -541,9 +639,29 @@ class API extends \WooCommerce\Square\API {
 	 */
 	public function retrieve_gift_card( $nonce = '' ) {
 
-		$request = new API\Requests\Gift_Card( $this->client );
+		$request = new API\Requests\Gift_Card( $this->get_location_id(), $this->client );
 
 		$request->set_retrieve_gift_card_data( $nonce );
+
+		$this->set_response_handler( API\Responses\Get_Gift_Card::class );
+
+		return $this->perform_request( $request );
+	}
+
+	/**
+	 * Retrieves a gift card using GAN.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $gan Gift card number.
+	 *
+	 * @return API\Responses\Get_Gift_Card
+	 */
+	public function retrieve_gift_card_by_gan( $gan = '' ) {
+
+		$request = new API\Requests\Gift_Card( $this->get_location_id(), $this->client );
+
+		$request->set_retrieve_gift_card_from_gan_data( $gan );
 
 		$this->set_response_handler( API\Responses\Get_Gift_Card::class );
 
@@ -652,7 +770,7 @@ class API extends \WooCommerce\Square\API {
 	 */
 	protected function get_api_id() {
 
-		return $this->get_plugin()->get_gateway()->get_id();
+		return $this->api_id ? $this->api_id : $this->get_plugin()->get_gateway()->get_id();
 	}
 
 
@@ -681,5 +799,13 @@ class API extends \WooCommerce\Square\API {
 	 */
 	public function update_tokenized_payment_method( \WC_Order $order ) {}
 
-
+	/**
+	 * Set API ID to used for logging.
+	 *
+	 * @param string $api_id
+	 * @return void
+	 */
+	public function set_api_id( $api_id ) {
+		$this->api_id = $api_id;
+	}
 }

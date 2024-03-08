@@ -32,7 +32,9 @@ use WooCommerce\Square\Framework\PaymentGateway\PaymentTokens\Payment_Gateway_Pa
 use WooCommerce\Square\Plugin;
 use WooCommerce\Square\Framework as SquareFramework;
 use WooCommerce\Square\Handlers\Order;
+use WooCommerce\Square\Handlers\Product;
 use WooCommerce\Square\Utilities\Money_Utility;
+use WooCommerce\Square\WC_Order_Square;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -194,6 +196,47 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	/** @var array of Payment_Gateway_Integration objects for Subscriptions, Pre-Orders, etc. */
 	protected $integrations;
 
+	/** @var string configuration option: whether Square gateway is enabled. */
+	public $enabled;
+
+	/** @var string configuration option: title to show on the Checkout page for Square gateway. */
+	public $title;
+
+	/** @var string configuration option: description to show on the Checkout page for Square gateway. */
+	public $description;
+
+	/** @var string digital wallets section title field. */
+	protected $digital_wallet_settings;
+
+	/** @var string configuration option: whether digital wallets is enabled. */
+	protected $enable_digital_wallets;
+
+	/** @var string configuration option: button type: Buy Now | Donate | No Text. */
+	protected $digital_wallets_button_type;
+
+	/** @var string configuration option: button color for Apply Pay. */
+	protected $digital_wallets_apple_pay_button_color;
+
+	/** @var string configuration option: button color for Google Pay. */
+	protected $digital_wallets_google_pay_button_color;
+
+	/** @var array configuration option: list of buttons that are hidden on the front end. */
+	protected $digital_wallets_hide_button_options;
+
+	/** @var string gift cards section title field. */
+	protected $gift_card_settings;
+
+	/** @var string configuration option: whether gift cards is enabled. */
+	protected $enable_gift_cards;
+
+	/** @var string advanced settings section title field. */
+	protected $advanced_settings_title;
+
+	/** @var string whether apple pay domain is registered. */
+	protected $apple_pay_domain_registered;
+
+	/** @var string whether apple pay domain registration was attempted. */
+	protected $apple_pay_domain_registration_attempted;
 
 	/**
 	 * Initialize the gateway
@@ -522,7 +565,7 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 			 */
 			$js_url = apply_filters( 'wc_payment_gateway_square_javascript_url', $js_url );
 
-			wp_enqueue_script( $handle, $js_url, array(), $this->get_plugin()->get_version(), true );
+			wp_enqueue_script( $handle, $js_url, array( 'jquery', 'wc-country-select' ), $this->get_plugin()->get_version(), true );
 		}
 
 		// CSS
@@ -1572,13 +1615,12 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	 * The returned order is expected to be used in a transaction request.
 	 *
 	 * @since 3.0.0
-	 * @param int|\WC_Order $order the order or order ID being processed
-	 * @return \WC_Order object with payment and transaction information attached
+	 * @param int|WC_Order_Square $order the order or order ID being processed
+	 * @return WC_Order_Square object with payment and transaction information attached
 	 */
 	public function get_order( $order ) {
-
 		if ( is_numeric( $order ) ) {
-			$order = wc_get_order( $order );
+			$order = WC_Order_Square::wc_get_order( $order );
 		}
 
 		// set payment total here so it can be modified for later by add-ons like subscriptions which may need to charge an amount different than the get_total()
@@ -1610,7 +1652,7 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 		 *
 		 * @since 3.0.0
 		 *
-		 * @param \WC_Order $order order object
+		 * @param WC_Order_Square $order order object
 		 * @param Payment_Gateway $this payment gateway instance
 		 */
 		return apply_filters( 'wc_payment_gateway_' . $this->get_id() . '_get_order_base', $order, $this );
@@ -1700,14 +1742,13 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param \WC_Order|int $order the order being processed
+	 * @param \WC_Square_Order|int $order the order being processed
 	 * @param float|null $amount amount to capture or null for the full order amount
-	 * @return \WC_Order
+	 * @return WC_Order_Square
 	 */
 	public function get_order_for_capture( $order, $amount = null ) {
-
 		if ( is_numeric( $order ) ) {
-			$order = wc_get_order( $order );
+			$order = WC_Order_Square::wc_get_order( $order );
 		}
 
 		// add capture info
@@ -1732,7 +1773,7 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 		 * Allow actors to modify the order object used for performing charge captures.
 		 *
 		 * @since 3.0.0
-		 * @param \WC_Order $order order object
+		 * @param WC_Order_Square $order order object
 		 * @param Payment_Gateway $this instance
 		 */
 		return apply_filters( 'wc_payment_gateway_' . $this->get_id() . '_get_order_for_capture', $order, $this );
@@ -1833,6 +1874,8 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 					return $error;
 				}
 			}
+
+			$this->maybe_refund_gift_card( $order );
 		} catch ( \Exception $e ) {
 
 			$error = $this->get_refund_failed_wp_error( $e->getCode(), $e->getMessage() );
@@ -1861,6 +1904,85 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	}
 
 	/**
+	 * Refunds a Gift Card purchase/reload order.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param \WC_Order $order WooCommerce order.
+	 */
+	public function maybe_refund_gift_card( $order ) {
+		$line_item_qtys   = isset( $_POST['line_item_qtys'] ) ? json_decode( sanitize_text_field( wp_unslash( $_POST['line_item_qtys'] ) ), true ) : array();
+		$line_item_totals = isset( $_POST['line_item_totals'] ) ? json_decode( sanitize_text_field( wp_unslash( $_POST['line_item_totals'] ) ), true ) : array();
+		$line_items       = array();
+		$item_ids         = array_unique( array_merge( array_keys( $line_item_qtys ), array_keys( $line_item_totals ) ) );
+
+		foreach ( $item_ids as $item_id ) {
+			$line_items[ $item_id ] = array(
+				'qty'          => 0,
+				'refund_total' => 0,
+			);
+		}
+
+		foreach ( $line_item_qtys as $item_id => $qty ) {
+			$line_items[ $item_id ]['qty'] = max( $qty, 0 );
+		}
+
+		foreach ( $line_item_totals as $item_id => $total ) {
+			$line_items[ $item_id ]['refund_total'] = wc_format_decimal( $total );
+		}
+
+		foreach ( $line_items as $line_item_order_id => $refund_data ) {
+			$line_item    = $order->get_item( $line_item_order_id );
+			$product_data = $line_item->get_data();
+			$product      = wc_get_product( $product_data['product_id'] );
+
+			if ( ! $product instanceof \WC_Product ) {
+				continue;
+			}
+
+			if ( ! Product::is_gift_card( $product ) ) {
+				continue;
+			}
+
+			$purchase_type = Order::get_gift_card_purchase_type( $order );
+
+			if ( 'new' === $purchase_type ) {
+				$gan = $this->get_order_meta( $order, 'gift_card_number' );
+			} elseif ( 'load' === $purchase_type ) {
+				$gan = Order::get_gift_card_gan( $order );
+			}
+
+			$total = (float) $refund_data['refund_total'];
+
+			if ( ! $total ) {
+				continue;
+			}
+
+			$amount_money = Money_Utility::amount_to_money( $total, $order->get_currency() );
+			$response     = $this->get_api()->refund_gift_card( $gan, $amount_money, $order );
+
+			if ( $response->get_data() instanceof \Square\Models\CreateGiftCardActivityResponse ) {
+				/** @var \Square\Models\CreateGiftCardActivityResponse */
+				$gift_card_activity_response = $response->get_data();
+				$gift_card_activity          = $gift_card_activity_response->getGiftCardActivity();
+				$gan                         = $gift_card_activity->getGiftCardGan();
+				$decrement_activity_details  = $gift_card_activity->getAdjustDecrementActivityDetails();
+				$decrement_money             = $decrement_activity_details->getAmountMoney();
+				$decrement_amount            = $decrement_money->getAmount();
+				$float_amount                = Money_Utility::cents_to_float( $decrement_amount, $order->get_currency() );
+
+				$order->add_order_note(
+					sprintf(
+						esc_html__( '-%1$s adjusted from the gift card with number %2$s.', 'woocommerce-square' ),
+						wc_price( $float_amount, array( 'currency' => $order->get_currency() ) ),
+						esc_html( $gan )
+					)
+				);
+			}
+		}
+	}
+
+	/**
 	 * Add refund information as class members of WC_Order
 	 * instance for use in refund transactions.  Standard information includes:
 	 *
@@ -1873,15 +1995,14 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param \WC_Order|int $order order being processed
+	 * @param \WC_Square_Order|int $order order being processed
 	 * @param float $amount refund amount
 	 * @param string $reason optional refund reason text
 	 * @return \WC_Order|\WP_Error object with refund information attached
 	 */
 	protected function get_order_for_refund( $order, $amount, $reason ) {
-
 		if ( is_numeric( $order ) ) {
-			$order = wc_get_order( $order );
+			$order = WC_Order_Square::wc_get_order( $order );
 		}
 
 		// add refund info
@@ -2237,8 +2358,8 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param \WC_Order $order the order object
-	 * @return \WC_Order order object with member named unique_transaction_ref
+	 * @param \WC_Order|WC_Order_Square $order the order object
+	 * @return \WC_Order|WC_Order_Square order object with member named unique_transaction_ref
 	 */
 	protected function get_order_with_unique_transaction_ref( $order ) {
 
@@ -2340,6 +2461,11 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 			$this->update_order_meta( $order, 'payment_token', $order->payment->token );
 		}
 
+		// account number
+		if ( isset( $order->payment->account_number ) && $order->payment->account_number ) {
+			$this->update_order_meta( $order, 'account_four', substr( $order->payment->account_number, -4 ) );
+		}
+
 		if ( $this->is_credit_card_gateway() ) {
 
 			// credit card gateway data
@@ -2408,7 +2534,7 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param \WC_Order $order order
+	 * @param WC_Order_Square $order order
 	 * @param SquareFramework\PaymentGateway\Api\Payment_Gateway_API_Customer_Response $response
 	 */
 	protected function add_customer_data( $order, $response = null ) {
@@ -2860,6 +2986,7 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 		$form_fields['transaction_type'] = array(
 			'title'    => esc_html__( 'Transaction Type', 'woocommerce-square' ),
 			'type'     => 'select',
+			'class'    => 'wc-enhanced-select',
 			'desc_tip' => esc_html__( 'Select how transactions should be processed. Charge submits all transactions for settlement, Authorization simply authorizes the order total for capture later.', 'woocommerce-square' ),
 			'default'  => self::TRANSACTION_TYPE_CHARGE,
 			'options'  => array(
@@ -3359,7 +3486,7 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	/**
 	 * Builds the order note string for orders made using a gift and a credit card.
 	 *
-	 * @since x.x.x
+	 * @since 4.2.0
 	 *
 	 * @var \WC_Order            $order   WooCommerce order.
 	 * @var \Square\Models\Order $square_order Array of tenders.
@@ -3499,7 +3626,7 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	 *
 	 * @since 3.0.0
 	 *
-	 * @return Payment_Gateway_Plugin the parent plugin object
+	 * @return Plugin the parent plugin object
 	 */
 	public function get_plugin() {
 
@@ -3893,7 +4020,7 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 	/**
 	 * Returns the tender types used for a Woo Order.
 	 *
-	 * @since x.x.x
+	 * @since 3.9.0
 	 *
 	 * @param \WC_Order $order Woo Order
 	 *
@@ -4013,6 +4140,70 @@ abstract class Payment_Gateway extends \WC_Payment_Gateway {
 
 		/* This filter is documented in WC core */
 		return apply_filters( 'woocommerce_gateway_icon', $icon, $this->get_id() );
+	}
+
+	/**
+	 * Restores refunded Square inventory.
+	 *
+	 * @internal
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param int $order_id order ID
+	 * @param int $refund_id refund ID
+	 */
+	public function restore_refunded_inventory( $order_id, $refund_id ) {
+		$inventory_adjustments = array();
+
+		// no handling if inventory sync is disabled
+		if ( ! $this->get_plugin()->get_settings_handler()->is_inventory_sync_enabled() ) {
+			return;
+		}
+
+		$order = wc_get_order( $order_id );
+
+		// check that the order was paid using our gateway
+		if ( ! $order instanceof \WC_Order || $order->get_payment_method() !== $this->get_id() ) {
+			return;
+		}
+
+		// don't refund items if the "Restock refunded items" option is unchecked - maintains backwards compatibility if this function is called outside of the `woocommerce_order_refunded` do_action
+		if ( isset( $_POST['restock_refunded_items'] ) ) {
+			// Validate the user has permissions to process this request.
+			if ( ! check_ajax_referer( 'order-item', 'security', false ) || ! current_user_can( 'edit_shop_orders' ) ) { // phpcs:ignore WordPress.WP.Capabilities.Unknown
+				return;
+			}
+
+			if ( 'false' === $_POST['restock_refunded_items'] ) {
+				return;
+			}
+		}
+
+		$refund = wc_get_order( $refund_id );
+
+		if ( $refund instanceof \WC_Order_Refund ) {
+
+			foreach ( $refund->get_items() as $item ) {
+				if ( $item->is_type( 'line_item' ) ) {
+					$product = $item->get_product();
+
+					if ( $product ) {
+						$inventory_adjustment = Product::get_inventory_change_adjustment_type( $product, absint( $item->get_quantity() ) );
+
+						if ( ! empty( $inventory_adjustment ) ) {
+							$inventory_adjustments[] = $inventory_adjustment;
+						}
+					}
+				}
+			}
+		}
+
+		if ( ! empty( $inventory_adjustments ) ) {
+			wc_square()->get_api()->batch_change_inventory(
+				wc_square()->get_idempotency_key( $refund_id . '_' . time() . '_change_inventory' ),
+				$inventory_adjustments
+			);
+		}
 	}
 
 }

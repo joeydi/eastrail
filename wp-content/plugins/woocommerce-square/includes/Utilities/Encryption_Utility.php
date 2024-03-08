@@ -22,6 +22,7 @@
  */
 
 namespace WooCommerce\Square\Utilities;
+
 use WooCommerce_Square_Loader;
 
 defined( 'ABSPATH' ) || exit;
@@ -69,6 +70,7 @@ class Encryption_Utility {
 			} else { // otherwise, throw a notice and continue with the default
 
 				$message = sprintf(
+					/* translators: %1$s - Cipher method. %2$s - Preferred cipher method. */
 					__( '%1$s encryption is not available on this site. %2$s will be used instead.', 'woocommerce-square' ),
 					$preferred_cipher_method,
 					$this->cipher_method
@@ -117,7 +119,7 @@ class Encryption_Utility {
 			throw new \Exception( __( 'Could not generate encryption vector.', 'woocommerce-square' ) );
 		}
 
-		$encrypted_data = openssl_encrypt( json_encode( $data ), $this->get_cipher_method(), $key, 0, $vector );
+		$encrypted_data = openssl_encrypt( wp_json_encode( $data ), $this->get_cipher_method(), $key, 0, $vector );
 
 		return base64_encode( $vector . $encrypted_data );
 	}
@@ -255,9 +257,10 @@ class Encryption_Utility {
 	 * @return string
 	 */
 	protected function get_default_key() {
+		if ( wc_square()->get_settings_handler()->is_custom_square_auth_keys_set() ) {
+			return md5( SQUARE_ENCRYPTION_KEY . SQUARE_ENCRYPTION_SALT );
+		}
 
 		return md5( wp_salt(), true );
 	}
-
-
 }

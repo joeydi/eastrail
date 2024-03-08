@@ -20,6 +20,8 @@
 
 namespace WooCommerce\Square\Framework\Compatibility;
 
+use WooCommerce\Square\WC_Order_Square;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -90,7 +92,7 @@ class Order_Compatibility extends Data_Compatibility {
 	 * @since 3.0.0
 	 * @param \WC_Order $object the order object
 	 * @param array $props the new properties as $key => $value
-	 * @return \WC_Data|\WC_Order
+	 * @return \WC_Data|\WC_Order|WC_Order_Square
 	 */
 	public static function set_props( $object, $props, $compat_props = array() ) {
 

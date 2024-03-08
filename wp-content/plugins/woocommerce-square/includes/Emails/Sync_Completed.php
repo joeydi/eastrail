@@ -22,6 +22,13 @@ defined( 'ABSPATH' ) || exit;
  */
 class Sync_Completed extends Base_Email {
 	/**
+	 * Email body.
+	 *
+	 * @var string
+	 **/
+	public $body;
+
+	/**
 	 * Email constructor.
 	 *
 	 * @since 2.0.0

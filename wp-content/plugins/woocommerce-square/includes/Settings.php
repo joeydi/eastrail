@@ -124,6 +124,48 @@ class Settings extends \WC_Settings_API {
 				return $fields;
 			}
 		);
+
+		add_action( 'admin_notices', array( $this, 'show_auth_keys_changed_notice' ) );
+	}
+
+	/**
+	 * Show warning to reconnect if the `SQUARE_ENCRYPTION_KEY` and `SQUARE_ENCRYPTION_SALT` constants
+	 * are newly added.
+	 *
+	 * @since 4.2.0
+	 */
+	public function show_auth_keys_changed_notice() {
+		$is_keys_updated = get_option( 'wc_square_auth_key_updated', false );
+		$show_message    = ( $this->is_custom_square_auth_keys_set() && empty( $is_keys_updated ) )
+							|| ( ! $this->is_custom_square_auth_keys_set() && $is_keys_updated );
+
+		if ( $show_message ) {
+			wc_square()->get_admin_notice_handler()->add_admin_notice(
+				esc_html__( 'Square was disconnected because authentication keys were changed. Please connect again.', 'woocommerce-square' ),
+				'wc-square-disconnected-keys-changed',
+				array(
+					'dismissible'  => false,
+					'notice_class' => 'notice-warning',
+				)
+			);
+
+			delete_option( 'wc_square_access_tokens' );
+		}
+
+		if ( ! $this->is_custom_square_auth_keys_set() && $is_keys_updated ) {
+			delete_option( 'wc_square_auth_key_updated' );
+		}
+	}
+
+	/**
+	 * Returns true if `SQUARE_ENCRYPTION_KEY` and `SQUARE_ENCRYPTION_SALT` constants are both set.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @return boolean
+	 */
+	public function is_custom_square_auth_keys_set() {
+		return defined( 'SQUARE_ENCRYPTION_KEY' ) && defined( 'SQUARE_ENCRYPTION_SALT' );
 	}
 
 	/**
@@ -184,14 +226,14 @@ class Settings extends \WC_Settings_API {
 		);
 
 		$fields['sandbox_application_id'] = array(
-			'type'        => 'input',
+			'type'        => 'text',
 			'title'       => __( 'Sandbox Application ID', 'woocommerce-square' ),
 			'class'       => 'wc_square_sandbox_settings',
 			'description' => __( 'Application ID for the Sandbox Application, see the details in the My Applications section.', 'woocommerce-square' ),
 		);
 
 		$fields['sandbox_token'] = array(
-			'type'        => 'input',
+			'type'        => 'text',
 			'title'       => __( 'Sandbox Access Token', 'woocommerce-square' ),
 			'class'       => 'wc_square_sandbox_settings',
 			'description' => __( 'Access Token for the Sandbox Test Account, see the details in the Sandbox Test Account section. Make sure you use the correct Sandbox Access Token for your application. For a given Sandbox Test Account, each Authorized Application is assigned a different Access Token.', 'woocommerce-square' ),
@@ -262,6 +304,7 @@ class Settings extends \WC_Settings_API {
 			$fields['sync_interval'] = array(
 				'title'       => __( 'Sync interval', 'woocommerce-square' ),
 				'type'        => 'select',
+				'class'       => 'wc-enhanced-select',
 				'default'     => '1',
 				'options'     => array(
 					'0.25' => esc_html__( '15 minutes', 'woocommerce-square' ),
@@ -635,7 +678,7 @@ class Settings extends \WC_Settings_API {
 	/**
 	 * Determines if image overriding is enabled.
 	 *
-	 * @since x.x.x
+	 * @since 3.9.0
 	 *
 	 * @return bool
 	 */
@@ -643,7 +686,7 @@ class Settings extends \WC_Settings_API {
 		/**
 		 * Filter to enable/disable overriding product images.
 		 *
-		 * @since x.x.x
+		 * @since 3.9.0
 		 *
 		 * @param boolean 'should_override' Boolean flag to toggle overriding image feature.
 		 */

@@ -24,6 +24,7 @@ use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway;
 use WooCommerce\Square\Framework\Compatibility\Order_Compatibility;
 use WooCommerce\Square\Framework\Square_Helper;
 use WooCommerce\Square\Framework\PaymentGateway\PaymentTokens\Payment_Gateway_Payment_Token;
+use WooCommerce\Square\WC_Order_Square;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -195,13 +196,15 @@ class Payment_Gateway_Integration_Subscriptions extends Payment_Gateway_Integrat
 
 			// payment token
 			if ( ! empty( $order->payment->token ) ) {
-				update_post_meta( Order_Compatibility::get_prop( $subscription, 'id' ), $this->get_gateway()->get_order_meta_prefix() . 'payment_token', $order->payment->token );
+				$subscription->update_meta_data( $this->get_gateway()->get_order_meta_prefix() . 'payment_token', $order->payment->token );
 			}
 
 			// customer ID
 			if ( ! empty( $order->customer_id ) ) {
-				update_post_meta( Order_Compatibility::get_prop( $subscription, 'id' ), $this->get_gateway()->get_order_meta_prefix() . 'customer_id', $order->customer_id );
+				$subscription->update_meta_data( $this->get_gateway()->get_order_meta_prefix() . 'customer_id', $order->customer_id );
 			}
+
+			$subscription->save();
 		}
 	}
 
@@ -244,7 +247,7 @@ class Payment_Gateway_Integration_Subscriptions extends Payment_Gateway_Integrat
 	 *
 	 * @since 3.0.0
 	 * @see Payment_Gateway_Direct::get_order()
-	 * @param \WC_Order $order renewal order
+	 * @param \WC_Order|WC_Order_Square $order renewal order
 	 * @return \WC_Order renewal order with payment token data set
 	 */
 	public function get_order( $order ) {

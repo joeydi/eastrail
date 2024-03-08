@@ -79,23 +79,19 @@ class Payment_Gateway_Admin_Order {
 	 * @param string $hook_suffix page hook suffix
 	 */
 	public function enqueue_scripts( $hook_suffix ) {
+		global $post;
+
+		if ( ! $post ) {
+			return;
+		}
 
 		// Order screen assets
 		if ( 'shop_order' === get_post_type() ) {
 
 			// Edit Order screen assets
-			if ( 'post.php' === $hook_suffix ) {
+			if ( 'post.php' === $hook_suffix || 'post-new.php' === $hook_suffix ) {
 
-				$order = wc_get_order( Square_Helper::get_request( 'post' ) );
-
-				if ( ! $order ) {
-					return;
-				}
-
-				// bail if the order payment method doesn't belong to this plugin
-				if ( ! $this->get_order_gateway( $order ) ) {
-					return;
-				}
+				$order = wc_get_order( $post->ID );
 
 				$this->enqueue_edit_order_assets( $order );
 			}
@@ -125,6 +121,7 @@ class Payment_Gateway_Admin_Order {
 				'capture_action' => 'wc_square_capture_charge',
 				'capture_nonce'  => wp_create_nonce( 'wc_square_capture_charge' ),
 				'capture_error'  => esc_html__( 'Something went wrong, and the capture could no be completed. Please try again.', 'woocommerce-square' ),
+				'has_gift_card'  => 'yes' === wc_square()->get_gateway()->get_order_meta( $order, 'is_gift_card_purchased' ),
 			)
 		);
 

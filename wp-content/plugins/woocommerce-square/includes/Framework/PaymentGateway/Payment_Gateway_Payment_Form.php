@@ -481,7 +481,7 @@ class Payment_Gateway_Payment_Form {
 		$html = sprintf(
 			'<input type="radio" id="wc-%1$s-payment-token-%2$s" name="wc-%1$s-payment-token" class="js-sv-wc-payment-gateway-payment-token js-wc-%1$s-payment-token" style="width:auto; margin-right:.5em;" value="%2$s" %3$s/>',
 			esc_attr( $this->get_gateway()->get_id_dasherized() ),
-			esc_attr( $token->get_token() ),
+			esc_attr( $token->get_id() ),
 			checked( $token->is_default(), true, false )
 		);
 

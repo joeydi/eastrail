@@ -3,7 +3,6 @@
 namespace WooCommerce\Square\Gateway\API\Responses;
 
 use WooCommerce\Square\Framework\PaymentGateway\Api\Payment_Gateway_API_Authorization_Response;
-use WooCommerce\Square\Framework\PaymentGateway\Api\Payment_Gateway_API_Response_Message_Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -124,7 +123,7 @@ class Create_Payment extends \WooCommerce\Square\Gateway\API\Response implements
 	/**
 	 * Returns if the card used is a Square Gift Card.
 	 *
-	 * @since x.x.x
+	 * @since 3.9.0
 	 * @return boolean
 	 */
 	public function is_gift_card_payment() {
@@ -135,15 +134,22 @@ class Create_Payment extends \WooCommerce\Square\Gateway\API\Response implements
 		return 'SQUARE_GIFT_CARD' === $card->getCardBrand();
 	}
 
+	/**
+	 * Returns true if the payment status is completed.
+	 *
+	 * @since 4.5.0
+	 * @return boolean
+	 */
+	public function is_cash_app_payment_completed() {
+		return $this->get_payment() && 'COMPLETED' === $this->get_payment()->getStatus();
+	}
 
 	/** No-op methods *************************************************************************************************/
-
 
 	public function get_avs_result() { }
 
 	public function get_csc_result() { }
 
 	public function csc_match() { }
-
 
 }

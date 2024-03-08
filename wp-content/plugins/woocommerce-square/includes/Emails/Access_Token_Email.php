@@ -32,6 +32,13 @@ defined( 'ABSPATH' ) || exit;
  */
 class Access_Token_Email extends Base_Email {
 	/**
+	 * Email body.
+	 *
+	 * @var string
+	 **/
+	public $body;
+
+	/**
 	 * Email constructor.
 	 *
 	 * @since 2.1.0

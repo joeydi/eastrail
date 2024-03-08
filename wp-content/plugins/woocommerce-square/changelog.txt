@@ -1,5 +1,92 @@
 *** WooCommerce Square Changelog ***
 
+= 4.5.1 - 2024-02-27 =
+* Fix - Address the repetitive creation of `wc_square_init_payment_token_migration` actions in the payment token migration process.
+* Dev - Bump WooCommerce "tested up to" version 8.6.
+* Dev - Bump WooCommerce minimum supported version to 8.4.
+
+= 4.5.0 - 2024-01-31 =
+* Add - Support for the Cash App Pay payment method.
+* Dev - Added end-to-end (E2E) tests for the Cash App Pay payment method.
+* Dev - Bump WooCommerce "tested up to" version 8.5.
+* Dev - Bump WooCommerce minimum supported version to 8.3.
+* Dev - Bump WordPress minimum supported version to 6.3.
+* Fix - Issue with syncing products that have a description more than 4096 characters.
+
+= 4.4.1 - 2024-01-18 =
+* Fix - Resolved the issue of double-counted inventory drops when WooPayments is used as the payment processor.
+* Dev - Bump WooCommerce "tested up to" version 8.4.
+* Dev - Bump WooCommerce minimum supported version to 8.2.
+* Dev - Update WordPress "tested up to" version to 6.4.0.
+* Dev - Ensure that all end-to-end tests pass.
+* Tweak - Updated placement of Express payment buttons (e.g., Apple Pay, Google Pay) on cart and product pages to align with WooCommerce Express payment button standards.
+* Remove - Action Scheduler dependency removed as it now comes bundled as part of WooCommerce core.
+
+= 4.4.0 - 2023-11-30 =
+* Fix - Fatal error caused by Digital Wallets when multiple shipping packages exist in a cart.
+* Fix - Digital Wallets not rendering on Single Product and Cart pages.
+* Fix - Disable Gift Card functionality with Pre-Orders "Charge Upon Release" products.
+* Fix - Import value of "Sync with Square" field if it is not set in the CSV.
+* Fix - Card name in transaction order notes when order is placed through Block Checkout.
+* Dev - Bump WooCommerce "tested up to" version 8.3.
+* Dev - Bump WooCommerce minimum supported version to 8.1.
+* Dev - Bump WordPress "tested up to" version 6.4.
+* Dev - Bump WordPress minimum supported version to 6.2.
+* Dev - Add Playwright e2e coverage for Cart Block and Checkout Block.
+* Tweak - Admin settings colour to match admin theme colour scheme.
+
+= 4.3.1 - 2023-11-06 =
+* Fix - Fatal error caused when the Action Scheduler API method `as_has_scheduled_action` is used for migrating payment tokens.
+* Fix - Missing payment token and customer ID in subscription orders when HPOS is enabled.
+* Fix - Issue with changing payment method for subscriptions when HPOS is enabled.
+* Fix - Fatal error when Digital Wallet is enabled and product quantity is 0 or price field is unset.
+* Add - Support for submitting custom required fields data via Digital Wallets based checkout.
+
+= 4.3.0 - 2023-10-25 =
+* Add - Support for Digital Wallets on Block-based Cart and Checkout pages.
+* Fix - Issue with product import and sync not updating product title and description fields.
+* Dev - Add compatibility support for PHP 8.2.
+* Dev - Bump WooCommerce "tested up to" version 8.1.
+* Dev - Bump WooCommerce minimum supported version to 7.9.
+* Dev - Bump woocommerce-sniffs to 1.0.0.
+
+= 4.2.2 - 2023-10-11 =
+* Dev - Update PHPCS and PHPCompatibility GitHub Actions.
+* Tweak - Timing of the Apple Pay domain registration warning message.
+
+= 4.2.1 - 2023-09-18 =
+* Fix - Inventory tracking logic in the Square product import.
+* Tweak - Remove redundant code.
+* Dev - Bump WooCommerce "tested up to" version 8.0.
+* Dev - Bump WooCommerce minimum supported version to 7.8.
+* Dev - Bump WordPress "tested up to" version 6.3.
+* Dev - Bump WordPress minimum supported version to 6.1.
+* Dev - Update JS docblock to indicate moving away from WooCommerce Checkout Block payment integration to Web Payments SDK.
+* Dev - Resolve PHPCS errors.
+
+= 4.2.0 - 2023-08-22 =
+* Add - Ability to purchase a new gift card.
+* Add - Ability to add funds to an existing gift card.
+* Add - Capability to refund a Gift Card order.
+* Add - Retry mechanism for RATE LIMIT errors.
+* Changed: Removed the gift card beta label.
+* Dev - Bump WordPress minimum supported version from 5.8 to 6.0.
+* Dev - Bump WooCommerce minimum supported version from 6.8 to 7.7.
+* Dev - Bump WooCommerce "tested up to" version from 7.8 to 7.9.
+* Dev - Bump Square PHP SDK version from 24.0.0.20221116 to 29.0.0.20230720.
+* Fix - Allow guest customer to update billing address for manual order if country is not set.
+* Fix - Console error when checkout is performed with empty credit card fields.
+* Fix - Block Checkout using saved cards.
+* Fix - Auto-disconnection issue due to salt rotation.
+* Fix - Issue with displaying limited saved payment methods due to posts_per_page setting.
+
+= 4.1.0 - 2023-07-31 =
+* Add - Support for inventory sync of individual products and variations.
+* Add - Inventory sync improvements.
+* Fix - Product Add-Ons compatibility with total on single product page.
+* Fix - Updated implementation logic of functions to better sanitize input data.
+* Tweak - Improve Square credit card payment form initialization on checkout page.
+
 = 4.0.0 - 2023-07-05 =
 * Add - Store Owner details in the `Additional Content` field to the `Sync Complete` and `Access Token` email notifications.
 * Dev - Project maintenance automation via GitHub Actions.

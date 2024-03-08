@@ -175,7 +175,7 @@ class Orders extends API\Request {
 	 *
 	 * @param array  $payment_ids Array of payment IDs.
 	 * @param string $order_id    Square order ID.
-	 * @since x.x.x
+	 * @since 3.9.0
 	 */
 	public function set_pay_order_data( $payment_ids, $order_id ) {
 		$this->square_api_method = 'payOrder';
@@ -274,9 +274,14 @@ class Orders extends API\Request {
 		$api_line_items = array();
 		$tax_type       = wc_prices_include_tax() ? API::TAX_TYPE_INCLUSIVE : API::TAX_TYPE_ADDITIVE;
 
+		/** @var \WC_Order_Item_Product $item */
 		foreach ( $line_items as $item ) {
 			$is_product = $item instanceof \WC_Order_Item_Product;
 			$line_item  = new \Square\Models\OrderLineItem( $is_product ? (string) $item->get_quantity() : (string) 1 );
+
+			if ( $is_product && Product::is_gift_card( $item->get_product() ) ) {
+				$line_item->setItemType( 'GIFT_CARD' );
+			}
 
 			$total_tax       = $item->get_total_tax();
 			$total_amount    = $item->get_total();

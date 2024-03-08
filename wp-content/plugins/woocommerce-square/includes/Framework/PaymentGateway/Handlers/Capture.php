@@ -189,6 +189,15 @@ class Capture {
 				$response = $this->get_gateway()->get_api()->credit_card_capture( $order );
 			}
 
+			$gift_card_purchase_type = \WooCommerce\Square\Handlers\Order::get_gift_card_purchase_type( $order );
+
+			if ( 'new' === $gift_card_purchase_type ) {
+				$this->get_gateway()->create_gift_card( $order );
+			} elseif ( 'load' === $gift_card_purchase_type ) {
+				$gan = \WooCommerce\Square\Handlers\Order::get_gift_card_gan( $order );
+				$this->get_gateway()->load_gift_card( $gan, $order );
+			}
+
 			// bail early if the capture wasn't approved
 			if ( ! $response->transaction_approved() ) {
 
@@ -423,7 +432,8 @@ class Capture {
 
 		// if a specific auth amount was stored, use it
 		// otherwise, use the order total
-		$amount = $this->get_gateway()->get_order_meta( $order, 'authorization_amount' ) ?: $order->get_total();
+		$amount = $this->get_gateway()->get_order_meta( $order, 'authorization_amount' );
+		$amount = $amount ? $amount : $order->get_total();
 
 		return (float) $amount;
 	}

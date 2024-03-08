@@ -1,9 +1,10 @@
 <?php
 
 namespace WooCommerce\Square\Framework;
+
 use WooCommerce\Square\Framework\Plugin_Compatibility;
 
-defined( 'ABSPATH' ) or exit;
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Square Helper Class
@@ -180,7 +181,7 @@ class Square_Helper {
 	 * @param array $element element to insert into array
 	 * @return array
 	 */
-	public static function array_insert_after( Array $array, $insert_key, Array $element ) {
+	public static function array_insert_after( array $array, $insert_key, array $element ) {
 
 		$new_array = array();
 
@@ -188,7 +189,7 @@ class Square_Helper {
 
 			$new_array[ $key ] = $value;
 
-			if ( $insert_key == $key ) {
+			if ( $insert_key === $key ) {
 
 				foreach ( $element as $k => $v ) {
 					$new_array[ $k ] = $v;
@@ -281,19 +282,21 @@ class Square_Helper {
 
 
 	/**
-	 * Safely get and trim data from $_POST
+	 * Safely get sanitized data from $_POST
 	 *
 	 * @since 3.0.0
-	 * @param string $key array key to get from $_POST array
+	 * @param string $key               Array key to get from $_POST array.
+	 * @param string $sanitize_callback Name of the sanitization callback function.
+	 *
 	 * @return string value from $_POST or blank string if $_POST[ $key ] is not set
 	 */
-	public static function get_post( $key ) {
-
-		if ( isset( $_POST[ $key ] ) ) {
-			return trim( $_POST[ $key ] );
+	public static function get_post( $key = '', $sanitize_callback = 'sanitize_text_field' ) {
+		if ( ! is_callable( $sanitize_callback ) ) {
+			$sanitize_callback = 'sanitize_text_field';
 		}
 
-		return '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		return isset( $_POST[ $key ] ) ? call_user_func( $sanitize_callback, wp_unslash( $_POST[ $key ] ) ) : '';
 	}
 
 
@@ -301,16 +304,19 @@ class Square_Helper {
 	 * Safely get and trim data from $_REQUEST
 	 *
 	 * @since 3.0.0
-	 * @param string $key array key to get from $_REQUEST array
+	 * @param string $key               Array key to get from $_REQUEST array.
+	 * @param string $sanitize_callback Name of the sanitization callback function.
+	 *
 	 * @return string value from $_REQUEST or blank string if $_REQUEST[ $key ] is not set
 	 */
-	public static function get_request( $key ) {
+	public static function get_request( $key, $sanitize_callback = 'sanitize_text_field' ) {
 
-		if ( isset( $_REQUEST[ $key ] ) ) {
-			return trim( $_REQUEST[ $key ] );
+		if ( ! is_callable( $sanitize_callback ) ) {
+			$sanitize_callback = 'sanitize_text_field';
 		}
 
-		return '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		return isset( $_REQUEST[ $key ] ) ? call_user_func( $sanitize_callback, wp_unslash( $_REQUEST[ $key ] ) ) : '';
 	}
 
 	/**
@@ -388,21 +394,22 @@ class Square_Helper {
 
 				case E_USER_NOTICE:
 					$prefix = 'Notice: ';
-				break;
+					break;
 
 				case E_USER_WARNING:
 					$prefix = 'Warning: ';
-				break;
+					break;
 
 				default:
 					$prefix = '';
 			}
 
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			error_log( $prefix . $message );
 
 		} else {
-
-			trigger_error( $message, $type ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.PHP.DevelopmentFunctions.error_log_trigger_error
+			trigger_error( $message, $type );
 		}
 	}
 }

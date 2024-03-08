@@ -46,6 +46,11 @@ class Digital_Wallet {
 	public $total_label_suffix;
 
 	/**
+	 * @var array Array of localised data.
+	 */
+	protected $localised_data = array();
+
+	/**
 	 * Setup the Digital Wallet class
 	 *
 	 * @since 2.3
@@ -99,11 +104,17 @@ class Digital_Wallet {
 		$available_pages = $this->get_available_pages();
 
 		if ( ( $is_user_logged_in || ! $is_registration_required ) && in_array( 'product', $available_pages, true ) ) {
-			add_action( 'woocommerce_after_add_to_cart_quantity', array( $this, 'render_button' ) );
+			add_action( 'woocommerce_after_add_to_cart_button', array( $this, 'render_button' ) );
 		}
 
 		if ( ( $is_user_logged_in || ! $is_registration_required ) && in_array( 'cart', $available_pages, true ) ) {
-			add_action( 'woocommerce_proceed_to_checkout', array( $this, 'render_button' ) );
+			/*
+			 * Add Express Pay buttons to cart page.
+			 *
+			 * This is registered to run late (at priority 20) to ensure the buttons are
+			 * added following the default WooCommerce proceed to checkout button.
+			 */
+			add_action( 'woocommerce_proceed_to_checkout', array( $this, 'render_button' ), 20 );
 		}
 
 		if ( ( $is_user_logged_in || ! $is_registration_required || $is_registration_enabled ) && in_array( 'checkout', $available_pages, true ) ) {
@@ -114,7 +125,41 @@ class Digital_Wallet {
 			add_action( 'before_woocommerce_pay', array( $this, 'render_button' ) );
 		}
 
+		$page            = $this->get_current_page();
+		$payment_request = false;
+
+		try {
+			$payment_request = $this->get_payment_request_for_context( $page );
+		} catch ( \Exception $e ) {
+			$this->gateway->get_plugin()->log( 'Error: ' . $e->getMessage() );
+		}
+
+		if ( $this->gateway && $page ) {
+			$this->localised_data = array(
+				'application_id'           => $this->gateway->get_application_id(),
+				'location_id'              => wc_square()->get_settings_handler()->get_location_id(),
+				'gateway_id'               => $this->gateway->get_id(),
+				'gateway_id_dasherized'    => $this->gateway->get_id_dasherized(),
+				'payment_request'          => $payment_request,
+				'context'                  => $page,
+				'general_error'            => __( 'An error occurred, please try again or try an alternate form of payment.', 'woocommerce-square' ),
+				'ajax_url'                 => \WC_AJAX::get_endpoint( '%%endpoint%%' ),
+				'payment_request_nonce'    => wp_create_nonce( 'wc-square-get-payment-request' ),
+				'add_to_cart_nonce'        => wp_create_nonce( 'wc-square-add-to-cart' ),
+				'recalculate_totals_nonce' => wp_create_nonce( 'wc-square-recalculate-totals' ),
+				'process_checkout_nonce'   => wp_create_nonce( 'woocommerce-process_checkout' ),
+				'logging_enabled'          => $this->gateway->debug_log(),
+				'hide_button_options'      => $this->get_hidden_button_options(),
+				'google_pay_color'         => $this->gateway->get_option( 'digital_wallets_google_pay_button_color', 'black' ),
+				'apple_pay_color'          => $this->gateway->get_option( 'digital_wallets_apple_pay_button_color', 'black' ),
+			);
+		}
+
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+	}
+
+	public function get_localised_data() {
+		return $this->localised_data;
 	}
 
 	/**
@@ -145,7 +190,7 @@ class Digital_Wallet {
 					)
 				);
 
-			} elseif ( 'no' === $this->gateway->get_option( 'apple_pay_domain_registered', '' ) ) {
+			} elseif ( 'no' === $this->gateway->get_option( 'apple_pay_domain_registered', '' ) && 'yes' === $this->gateway->get_option( 'apple_pay_domain_registration_attempted', 'no' ) ) {
 				// Domain failed to register
 				wc_square()->get_admin_notice_handler()->add_admin_notice(
 					sprintf(
@@ -164,12 +209,71 @@ class Digital_Wallet {
 	}
 
 	/**
+	 * Returns true if the checkout using Digital Wallets require custom fields
+	 * to not be empty.
+	 *
+	 * @since 4.3.1
+	 *
+	 * @return boolean
+	 */
+	public function does_checkout_require_custom_fields() {
+		// Default WooCommerce Core required fields for billing, shipping, account and order.
+		$default_required_fields = array(
+			'billing_first_name',
+			'billing_last_name',
+			'billing_company',
+			'billing_country',
+			'billing_address_1',
+			'billing_address_2',
+			'billing_city',
+			'billing_state',
+			'billing_postcode',
+			'billing_phone',
+			'billing_email',
+			'shipping_first_name',
+			'shipping_last_name',
+			'shipping_company',
+			'shipping_country',
+			'shipping_address_1',
+			'shipping_address_2',
+			'shipping_city',
+			'shipping_state',
+			'shipping_postcode',
+			'order_comments',
+			'account_username',
+			'account_password',
+		);
+
+		$fields = WC()->checkout()->get_checkout_fields();
+		$fields = array_merge(
+			$fields['billing'] ?? array(),
+			$fields['shipping'] ?? array(),
+			$fields['order'] ?? array(),
+			$fields['account'] ?? array(),
+		);
+
+		foreach ( $fields as $field_key => $field_data ) {
+			if ( false === array_search( $field_key, $default_required_fields, true ) ) {
+				if ( isset( $field_data['required'] ) && true === $field_data['required'] ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Render the Digital Wallet buttons (Apple Pay) on the Product, Cart or Checkout pages
 	 *
 	 * @since 2.3
 	 * @return void
 	 */
 	public function render_button() {
+
+		if ( self::does_checkout_require_custom_fields() && ! is_checkout() ) {
+			return;
+		}
 
 		$apple_pay_classes  = $google_pay_classes = array( 'wc-square-wallet-buttons' );
 		$button_type        = $this->gateway->get_option( 'digital_wallets_button_type', 'buy' );
@@ -197,7 +301,26 @@ class Digital_Wallet {
 			</div>
 
 			<div id="wc-square-google-pay" lang="<?php echo esc_attr( substr( get_locale(), 0, 2 ) ); ?>"></div>
-			<p id="wc-square-wallet-divider">&ndash; <?php esc_html_e( 'OR', 'woocommerce-square' ); ?> &ndash;</p>
+
+			<?php
+			/**
+			 * Filter whether to show the divider between the Square digital wallet buttons and the checkout.
+			 *
+			 * This filter allows extensions to hide the "-- OR --" divider between express pay/wallet buttons
+			 * and the checkout. This is useful for plugins adding their own express pay/wallet buttons following
+			 * the Square buttons.
+			 *
+			 * @since 4.4.1
+			 *
+			 * @param bool $show_divider Whether to show the divider. Default true.
+			 */
+			$show_divider = apply_filters( 'wp_square_show_digital_wallet_divider_on_checkout', true );
+			if ( $show_divider && is_checkout() ) :
+				?>
+				<p id="wc-square-wallet-divider">&ndash; <?php esc_html_e( 'OR', 'woocommerce-square' ); ?> &ndash;</p>
+				<?php
+			endif;
+			?>
 		</div>
 		<?php
 	}
@@ -227,26 +350,7 @@ class Digital_Wallet {
 			 */
 			$args = apply_filters(
 				'wc_square_digital_wallet_js_args',
-				array(
-					'application_id'           => $this->gateway->get_application_id(),
-					'location_id'              => wc_square()->get_settings_handler()->get_location_id(),
-					'gateway_id'               => $this->gateway->get_id(),
-					'gateway_id_dasherized'    => $this->gateway->get_id_dasherized(),
-					'payment_request'          => $this->get_payment_request_for_context( $page ),
-					'context'                  => $page,
-					'general_error'            => __( 'An error occurred, please try again or try an alternate form of payment.', 'woocommerce-square' ),
-					'ajax_url'                 => \WC_AJAX::get_endpoint( '%%endpoint%%' ),
-					'payment_request_nonce'    => wp_create_nonce( 'wc-square-get-payment-request' ),
-					'add_to_cart_nonce'        => wp_create_nonce( 'wc-square-add-to-cart' ),
-					'recalculate_totals_nonce' => wp_create_nonce( 'wc-square-recalculate-totals' ),
-					'process_checkout_nonce'   => wp_create_nonce( 'woocommerce-process_checkout' ),
-					'logging_enabled'          => $this->gateway->debug_log(),
-					'hide_button_options'      => $this->get_hidden_button_options(),
-					'google_pay_color'         => $this->gateway->get_option( 'digital_wallets_google_pay_button_color', 'black' ),
-					'apple_pay_color'          => $this->gateway->get_option( 'digital_wallets_apple_pay_button_color', 'black' ),
-					'is_pay_for_order_page'    => is_wc_endpoint_url( 'order-pay' ),
-					'order_id'                 => absint( get_query_var( 'order-pay' ) ),
-				)
+				$this->get_localised_data()
 			);
 
 			wc_enqueue_js( sprintf( 'window.wc_square_digital_wallet_handler = new WC_Square_Digital_Wallet_Handler( %s );', wp_json_encode( $args ) ) );
@@ -259,7 +363,7 @@ class Digital_Wallet {
 	/**
 	 * Build the payment request object for the given context (i.e. product, cart or checkout page)
 	 *
-	 * Payment request objects are used by the SqPaymentForm and need to be in a specific format.
+	 * Payment request objects are used by the Payments and need to be in a specific format.
 	 * Reference: https://developer.squareup.com/docs/api/paymentform#paymentform-paymentrequestobjects
 	 *
 	 * @since 2.3
@@ -274,7 +378,11 @@ class Digital_Wallet {
 
 		switch ( $context ) {
 			case 'product':
-				$payment_request = $this->get_product_payment_request( get_the_ID() );
+				try {
+					$payment_request = $this->get_product_payment_request( get_the_ID() );
+				} catch ( \Exception $e ) {
+					$this->gateway->get_plugin()->log( 'Error: ' . $e->getMessage() );
+				}
 				break;
 
 			case 'cart':
@@ -300,7 +408,7 @@ class Digital_Wallet {
 	}
 
 	/**
-	 * Build a payment request object to be sent to SqPaymentForm on the product page
+	 * Build a payment request object to be sent to Payments on the product page
 	 *
 	 * Documentation: https://developer.squareup.com/docs/api/paymentform#paymentform-paymentrequestobjects
 	 *
@@ -374,7 +482,7 @@ class Digital_Wallet {
 	}
 
 	/**
-	 * Build a payment request object to be sent to SqPaymentForm.
+	 * Build a payment request object to be sent to Payments.
 	 *
 	 * Documentation: https://developer.squareup.com/docs/api/paymentform#paymentform-paymentrequestobjects
 	 *
@@ -534,11 +642,15 @@ class Digital_Wallet {
 
 		try {
 			if ( 'product' === $context ) {
-				$product_id      = ! empty( $_POST['product_id'] ) ? wc_clean( wp_unslash( $_POST['product_id'] ) ) : 0;
-				$quantity        = ! empty( $_POST['quantity'] ) ? wc_clean( wp_unslash( $_POST['quantity'] ) ) : 1;
-				$attributes      = ! empty( $_POST['attributes'] ) ? wc_clean( wp_unslash( $_POST['attributes'] ) ) : array();
-				$payment_request = $this->get_product_payment_request( $product_id, $quantity, $attributes );
+				$product_id = ! empty( $_POST['product_id'] ) ? wc_clean( wp_unslash( $_POST['product_id'] ) ) : 0;
+				$quantity   = ! empty( $_POST['quantity'] ) ? wc_clean( wp_unslash( $_POST['quantity'] ) ) : 1;
+				$attributes = ! empty( $_POST['attributes'] ) ? wc_clean( wp_unslash( $_POST['attributes'] ) ) : array();
 
+				try {
+					$payment_request = $this->get_product_payment_request( $product_id, $quantity, $attributes );
+				} catch ( \Exception $e ) {
+					wp_send_json_error( $e->getMessage() );
+				}
 			} else {
 				$payment_request = $this->get_payment_request_for_context( $context );
 			}
@@ -569,8 +681,14 @@ class Digital_Wallet {
 			$quantity   = ! empty( $_POST['quantity'] ) ? wc_clean( wp_unslash( $_POST['quantity'] ) ) : 1;
 			$attributes = ! empty( $_POST['attributes'] ) ? wc_clean( wp_unslash( $_POST['attributes'] ) ) : array();
 
+			try {
+				$payment_request = $this->get_product_payment_request( $product_id, $quantity, $attributes, true );
+			} catch ( \Exception $e ) {
+				wp_send_json_error( $e->getMessage() );
+			}
+
 			$response = array(
-				'payment_request'          => $this->get_product_payment_request( $product_id, $quantity, $attributes, true ),
+				'payment_request'          => $payment_request,
 				// We need to generate a new set of nonces now that a WC customer session exists after a product was added to the cart
 				'payment_request_nonce'    => wp_create_nonce( 'wc-square-get-payment-request' ),
 				'add_to_cart_nonce'        => wp_create_nonce( 'wc-square-add-to-cart' ),
@@ -743,6 +861,7 @@ class Digital_Wallet {
 				$this->calculate_shipping( $shipping_address );
 
 				$packages = WC()->shipping->get_packages();
+				$packages = array_values( $packages ); /// reindex the array.
 
 				if ( ! empty( $packages ) ) {
 					foreach ( $packages[0]['rates'] as $method ) {
@@ -1004,6 +1123,8 @@ class Digital_Wallet {
 		$is_sandbox   = $this->gateway->get_plugin()->get_settings_handler()->is_sandbox();
 		$domain_name  = ! empty( $_SERVER['HTTP_HOST'] ) ? wc_clean( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
 
+		$this->gateway->update_option( 'apple_pay_domain_registration_attempted', 'yes' );
+
 		if ( empty( $domain_name ) ) {
 			throw new \Exception( 'Unable to verify domain with Apple Pay - no domain found in $_SERVER[\'HTTP_HOST\'].' );
 		}
@@ -1078,7 +1199,15 @@ class Digital_Wallet {
 		if ( null === $this->page ) {
 			$is_cart    = is_cart() && ! WC()->cart->is_empty();
 			$is_product = is_product() || wc_post_content_has_shortcode( 'product_page' );
-			$this->page = $is_cart ? 'cart' : ( $is_product ? 'product' : ( is_checkout() ? 'checkout' : null ) );
+			$this->page = null;
+
+			if ( $is_cart ) {
+				$this->page = 'cart';
+			} elseif ( $is_product ) {
+				$this->page = 'product';
+			} elseif ( is_checkout() || ( function_exists( 'has_block' ) && has_block( 'woocommerce/checkout' ) ) ) {
+				$this->page = 'checkout';
+			}
 		}
 
 		return $this->page;

@@ -45,6 +45,8 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 	 */
 	protected $gateway = null;
 
+	protected $digital_wallets_handler;
+
 	/**
 	 * Init Square Cart and Checkout Blocks handler class
 	 *
@@ -52,19 +54,6 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 	 */
 	public function __construct() {
 		$this->plugin = wc_square();
-
-		add_action(
-			'woocommerce_blocks_enqueue_checkout_block_scripts_before',
-			function() {
-				add_filter( 'woocommerce_saved_payment_methods_list', array( $this, 'add_square_saved_payment_methods' ), 10, 2 );
-			}
-		);
-		add_action(
-			'woocommerce_blocks_enqueue_checkout_block_scripts_after',
-			function () {
-				remove_filter( 'woocommerce_saved_payment_methods_list', array( $this, 'add_square_saved_payment_methods' ) );
-			}
-		);
 
 		add_action( 'woocommerce_rest_checkout_process_payment_with_context', array( $this, 'log_js_data' ), 10, 2 );
 
@@ -76,7 +65,8 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 	 * Initializes the payment method type.
 	 */
 	public function initialize() {
-		$this->settings = get_option( 'woocommerce_square_credit_card_settings', array() );
+		$this->settings                = get_option( 'woocommerce_square_credit_card_settings', array() );
+		$this->digital_wallets_handler = wc_square()->get_gateway()->get_digital_wallet_handler();
 	}
 
 	/**
@@ -125,19 +115,25 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 	 * @return array
 	 */
 	public function get_payment_method_data() {
-		return empty( $this->get_gateway() ) ? array() : array(
-			'title'                  => $this->get_setting( 'title' ),
-			'application_id'         => $this->get_gateway()->get_application_id(),
-			'location_id'            => $this->plugin->get_settings_handler()->get_location_id(),
-			'is_sandbox'             => $this->plugin->get_settings_handler()->is_sandbox(),
-			'input_styles'           => $this->get_input_styles(),
-			'available_card_types'   => $this->get_available_card_types(),
-			'logging_enabled'        => $this->get_gateway()->debug_log(),
-			'general_error'          => __( 'An error occurred, please try again or try an alternate form of payment.', 'woocommerce-square' ),
-			'supports'               => $this->get_supported_features(),
-			'show_saved_cards'       => $this->get_gateway()->tokenization_enabled(),
-			'show_save_option'       => $this->get_gateway()->tokenization_enabled() && ! $this->get_gateway()->get_payment_form_instance()->tokenization_forced(),
-			'is_tokenization_forced' => $this->get_gateway()->get_payment_form_instance()->tokenization_forced(),
+		return empty( $this->get_gateway() ) ? array() : array_merge(
+			array(
+				'title'                      => $this->get_setting( 'title' ),
+				'application_id'             => $this->get_gateway()->get_application_id(),
+				'location_id'                => $this->plugin->get_settings_handler()->get_location_id(),
+				'is_sandbox'                 => $this->plugin->get_settings_handler()->is_sandbox(),
+				'available_card_types'       => $this->get_available_card_types(),
+				'logging_enabled'            => $this->get_gateway()->debug_log(),
+				'general_error'              => __( 'An error occurred, please try again or try an alternate form of payment.', 'woocommerce-square' ),
+				'supports'                   => $this->get_supported_features(),
+				'show_saved_cards'           => $this->get_gateway()->tokenization_enabled(),
+				'show_save_option'           => $this->get_gateway()->tokenization_enabled() && ! $this->get_gateway()->get_payment_form_instance()->tokenization_forced(),
+				'is_tokenization_forced'     => $this->get_gateway()->get_payment_form_instance()->tokenization_forced(),
+				'is_digital_wallets_enabled' => $this->gateway->is_digital_wallet_available() && 'yes' === $this->gateway->get_option( 'enable_digital_wallets', 'yes' ),
+				'payment_token_nonce'        => wp_create_nonce( 'payment_token_nonce' ),
+				'is_pay_for_order_page'      => is_wc_endpoint_url( 'order-pay' ),
+				'recalculate_totals_nonce'   => wp_create_nonce( 'wc-square-recalculate-totals' ),
+			),
+			$this->digital_wallets_handler->get_localised_data()
 		);
 	}
 
@@ -150,29 +146,6 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 	 */
 	private function get_title() {
 		return ! empty( $this->get_setting( 'title' ) ) ? $this->get_setting( 'title' ) : esc_html__( 'Credit Card', 'woocommerce-square' );
-	}
-
-	/**
-	 * Get Square Payment Form iframe input styles
-	 *
-	 * @since 2.5
-	 * @return array
-	 */
-	private function get_input_styles() {
-		$input_styles = array(
-			array(
-				'backgroundColor' => 'transparent',
-				'fontSize'        => '1.3em',
-			),
-		);
-
-		/**
-		 * Filters the the Square payment form input styles.
-		 *
-		 * @since 2.5
-		 * @param array $styles array of input styles
-		 */
-		return (array) apply_filters( 'wc_square_credit_card_payment_form_input_styles', $input_styles, $this );
 	}
 
 	/**
@@ -213,40 +186,6 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 	public function get_supported_features() {
 		$gateway = $this->get_gateway();
 		return ! empty( $gateway ) ? array_filter( $gateway->supports, array( $gateway, 'supports' ) ) : array();
-	}
-
-	/**
-	 * Manually adds the customers Square cards to the list of cards returned
-	 * by the `woocommerce_saved_payment_methods_list` filter.
-	 *
-	 * With Square, we don't store customer cards in WC's payment token table so
-	 * in order for them to appear on the checkout block we have to manually add them.
-	 *
-	 * @since 2.5
-	 * @param array $saved_methods
-	 * @param int   $user_id
-	 * @return array
-	 */
-	public function add_square_saved_payment_methods( $saved_methods, $user_id ) {
-		$tokens = $this->get_gateway()->get_payment_tokens_handler()->get_tokens( $user_id );
-
-		foreach ( $tokens as $token ) {
-			$saved_method = array(
-				'method'     => array(
-					'gateway' => 'square_credit_card',
-					'last4'   => $token->get_last4(),
-					'brand'   => wc_get_credit_card_type_label( $token->get_card_type() ),
-				),
-				'expires'    => $token->get_exp_date(),
-				'is_default' => $token->is_default(),
-				'actions'    => array(),
-				'tokenId'    => $token->get_id(),
-			);
-
-			$saved_methods['cc'][] = $saved_method;
-		}
-
-		return $saved_methods;
 	}
 
 	/**
@@ -310,7 +249,7 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 	private function get_gateway() {
 		if ( empty( $this->gateway ) ) {
 			$gateways      = $this->plugin->get_gateways();
-			$this->gateway = ! empty( $gateways ) ? array_pop( $gateways ) : null;
+			$this->gateway = ! empty( $gateways ) ? $gateways[0] : null;
 		}
 
 		return $this->gateway;

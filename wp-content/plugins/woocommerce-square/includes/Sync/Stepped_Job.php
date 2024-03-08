@@ -100,6 +100,8 @@ abstract class Stepped_Job extends Job {
 	 * @since 2.0.0
 	 */
 	protected function do_next_step() {
+		$max_retry = 3;  // Maximum number of retries for rate limit errors.
+		$retry     = $this->get_attr( 'retry', 0 ); // Number of retries for rate limit errors.
 
 		$next_step = $this->get_next_step();
 
@@ -111,8 +113,15 @@ abstract class Stepped_Job extends Job {
 
 				$this->$next_step();
 				$this->complete_step_cycle( $next_step );
-
+				$this->set_attr( 'retry', 0 ); // Reset retry count to 0 after successful step cycle.
 			} catch ( \Exception $exception ) {
+				$error_message = $exception->getMessage();
+				// If sync fail with rate limit error, retry the sync process after few seconds. (retry upto 3 times)
+				if ( false !== strpos( $error_message, 'RATE_LIMITED' ) && $retry < $max_retry ) {
+					wc_square()->log( 'Rate limit error detected, pausing sync process for few secs...' );
+					$this->set_attr( 'retry', $retry + 1 );
+					return;
+				}
 
 				$this->complete_step_cycle( $next_step, false, $exception->getMessage() );
 				$this->fail( $exception->getMessage() );
@@ -168,11 +177,11 @@ abstract class Stepped_Job extends Job {
 
 			if ( true === $is_successful ) {
 
-				wc_square()->log( "Completed step cycle: $step_name (${current_step_cycle['runtime']})" );
+				wc_square()->log( "Completed step cycle: $step_name ({$current_step_cycle['runtime']})" );
 
 			} else {
 
-				wc_square()->log( "Failed step cycle: $step_name (${current_step_cycle['runtime']}) - $error_message" );
+				wc_square()->log( "Failed step cycle: $step_name ({$current_step_cycle['runtime']}) - $error_message" );
 			}
 
 			$completed_cycles   = $this->get_attr( 'completed_step_cycles', array() );

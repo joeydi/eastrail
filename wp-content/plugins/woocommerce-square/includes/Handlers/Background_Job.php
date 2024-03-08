@@ -127,7 +127,15 @@ class Background_Job extends Background_Job_Handler {
 
 		// Start next job or complete process
 		if ( ! $this->is_queue_empty() ) {
-			as_enqueue_async_action( 'wc_square_job_runner' );
+			// If the job has a retry count set, we'll retry the job after a delay.
+			if ( isset( $job->retry ) && is_numeric( $job->retry ) && $job->retry > 0 ) {
+				$base_delay = 30;  // Base delay in seconds for rate limit errors. 30 seconds.
+				$delay      = $base_delay * ( pow( 2, $job->retry ) );
+				wc_square()->log( "Retrying in {$delay} seconds." );
+				as_schedule_single_action( time() + $delay, 'wc_square_job_runner' );
+			} else {
+				as_enqueue_async_action( 'wc_square_job_runner' );
+			}
 		} else {
 			$this->complete();
 		}
@@ -313,6 +321,11 @@ class Background_Job extends Background_Job_Handler {
 
 		if ( $this->is_queue_empty() ) {
 			// no data to process
+			return;
+		}
+
+		if ( as_has_scheduled_action( 'wc_square_job_runner' ) ) {
+			// scheduled action for trigger sync is already exists
 			return;
 		}
 

@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: WooCommerce Square
- * Version: 4.0.0
+ * Version: 4.5.1
  * Plugin URI: https://woocommerce.com/products/square/
- * Requires at least: 5.8
- * Tested up to: 6.2.0
+ * Requires at least: 6.3
+ * Tested up to: 6.4
  * Requires PHP: 7.4
  *
  * Description: Adds ability to sync inventory between WooCommerce and Square POS. In addition, you can also make purchases through the Square payment gateway.
@@ -20,16 +20,14 @@
  * @copyright Copyright (c) 2019, Automattic, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0 or later
  *
- * WC requires at least: 6.8
- * WC tested up to: 7.8.0
+ * WC requires at least: 8.4
+ * WC tested up to: 8.6
  */
 
 defined( 'ABSPATH' ) || exit;
 
-require_once plugin_dir_path( __FILE__ ) . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
-
 if ( ! defined( 'WC_SQUARE_PLUGIN_VERSION' ) ) {
-	define( 'WC_SQUARE_PLUGIN_VERSION', '4.0.0' ); // WRCS: DEFINED_VERSION.
+	define( 'WC_SQUARE_PLUGIN_VERSION', '4.5.1' ); // WRCS: DEFINED_VERSION.
 }
 
 if ( ! defined( 'WC_SQUARE_PLUGIN_URL' ) ) {
@@ -52,10 +50,10 @@ class WooCommerce_Square_Loader {
 	const MINIMUM_PHP_VERSION = '7.4.0';
 
 	/** minimum WordPress version required by this plugin */
-	const MINIMUM_WP_VERSION = '5.8';
+	const MINIMUM_WP_VERSION = '6.3';
 
 	/** minimum WooCommerce version required by this plugin */
-	const MINIMUM_WC_VERSION = '6.8';
+	const MINIMUM_WC_VERSION = '8.4';
 
 	/**
 	 * SkyVerge plugin framework version used by this plugin
@@ -428,6 +426,7 @@ class WooCommerce_Square_Loader {
 	public function register_payment_method_block_integrations( $payment_method_registry ) {
 		if ( class_exists( '\Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
 			$payment_method_registry->register( new WooCommerce\Square\Gateway\Blocks_Handler() );
+			$payment_method_registry->register( new WooCommerce\Square\Gateway\Cash_App_Pay_Blocks_Handler() );
 		}
 	}
 

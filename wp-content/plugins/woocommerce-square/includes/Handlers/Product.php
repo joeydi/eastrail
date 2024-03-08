@@ -23,6 +23,7 @@
 
 namespace WooCommerce\Square\Handlers;
 
+use Square\Models\BatchRetrieveCatalogObjectsResponse;
 use WooCommerce\Square\Utilities\Money_Utility;
 use WooCommerce\Square\Sync\Records;
 use WooCommerce\Square\Sync\Helper;
@@ -37,19 +38,54 @@ defined( 'ABSPATH' ) || exit;
 class Product {
 
 
-	/** @var string the taxonomy name that flags whether a product is marked as 'synced' with Square */
+	/**
+	 * Meta key to store the taxonomy name that flags whether a product
+	 * is marked as 'synced' with Square
+	 * @var string
+	 **/
 	const SYNCED_WITH_SQUARE_TAXONOMY = 'wc_square_synced';
 
+	/**
+	 * Meta key to store catalog object ID.
+	 *
+	 * @var string
+	 */
 	const SQUARE_ID_META_KEY = '_square_item_id';
 
+	/**
+	 * Meta key to store version of a catalog object.
+	 *
+	 * @var string
+	 */
 	const SQUARE_VERSION_META_KEY = '_square_item_version';
 
+	/**
+	 * Meta key to store version of a catalog object variation.
+	 *
+	 * @var string
+	 */
 	const SQUARE_VARIATION_ID_META_KEY = '_square_item_variation_id';
 
+	/**
+	 * Meta key to store version of a catalog object variation.
+	 *
+	 * @var string
+	 */
 	const SQUARE_VARIATION_VERSION_META_KEY = '_square_item_variation_version';
 
+	/**
+	 * Meta key to store catalog object thumbnail ID.
+	 *
+	 * @var string
+	 **/
 	const SQUARE_IMAGE_ID_META_KEY = '_square_item_image_id';
 
+	/**
+	 * Meta key used to identify whether a product is a gift card.
+	 *
+	 * @var string
+	 */
+	const SQUARE_GIFT_CARD_KEY = '_square_gift_card';
 
 	/**
 	 * @param \WC_Product $product
@@ -122,7 +158,7 @@ class Product {
 					/**
 					 * Allow overriding variation name during product import from Square
 					 *
-					 * @since 2.0.0
+					 * @since 3.3.0
 					 *
 					 * @param string                             $variation_name Variation name to update.
 					 * @param \SquareConnect\Model\CatalogObject $catalog_variation Catalog item variation being imported.
@@ -178,7 +214,7 @@ class Product {
 		/**
 		 * Allow overriding product name during import from Square
 		 *
-		 * @since 2.0.0
+		 * @since 3.3.0
 		 *
 		 * @param string                           $product_name Product name to update.
 		 * @param \SquareConnect\Model\CatalogItem $catalog_item Catalog item being imported.
@@ -197,7 +233,7 @@ class Product {
 		/**
 		 * Allow overriding product description during import from Square
 		 *
-		 * @since 2.0.0
+		 * @since 3.3.0
 		 *
 		 * @param string                           $product_description Product description to update.
 		 * @param \SquareConnect\Model\CatalogItem $catalog_item Catalog item being imported.
@@ -442,6 +478,62 @@ class Product {
 		return $product;
 	}
 
+	/**
+	 * Updates a product's stock by getting the latest values from Square.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @param int[] $product_ids Product IDs.
+	 * @param bool  $save        Whether to save the product object.
+	 * @return void
+	 * @throws \Exception
+	 */
+	public static function update_products_stock_from_square( $product_ids ) {
+		$products_map = self::get_square_meta( $product_ids, 'square_item_variation_id' );
+		$square_ids   = array_keys( $products_map );
+
+		if ( empty( $square_ids ) ) {
+			return;
+		}
+
+		// Flag as syncing so updating the stock won't trigger another sync
+		if ( ! defined( 'DOING_SQUARE_SYNC' ) || false === DOING_SQUARE_SYNC ) {
+			define( 'DOING_SQUARE_SYNC', true );
+		}
+
+		$response = wc_square()->get_api()->batch_retrieve_catalog_objects( $square_ids );
+		if ( ! $response->get_data() instanceof BatchRetrieveCatalogObjectsResponse ) {
+			throw new \Exception( 'Response data is missing' );
+		}
+
+		if ( is_array( $response->get_data()->getObjects() ) ) {
+			$inventory_hash     = Helper::get_catalog_objects_inventory_stats( $square_ids );
+			$inventory_tracking = Helper::get_catalog_inventory_tracking( $response->get_data()->getObjects() );
+
+			foreach ( $response->get_data()->getObjects() as $catalog_object ) {
+				$square_id             = $catalog_object->getId();
+				$stock                 = $inventory_hash[ $square_id ] ?? 0;
+				$is_inventory_tracking = isset( $inventory_tracking[ $square_id ] ) ? $inventory_tracking[ $square_id ] : true;
+
+				$product_id = $products_map[ $square_id ]['product_id'];
+				$product    = wc_get_product( $product_id );
+
+				if ( ! $product ) {
+					continue;
+				}
+
+				if ( $is_inventory_tracking ) {
+					$product->set_manage_stock( true );
+					$product->set_stock_quantity( $stock );
+				} else {
+					$product->set_stock_status( 'instock' );
+					$product->set_manage_stock( false );
+				}
+
+				$product->save();
+			}
+		}
+	}
 
 	/**
 	 * Initializes custom product taxonomies.
@@ -563,11 +655,11 @@ class Product {
 		}
 
 		/**
-		 * Filter hook to set whether a product can sync with Square.
+		 * Hook to filter whether a product can sync with Square.
 		 *
 		 * @since 2.0.2
 		 *
-		 * @param boolean     $can_sync Says whether product can be synced with square.
+		 * @param boolean     $can_sync Boolean to set if product can sync with Square.
 		 * @param \WC_Product $product  WooCommerce product.
 		 */
 		return (bool) apply_filters( 'wc_square_product_can_sync_with_square', $can_sync, $product );
@@ -1576,5 +1668,26 @@ class Product {
 				$variation_id
 			)
 		);
+	}
+
+	/**
+	 * Check if product is a gift card.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param WC_Product $product WooCommerce product.
+	 *
+	 * @return bool
+	 */
+	public static function is_gift_card( $product ) {
+		if ( ! is_a( $product, 'WC_Product' ) ) {
+			return false;
+		}
+
+		if ( $product->is_type( 'variation' ) ) {
+			$product = wc_get_product( $product->get_parent_id() );
+		}
+
+		return $product->meta_exists( self::SQUARE_GIFT_CARD_KEY ) && 'yes' === $product->get_meta( self::SQUARE_GIFT_CARD_KEY, true );
 	}
 }

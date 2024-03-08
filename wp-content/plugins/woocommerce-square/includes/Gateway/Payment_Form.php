@@ -59,10 +59,10 @@ class Payment_Form extends Payment_Gateway_Payment_Form {
 		add_action( "wc_{$gateway_id}_payment_form_start", array( $this, 'render_fieldset_start' ), 30 );
 
 		// payment fields
-		add_action( "wc_{$gateway_id}_payment_form",       array( $this, 'render_payment_fields' ), 0 );
+		add_action( "wc_{$gateway_id}_payment_form", array( $this, 'render_payment_fields' ), 0 );
 
 		// fieldset end
-		add_action( "wc_{$gateway_id}_payment_form_end",   array( $this, 'render_fieldset_end' ), 5 );
+		add_action( "wc_{$gateway_id}_payment_form_end", array( $this, 'render_fieldset_end' ), 5 );
 	}
 
 	/**
@@ -110,19 +110,6 @@ class Payment_Form extends Payment_Gateway_Payment_Form {
 		foreach ( $billing_data as $key => $value ) {
 			echo '<input type="hidden" id="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '" />';
 		}
-
-		if ( is_checkout_pay_page() ) {
-
-			$order = wc_get_order( $this->get_gateway()->get_checkout_pay_page_order_id() );
-
-			$total_amount = $order->get_total();
-
-		} else {
-
-			$total_amount = WC()->cart->total;
-		}
-
-		echo '<input type="hidden" name="wc-' . esc_attr( $this->get_gateway()->get_id_dasherized() ) . '-amount" value="' . esc_attr( $total_amount > 0 ? $total_amount : '' ) . '" />';
 
 		echo '<style> #sq-nudata-modal { z-index: 999999 !important; } </style>';
 	}
@@ -240,6 +227,9 @@ class Payment_Form extends Payment_Gateway_Payment_Form {
 			'logging_enabled'                  => $this->get_gateway()->debug_log(),
 			'ajax_wc_checkout_validate_nonce'  => wp_create_nonce( 'wc_' . $this->get_gateway()->get_id() . '_checkout_validate' ),
 			'is_manual_order_payment'          => is_checkout() && is_wc_endpoint_url( 'order-pay' ),
+			'payment_token_nonce'              => wp_create_nonce( 'payment_token_nonce' ),
+			'order_id'                         => absint( get_query_var( 'order-pay' ) ),
+			'ajax_get_order_amount_nonce'      => wp_create_nonce( 'wc_' . $this->get_gateway()->get_id() . '_get_order_amount' ),
 		);
 
 		// map the unique square card type string to our framework standards

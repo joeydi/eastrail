@@ -29,17 +29,25 @@ use WooCommerce\Square\API;
  * @since 3.7.0
  */
 class Gift_Card extends API\Request {
-
+	/**
+	 * Location ID.
+	 *
+	 * @since 4.2.0
+	 * @var string
+	 */
+	public $location_id;
 
 	/**
 	 * Initializes a new Catalog request.
 	 *
 	 * @since 3.7.0
 	 *
-	 * @param \Square\SquareClient $api_client the API client
+	 * @param string               $location_id Location ID.
+	 * @param \Square\SquareClient $api_client  The API client
 	 */
-	public function __construct( $api_client ) {
-		$this->square_api = $api_client->getGiftCardsApi();
+	public function __construct( $location_id, $api_client ) {
+		$this->square_api  = $api_client->getGiftCardsApi();
+		$this->location_id = $location_id;
 	}
 
 	/**
@@ -51,5 +59,38 @@ class Gift_Card extends API\Request {
 		$this->square_request    = new \Square\Models\RetrieveGiftCardFromNonceRequest( $nonce );
 		$this->square_api_method = 'retrieveGiftCardFromNonce';
 		$this->square_api_args   = array( $this->square_request );
+	}
+
+
+	/**
+	 * Sets data for the `retrieveGiftCardFromGAN` API method.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $gan Gift card number.
+	 */
+	public function set_retrieve_gift_card_from_gan_data( $gan = '' ) {
+		$this->square_request    = new \Square\Models\RetrieveGiftCardFromGANRequest( $gan );
+		$this->square_api_method = 'retrieveGiftCardFromGAN';
+		$this->square_api_args   = array( $this->square_request );
+	}
+
+	/**
+	 * Sets data to create a Gift card.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param $order_id Line item order ID.
+	 */
+	public function set_create_gift_card_data( $order_id ) {
+		$this->square_api_method = 'createGiftCard';
+		$gift_card               = new \Square\Models\GiftCard( \Square\Models\GiftCardType::DIGITAL );
+		$this->square_request    = new \Square\Models\CreateGiftCardRequest(
+			wc_square()->get_idempotency_key( $order_id, false ),
+			$this->location_id,
+			$gift_card
+		);
+
+		$this->square_api_args = array( $this->square_request );
 	}
 }

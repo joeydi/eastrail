@@ -19,12 +19,14 @@
  */
 
 namespace WooCommerce\Square\Framework\PaymentGateway\Integrations;
+
 use WooCommerce\Square\Framework\Compatibility\Order_Compatibility;
 use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway;
 use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway_Helper;
 use WooCommerce\Square\Framework\Square_Helper;
+use WooCommerce\Square\WC_Order_Square;
 
-defined( 'ABSPATH' ) or exit;
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Pre-Orders Integration
@@ -90,7 +92,7 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 		$pay_page_pre_order = false;
 		if ( $this->get_gateway()->is_pay_page_gateway() ) {
 
-			$order_id  = $this->get_gateway()->get_checkout_pay_page_order_id();
+			$order_id = $this->get_gateway()->get_checkout_pay_page_order_id();
 
 			if ( $order_id ) {
 				$pay_page_pre_order = \WC_Pre_Orders_Order::order_contains_pre_order( $order_id ) && \WC_Pre_Orders_Product::product_is_charged_upon_release( \WC_Pre_Orders_Order::get_pre_order_product( $order_id ) );
@@ -98,7 +100,7 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 		}
 
 		if ( ( \WC_Pre_Orders_Cart::cart_contains_pre_order() && \WC_Pre_Orders_Product::product_is_charged_upon_release( \WC_Pre_Orders_Cart::get_pre_order_product() ) ) ||
-			 $pay_page_pre_order ) {
+			$pay_page_pre_order ) {
 
 			// always tokenize the card for pre-orders that are charged upon release
 			$force_tokenization = true;
@@ -117,7 +119,7 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param \WC_Order $order the order
+	 * @param \WC_Order|WC_Order_Square $order the order
 	 * @return \WC_Order
 	 */
 	public function get_order( $order ) {
@@ -130,7 +132,9 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 		if ( \WC_Pre_Orders_Order::order_requires_payment_tokenization( $order ) ) {
 
 			// normally a guest user wouldn't be assigned a customer id, but for a pre-order requiring tokenization, it might be
-			if ( 0 == $order->get_user_id() && false !== ( $customer_id = $this->get_gateway()->get_guest_customer_id( $order ) ) ) {
+			$customer_id = $this->get_gateway()->get_guest_customer_id( $order );
+
+			if ( 0 === $order->get_user_id() && false !== $customer_id ) {
 				$order->customer_id = $customer_id;
 			}
 
@@ -162,11 +166,10 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 					$order->payment->card_type = $token->get_card_type();
 
 					// exp month/year
-					$order->payment->exp_month  = $token->get_expiry_month();
-					$order->payment->exp_year   = $token->get_expiry_year();
+					$order->payment->exp_month = $token->get_expiry_month();
+					$order->payment->exp_year  = $token->get_expiry_year();
 
 				}
-
 			} else {
 
 				// a guest user means that token data must be set from the original order
@@ -180,12 +183,13 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 					$order->payment->card_type = $this->get_gateway()->get_order_meta( Order_Compatibility::get_prop( $order, 'id' ), 'card_type' );
 
 					// expiry date
-					if ( $expiry_date = $this->get_gateway()->get_order_meta( Order_Compatibility::get_prop( $order, 'id' ), 'card_expiry_date' ) ) {
-						list( $exp_year, $exp_month ) = explode( '-', $expiry_date );
-						$order->payment->exp_month  = $exp_month;
-						$order->payment->exp_year   = $exp_year;
-					}
+					$expiry_date = $this->get_gateway()->get_order_meta( Order_Compatibility::get_prop( $order, 'id' ), 'card_expiry_date' );
 
+					if ( $expiry_date ) {
+						list( $exp_year, $exp_month ) = explode( '-', $expiry_date );
+						$order->payment->exp_month    = $exp_month;
+						$order->payment->exp_year     = $exp_year;
+					}
 				}
 			}
 		}
@@ -209,7 +213,7 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 
 		// processing pre-order
 		if ( \WC_Pre_Orders_Order::order_contains_pre_order( $order_id ) &&
-			 \WC_Pre_Orders_Order::order_requires_payment_tokenization( $order_id ) ) {
+			\WC_Pre_Orders_Order::order_requires_payment_tokenization( $order_id ) ) {
 
 			$order = $this->get_gateway()->get_order( $order_id );
 
@@ -235,12 +239,12 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 
 				// redirect to thank you page
 				$result = array(
-						'result'   => 'success',
-						'redirect' => $this->get_gateway()->get_return_url( $order ),
+					'result'   => 'success',
+					'redirect' => $this->get_gateway()->get_return_url( $order ),
 				);
 
-			} catch( \Exception $e ) {
-
+			} catch ( \Exception $e ) {
+				/* translators: %s pre-order tokenization failure message. */
 				$this->get_gateway()->mark_order_as_failed( $order, sprintf( esc_html__( 'Pre-Order Tokenization attempt failed (%s)', 'woocommerce-square' ), $this->get_gateway()->get_method_title(), $e->getMessage() ) );
 
 				$result = array(
@@ -276,7 +280,7 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param \WC_Order $order original order containing the pre-order
+	 * @param \WC_Order|WC_Order_Square $order original order containing the pre-order
 	 * @throws \Exception
 	 */
 	public function process_release_payment( $order ) {
@@ -287,7 +291,8 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 			$order = $this->get_gateway()->get_order( Order_Compatibility::get_prop( $order, 'id' ) );
 
 			// order description
-			$order->description = sprintf( esc_html__( '%s - Pre-Order Release Payment for Order %s', 'woocommerce-square' ), Square_Helper::get_site_name(), $order->get_order_number() );
+			/* translators: %1$s site name, %2$s order number */
+			$order->description = sprintf( esc_html__( '%1$s - Pre-Order Release Payment for Order %2$s', 'woocommerce-square' ), Square_Helper::get_site_name(), $order->get_order_number() );
 
 			// token is required
 			if ( ! $order->payment->token ) {
@@ -302,7 +307,6 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 				} else {
 					$response = $this->get_gateway()->get_api()->credit_card_authorization( $order );
 				}
-
 			}
 
 			// success! update order record
@@ -314,18 +318,20 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 				if ( $this->get_gateway()->is_credit_card_gateway() ) {
 
 					$message = sprintf(
-							esc_html__( '%s %s Pre-Order Release Payment Approved: %s ending in %s (expires %s)', 'woocommerce-square' ),
-							$this->get_gateway()->get_method_title(),
-							$this->get_gateway()->perform_credit_card_authorization( $order ) ? 'Authorization' : 'Charge',
-							Payment_Gateway_Helper::payment_type_to_name( ( ! empty( $order->payment->card_type ) ? $order->payment->card_type : 'card' ) ),
-							$last_four,
-							( ! empty( $order->payment->exp_month) && ! empty( $order->payment->exp_year ) ? $order->payment->exp_month . '/' . substr( $order->payment->exp_year, -2 ) : 'n/a' )
+						/* translators: %1$s gateway name, %2$s transaction type, %3$s card type, %4$s last four, %5$s expiry date */
+						esc_html__( '%1$s %2$s Pre-Order Release Payment Approved: %3$s ending in %4$s (expires %5$s)', 'woocommerce-square' ),
+						$this->get_gateway()->get_method_title(),
+						$this->get_gateway()->perform_credit_card_authorization( $order ) ? 'Authorization' : 'Charge',
+						Payment_Gateway_Helper::payment_type_to_name( ( ! empty( $order->payment->card_type ) ? $order->payment->card_type : 'card' ) ),
+						$last_four,
+						( ! empty( $order->payment->exp_month ) && ! empty( $order->payment->exp_year ) ? $order->payment->exp_month . '/' . substr( $order->payment->exp_year, -2 ) : 'n/a' )
 					);
 
 				}
 
 				// adds the transaction id (if any) to the order note
 				if ( $response->get_transaction_id() ) {
+					/* translators: %s transaction id */
 					$message .= ' ' . sprintf( esc_html__( '(Transaction ID %s)', 'woocommerce-square' ), $response->get_transaction_id() );
 				}
 
@@ -351,17 +357,16 @@ class Payment_Gateway_Integration_Pre_Orders extends Payment_Gateway_Integration
 					// otherwise complete the order
 					$order->payment_complete();
 				}
-
 			} else {
 
 				// failure
 				throw new \Exception( sprintf( '%s: %s', $response->get_status_code(), $response->get_status_message() ) );
 
 			}
-
 		} catch ( \Exception $e ) {
 
-			// Mark order as failed
+			// Mark order as failed.
+			/* translators: %s release payment failure message. */
 			$this->get_gateway()->mark_order_as_failed( $order, sprintf( esc_html__( 'Pre-Order Release Payment Failed: %s', 'woocommerce-square' ), $e->getMessage() ) );
 
 		}

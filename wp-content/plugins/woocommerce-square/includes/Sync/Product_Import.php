@@ -256,26 +256,7 @@ class Product_Import extends Stepped_Job {
 			$objects
 		);
 
-		$catalog_objects_hash = array();
-
-		/** @var \Square\Models\CatalogObject $catalog_object */
-		foreach ( $objects as $catalog_object ) {
-			$variation_data     = $catalog_object->getItemVariationData();
-			$location_overrides = $variation_data->getLocationOverrides();
-
-			if ( ! empty( $location_overrides ) ) {
-				foreach ( $location_overrides as $location_override ) {
-					$location_id = $location_override->getLocationId();
-
-					if ( wc_square()->get_settings_handler()->get_location_id() === $location_id ) {
-						$catalog_objects_hash[ $catalog_object->getId() ] = $location_override->getTrackInventory();
-					}
-				}
-			} else {
-				$track_inventory                                  = $variation_data->getTrackInventory();
-				$catalog_objects_hash[ $catalog_object->getId() ] = $track_inventory;
-			}
-		}
+		$catalog_objects_hash = Helper::get_catalog_inventory_tracking( $objects );
 
 		$result = wc_square()->get_api()->batch_retrieve_inventory_counts(
 			array(
@@ -445,7 +426,7 @@ class Product_Import extends Stepped_Job {
 	 *
 	 * @since 2.2.0
 	 *
-	 * @param WC_Product $product existing product in Woo that is being updated
+	 * @param \WC_Product $product existing product in Woo that is being updated
 	 * @param array $data the Square catalog object data
 	 * @return int|null
 	 */
@@ -460,6 +441,10 @@ class Product_Import extends Stepped_Job {
 			if ( ! $product instanceof \WC_Product_Variable && 'variable' === $data['type'] ) {
 				$product_id = $this->update_simple_product_to_variable( $product_id, $data );
 			}
+
+			$product->set_name( $data['title'] );
+			$product->set_description( $data['description'] );
+			$product->save();
 
 			// save product meta fields
 			$this->save_product_meta( $product_id, $data );

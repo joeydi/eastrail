@@ -26,8 +26,11 @@ namespace WooCommerce\Square;
 defined( 'ABSPATH' ) || exit;
 
 use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway_Plugin;
+use WooCommerce\Square\Framework\PaymentGateway\PaymentTokens\Square_Credit_Card_Payment_Token;
 use WooCommerce\Square\Framework\Square_Helper;
+use WooCommerce\Square\Gateway\Cash_App_Pay_Gateway;
 use WooCommerce\Square\Handlers\Background_Job;
+use WooCommerce\Square\Handlers\Async_Request;
 use WooCommerce\Square\Handlers\Email;
 use WooCommerce\Square\Handlers\Order;
 use WooCommerce\Square\Handlers\Product;
@@ -51,6 +54,8 @@ class Plugin extends Payment_Gateway_Plugin {
 	/** string gateway ID */
 	const GATEWAY_ID = 'square_credit_card';
 
+	/** string Cash App Pay gateway ID */
+	const CASH_APP_PAY_GATEWAY_ID = 'square_cash_app_pay';
 
 	/** @var Plugin plugin instance */
 	protected static $instance;
@@ -82,6 +87,9 @@ class Plugin extends Payment_Gateway_Plugin {
 	/** @var Products products handler */
 	private $products_handler;
 
+	/** @var Async_Request Asynchronous request handler */
+	private $async_request_handler;
+
 	/**
 	 * Constructs the plugin.
 	 *
@@ -94,7 +102,10 @@ class Plugin extends Payment_Gateway_Plugin {
 			self::VERSION,
 			array(
 				'text_domain'  => 'woocommerce-square',
-				'gateways'     => array( self::GATEWAY_ID => Gateway::class ),
+				'gateways'     => array(
+					self::GATEWAY_ID              => Gateway::class,
+					self::CASH_APP_PAY_GATEWAY_ID => Cash_App_Pay_Gateway::class,
+				),
 				'require_ssl'  => true,
 				'supports'     => array(
 					self::FEATURE_CAPTURE_CHARGE,
@@ -120,6 +131,10 @@ class Plugin extends Payment_Gateway_Plugin {
 		add_action( 'admin_notices', array( $this, 'add_admin_notices' ) );
 		add_filter( 'woocommerce_locate_template', array( $this, 'locate_template' ), 20, 3 );
 		add_filter( 'woocommerce_locate_core_template', array( $this, 'locate_template' ), 20, 3 );
+
+		add_action( 'action_scheduler_init', array( $this, 'schedule_token_migration_job' ) );
+		add_action( 'wc_square_init_payment_token_migration_v2', array( $this, 'register_payment_tokens_migration_scheduler' ) );
+		add_action( 'wc_square_init_payment_token_migration', '__return_false' );
 	}
 
 
@@ -144,6 +159,10 @@ class Plugin extends Payment_Gateway_Plugin {
 		$this->email_handler = new Email();
 
 		$this->order_handler = new Order();
+
+		if ( class_exists( '\WooCommerce\Square\Handlers\Async_Request' ) ) {
+			$this->async_request_handler = new Async_Request();
+		}
 	}
 
 
@@ -427,8 +446,6 @@ class Plugin extends Payment_Gateway_Plugin {
 				array( 'notice_class' => 'notice-warning' )
 			);
 		}
-
-		$this->add_gift_cards_disabled_notice();
 	}
 
 
@@ -523,10 +540,10 @@ class Plugin extends Payment_Gateway_Plugin {
 		global $typenow;
 
 		// only show on product edit pages when configured that prices include tax
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended - Nonce not required, not writing any changes.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce not required, not writing any changes.
 		if ( 'product' === $typenow && isset( $_GET['action'], $_GET['post'] ) && 'edit' === $_GET['action'] && wc_prices_include_tax() && $this->get_settings_handler()->is_product_sync_enabled() ) {
 
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended - Nonce not required, not writing any changes.
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce not required, not writing any changes.
 			$product = wc_get_product( (int) $_GET['post'] );
 
 			// only show for products configured as taxable and sync with Square
@@ -558,7 +575,7 @@ class Plugin extends Payment_Gateway_Plugin {
 
 		parent::add_currency_admin_notices();
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended - Nonce not required, only showing a notice.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce not required, only showing a notice.
 		if ( isset( $_GET['page'] ) && 'wc-settings' === $_GET['page'] && $this->get_settings_handler()->is_connected() ) {
 
 			foreach ( $this->get_settings_handler()->get_locations() as $location ) {
@@ -584,41 +601,6 @@ class Plugin extends Payment_Gateway_Plugin {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Adds admin notice for gift cards being disabled in 3.7.1.
-	 *
-	 * The notice is only shown when the  `woocommerce_square_show_gift_cards_disabled_notice` WP option is set, which
-	 * is only set on stores that upgraded to 3.7.1 and had the gift cards beta feature enabled.
-	 *
-	 * Note: This notice will be shown until the admin dismisses it.
-	 *
-	 * The Square/Framework/Admin_Notice_Handler class has its own handling for not showing notices for Admins that have already dismissed it.
-	 *
-	 * @since 3.7.1
-	 */
-	protected function add_gift_cards_disabled_notice() {
-		if ( 'yes' !== get_option( 'woocommerce_square_3_7_1_gift_cards_force_disable_notice', 'no' ) ) {
-			return;
-		}
-
-		// Show a notice to inform the merchant that gift cards haves been disabled.
-		$this->get_admin_notice_handler()->add_admin_notice(
-			sprintf(
-				// translators: Placeholders: %1$s %2$s - <strong> open/close tags for emphasis, %3$s %4$s - <a> open/close tag linking to documentation.
-				esc_html__( '%1$sSquare Gift Card support has been disabled.%2$s Gift Cards are in beta status and not recommended for production. %3$sLearn more%4$s.', 'woocommerce-square' ),
-				'<strong>',
-				'</strong>',
-				'<a target="blank" href="https://woocommerce.com/document/woocommerce-square/payment-settings/#section-6">',
-				'</a>'
-			),
-			'gift-cards-disabled',
-			array(
-				'always_show_on_settings' => false,
-				'notice_class'            => 'notice-error',
-			)
-		);
 	}
 
 
@@ -662,7 +644,7 @@ class Plugin extends Payment_Gateway_Plugin {
 	 * @return bool
 	 */
 	public function is_plugin_settings() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended - Nonce note required, read-only check.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce note required, read-only check.
 		return parent::is_plugin_settings() || ( isset( $_GET['page'], $_GET['tab'] ) && 'wc-settings' === $_GET['page'] && self::PLUGIN_ID === $_GET['tab'] );
 	}
 
@@ -674,7 +656,7 @@ class Plugin extends Payment_Gateway_Plugin {
 	 * @return bool
 	 */
 	public function is_gateway_settings() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended - Nonce note required, read-only check.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce note required, read-only check.
 		return isset( $_GET['page'], $_GET['tab'], $_GET['section'] ) && 'wc-settings' === $_GET['page'] && 'checkout' === $_GET['tab'] && self::GATEWAY_ID === $_GET['section'];
 	}
 
@@ -810,6 +792,17 @@ class Plugin extends Payment_Gateway_Plugin {
 	}
 
 	/**
+	 * Gets the Asynchronous request handler instance.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @return Async_Request
+	 */
+	public function get_async_request_handler() {
+		return $this->async_request_handler;
+	}
+
+	/**
 	 * Gets the plugin name.
 	 *
 	 * @since 2.0.0
@@ -926,5 +919,89 @@ class Plugin extends Payment_Gateway_Plugin {
 		return self::$instance;
 	}
 
+	/**
+	 * Schedules the migration of payment tokens.
+	 *
+	 * @since 3.8.0
+	 */
+	public function schedule_token_migration_job() {
+		if ( false !== get_option( 'wc_square_payment_token_migration_complete' ) ) {
+			return;
+		}
 
+		// Remove all OLD scheduled actions to cleanup DB.
+		// TODO: Remove this in next release.
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->prefix}actionscheduler_actions WHERE hook = 'wc_square_init_payment_token_migration'" );
+
+		if ( false === as_has_scheduled_action( 'wc_square_init_payment_token_migration_v2' ) ) {
+			as_enqueue_async_action( 'wc_square_init_payment_token_migration_v2', array( 'page' => 1 ) );
+		}
+	}
+
+	/**
+	 * Migrates payment token from user_meta to WC_Payment_Token_CC.
+	 *
+	 * @param integer $page Pagination number.
+	 * @since 3.8.0
+	 */
+	public function register_payment_tokens_migration_scheduler( $page ) {
+		$payment_tokens_handler = wc_square()->get_gateway()->get_payment_tokens_handler();
+		$meta_key               = $payment_tokens_handler->get_user_meta_name();
+
+		// Get 5 users in a batch.
+		$users = get_users(
+			array(
+				'fields'     => array( 'ID' ),
+				'number'     => 5,
+				'paged'      => $page,
+				'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					array(
+						'key'     => $meta_key,
+						'compare' => 'EXISTS',
+					),
+				),
+			)
+		);
+
+		// If users array is empty, then set status in options to indicate migration is complete.
+		if ( empty( $users ) ) {
+			$payment_tokens_handler->clear_all_transients();
+			update_option( 'wc_square_payment_token_migration_complete', true );
+			return;
+		}
+
+		// Re-run scheduler for the next page of users.
+		as_enqueue_async_action( 'wc_square_init_payment_token_migration_v2', array( 'page' => $page + 1 ) );
+
+		foreach ( $users as $user ) {
+			$user_payment_tokens = get_user_meta( $user->id, $meta_key, true );
+
+			if ( ! is_array( $user_payment_tokens ) || empty( $user_payment_tokens ) ) {
+				continue;
+			}
+
+			foreach ( $user_payment_tokens as $token => $user_payment_token_data ) {
+				// Check if token already exists in WC_Payment_Token_CC.
+				if ( $payment_tokens_handler->user_has_token( $user->id, $token ) ) {
+					continue;
+				}
+
+				$payment_token = new Square_Credit_Card_Payment_Token();
+				$payment_token->set_token( $token );
+				$payment_token->set_card_type( $user_payment_token_data['card_type'] );
+				$payment_token->set_last4( $user_payment_token_data['last_four'] );
+				$payment_token->set_expiry_month( $user_payment_token_data['exp_month'] );
+				$payment_token->set_expiry_year( $user_payment_token_data['exp_year'] );
+				$payment_token->set_user_id( $user->id );
+				$payment_token->set_gateway_id( wc_square()->get_gateway()->get_id() );
+
+				if ( isset( $user_payment_token_data['nickname'] ) ) {
+					$payment_token->set_nickname( $user_payment_token_data['nickname'] );
+				}
+
+				$payment_token->save();
+			}
+		}
+	}
 }

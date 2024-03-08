@@ -20,7 +20,7 @@
 
 namespace WooCommerce\Square\Framework\PaymentGateway\Api;
 
-defined( 'ABSPATH' ) or exit;
+defined( 'ABSPATH' ) || exit;
 
 /**
  * WooCommerce Direct Payment Gateway API
@@ -69,6 +69,68 @@ interface Payment_Gateway_API {
 	 */
 	public function credit_card_capture( \WC_Order $order );
 
+	/**
+	 * Performs a gift card charge for a given order.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param \WC_Order $order order object
+	 * @return \WooCommerce\Square\API\Response
+	 */
+	public function gift_card_charge( \WC_Order $order );
+
+	/**
+	 * Performs payments when a transaction is done using multiple payment methods.
+	 * For example: Gift Card + Square Credit Card.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param array  $payment_ids Array of payment IDs.
+	 * @param string $order_id    Square order ID.
+	 */
+	public function pay_order( $payment_ids, $order_id );
+
+	/**
+	 * Creates a Gift Card.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param $order_id Line item order ID.
+	 * @return API\Responses\Get_Gift_Card
+	 */
+	public function create_gift_card( $order_id );
+
+	/**
+	 * Activates a Gift Card which is in a pending state.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $gift_card_id The ID of the inactive Gift Card.
+	 * @param string $order_id     Square Order ID associated with the Gift Card.
+	 * @param string $line_item_id Line Item ID for the Gift Card.
+	 */
+	public function activate_gift_card( $gift_card_id, $order_id, $line_item_id );
+
+	/**
+	 * Loads an existing gift card with an amount.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string    $gan   The gift card number.
+	 * @param \WC_Order $order WooCommerce order.
+	 */
+	public function load_gift_card( $gan, $order );
+
+	/**
+	 * Sets data to refund/adjust decrement funds in a gift card.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string               $gan          Gift card number.
+	 * @param \Square\Models\Money $amount_money The amount to be refunded.
+	 * @param \WC_Order            $order        WooCommerce order.
+	 */
+	public function refund_gift_card( $gan, $amount_money, $order );
 
 	/**
 	 * Perform an eCheck debit (ACH transaction) for the given order

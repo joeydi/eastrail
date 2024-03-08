@@ -1356,6 +1356,8 @@ class Manual_Synchronization extends Stepped_Job {
 					$pull_inventory_variation_ids[] = $variation->getId();
 				}
 
+				Product::update_from_square( $product, $square_object->getItemData(), false );
+
 				$image_id = Product::get_catalog_item_thumbnail_id( $square_object );
 				Product::update_image_from_square( $product, $image_id );
 

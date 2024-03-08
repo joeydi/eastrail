@@ -131,10 +131,10 @@ class Records {
 
 			switch ( $args['orderby'] ) {
 				case 'date':
-					uasort( $records, array( 'self', 'sort_records_by_date' ) );
+					uasort( $records, array( self::class, 'sort_records_by_date' ) );
 					break;
 				case 'type':
-					uasort( $records, array( 'self', 'sort_records_by_type' ) );
+					uasort( $records, array( self::class, 'sort_records_by_type' ) );
 					break;
 			}
 

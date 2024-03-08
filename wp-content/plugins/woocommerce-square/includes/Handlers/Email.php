@@ -39,6 +39,9 @@ class Email {
 	/** @var Emails\Access_Token_Email instance */
 	private $square_access_token_email;
 
+	/** @var Emails\Gift_Card_Sent instance */
+	private $square_gift_card_sent;
+
 	/**
 	 * Sets up Square emails.
 	 *
@@ -79,6 +82,10 @@ class Email {
 		if ( null === $this->square_access_token_email ) {
 			$this->square_access_token_email = new Emails\Access_Token_Email();
 		}
+
+		if ( null === $this->square_gift_card_sent ) {
+			$this->square_gift_card_sent = new Emails\Gift_Card_Sent();
+		}
 	}
 
 	/**
@@ -101,6 +108,10 @@ class Email {
 
 		if ( ! array_key_exists( 'wc_square_access_token_email', $emails ) || ! $emails['wc_square_access_token_email'] instanceof Emails\Sync_Completed ) {
 			$emails['wc_square_access_token_email'] = $this->square_access_token_email;
+		}
+
+		if ( ! array_key_exists( 'wc_square_gift_card_sent', $emails ) || ! $emails['wc_square_gift_card_sent'] instanceof Emails\Sync_Completed ) {
+			$emails['wc_square_gift_card_sent'] = $this->square_gift_card_sent;
 		}
 
 		return $emails;
@@ -128,5 +139,17 @@ class Email {
 	public function get_access_token_email() {
 		$this->init_emails();
 		return $this->square_access_token_email;
+	}
+
+	/**
+	 * Gets the Square Gift Card email sent instance.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @return Emails\Gift_Card_Sent
+	 */
+	public function get_gift_card_sent() {
+		$this->init_emails();
+		return $this->square_gift_card_sent;
 	}
 }

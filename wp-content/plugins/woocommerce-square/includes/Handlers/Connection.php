@@ -149,6 +149,10 @@ class Connection {
 
 		delete_option( 'wc_square_updated_to_2_0_0' );
 
+		if ( wc_square()->get_settings_handler()->is_custom_square_auth_keys_set() ) {
+			update_option( 'wc_square_auth_key_updated', true );
+		}
+
 		wp_safe_redirect( $this->get_plugin()->get_settings_url() );
 		exit;
 	}

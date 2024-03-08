@@ -105,21 +105,23 @@ class Base_Email extends \WC_Email {
 			$form_fields['subject']['default']     = $this->subject;
 		}
 
-		// add a recipient field
-		$form_fields = Square_Helper::array_insert_after(
-			$form_fields,
-			isset( $form_fields['enabled'] ) ? 'enabled' : key( $form_fields ),
-			array(
-				'recipient' => array(
-					'title'       => __( 'Recipient(s)', 'woocommerce-square' ),
-					'type'        => 'text',
-					/* translators: %s default email address */
-					'description' => sprintf( __( 'Enter recipients (comma separated) for this email. Defaults to admin email: %s', 'woocommerce-square' ), '<code>' . esc_attr( get_option( 'admin_email' ) ) . '</code>' ),
-					'placeholder' => get_bloginfo( 'admin_email' ),
-					'default'     => get_bloginfo( 'admin_email' ),
-				),
-			)
-		);
+		if ( ! $this->is_customer_email() ) {
+			// add a recipient field
+			$form_fields = Square_Helper::array_insert_after(
+				$form_fields,
+				isset( $form_fields['enabled'] ) ? 'enabled' : key( $form_fields ),
+				array(
+					'recipient' => array(
+						'title'       => __( 'Recipient(s)', 'woocommerce-square' ),
+						'type'        => 'text',
+						/* translators: %s default email address */
+						'description' => sprintf( __( 'Enter recipients (comma separated) for this email. Defaults to admin email: %s', 'woocommerce-square' ), '<code>' . esc_attr( get_option( 'admin_email' ) ) . '</code>' ),
+						'placeholder' => get_bloginfo( 'admin_email' ),
+						'default'     => get_bloginfo( 'admin_email' ),
+					),
+				)
+			);
+		}
 
 		// set the updated fields
 		$this->form_fields = $form_fields;

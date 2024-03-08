@@ -25,6 +25,7 @@ namespace WooCommerce\Square;
 
 defined( 'ABSPATH' ) || exit;
 
+use WooCommerce\Square\Admin\Analytics\Revenue;
 use WooCommerce\Square\Handlers\Product;
 
 /**
@@ -73,6 +74,8 @@ class Admin {
 		// privacy
 		$this->privacy_handler = new Admin\Privacy();
 
+		new Revenue();
+
 		$this->add_hooks();
 	}
 
@@ -102,8 +105,6 @@ class Admin {
 				$this->load_scripts_styles();
 			}
 		);
-
-		add_action( 'wc_square_dismiss_notice', array( $this, 'dismiss_gift_cards_disabled_notice' ) );
 	}
 
 
@@ -145,27 +146,12 @@ class Admin {
 						'synced_with_square'          => __( 'Synced with Square', 'woocommerce-square' ),
 						'managed_by_square'           => __( 'Managed by Square', 'woocommerce-square' ),
 						'fetch_stock_with_square'     => __( 'Fetch stock from Square', 'woocommerce-square' ),
+						'sync_inventory'              => __( 'Sync inventory', 'woocommerce-square' ),
+						'sync_stock_from_square'      => __( 'Sync stock from Square', 'woocommerce-square' ),
 					),
 				)
 			);
-
-			return;
-		}
-
-		// Temporary - this can be removed when Gift Cards is out of beta. 2023-04-20
-		// The admin stylesheet is needed to provide notice-like styling for the Gift Cards beta notice.
-		if ( $this->get_plugin()->is_gateway_settings() ) {
-			wp_enqueue_style(
-				'wc-square-admin',
-				$this->get_plugin()->get_plugin_url() . '/assets/css/admin/wc-square-admin.min.css',
-				array(),
-				Plugin::VERSION
-			);
-
-			return;
-		}
-
-		if ( $this->get_plugin()->is_plugin_settings() ) {
+		} elseif ( $this->get_plugin()->is_plugin_settings() ) {
 			wp_enqueue_style(
 				'wc-square-admin',
 				$this->get_plugin()->get_plugin_url() . '/assets/css/admin/wc-square-admin.min.css',
@@ -274,20 +260,4 @@ class Admin {
 
 		return $this->plugin;
 	}
-
-
-	/**
-	 * Don't show the gift cards disabled notice for every WP Admin once it has been dismissed.
-	 *
-	 * @since 3.7.1
-	 *
-	 * @param string $notice_id
-	 */
-	public function dismiss_gift_cards_disabled_notice( $notice_id ) {
-		if ( 'gift-cards-disabled' === $notice_id ) {
-			delete_option( 'woocommerce_square_3_7_1_gift_cards_force_disable_notice' );
-		}
-	}
-
-
 }

@@ -51,6 +51,15 @@ class Order {
 	 */
 	private $products_to_sync = array();
 
+	/**
+	 * Array of payment gateways that are Square payment gateways.
+	 *
+	 * @var array
+	 */
+	private $square_payment_gateways = array(
+		Plugin::GATEWAY_ID,
+		Plugin::CASH_APP_PAY_GATEWAY_ID,
+	);
 
 	/**
 	 * Sets up Square order handler.
@@ -58,16 +67,27 @@ class Order {
 	 * @since 2.0.0
 	 */
 	public function __construct() {
-
+		add_action( 'wp', array( $this, 'save_guest_details' ) );
 		// remove Square variation IDs from order item meta
 		add_action( 'woocommerce_hidden_order_itemmeta', array( $this, 'hide_square_order_item_meta' ) );
 
-		// ADD hooks for stock syncs based on changes from orders not from this gateway
-		add_action( 'woocommerce_checkout_order_processed', array( $this, 'maybe_sync_stock_for_order_via_other_gateway' ), 10, 3 );
-		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'maybe_sync_stock_for_store_api_order_via_other_gateway' ), 10, 1 );
+		if ( version_compare( WC()->version, '7.6', '>=' ) ) {
+			// Add hooks for stock sync.
+			add_action( 'woocommerce_reduce_order_item_stock', array( $this, 'maybe_stage_stock_updates_for_product' ), 10, 3 );
+			add_action( 'woocommerce_reduce_order_stock', array( $this, 'maybe_sync_staged_inventory_updates' ) );
+		} else {
+			// @todo Remove this block when WooCommerce 7.6 is the minimum supported version.
+			// ADD hooks for stock syncs based on changes from orders not from this gateway
+			add_action( 'woocommerce_checkout_order_processed', array( $this, 'maybe_sync_stock_for_order_via_other_gateway' ), 10, 3 );
+			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'maybe_sync_stock_for_store_api_order_via_other_gateway' ), 10, 1 );
 
-		// Add specific hook for paypal IPN callback
-		add_action( 'valid-paypal-standard-ipn-request', array( $this, 'maybe_sync_stock_for_order_via_paypal' ), 10, 1 );
+			// Add specific hook for paypal IPN callback
+			add_action( 'valid-paypal-standard-ipn-request', array( $this, 'maybe_sync_stock_for_order_via_paypal' ), 10, 1 );
+		}
+
+		// ADD hooks to restore stock for pending and cancelled order status.
+		add_action( 'woocommerce_order_status_cancelled', array( $this, 'maybe_sync_inventory_for_stock_increase' ), 1 );
+		add_action( 'woocommerce_order_status_pending', array( $this, 'maybe_sync_inventory_for_stock_increase' ), 1 );
 
 		// ADD hooks to listen to refunds on orders from other gateways.
 		add_action( 'woocommerce_order_refunded', array( $this, 'maybe_sync_stock_for_refund_from_other_gateway' ), 10, 2 );
@@ -78,9 +98,17 @@ class Order {
 		// Include gift card information in payment method info.
 		add_filter( 'woocommerce_order_get_payment_method_title', array( $this, 'filter_payment_method_title' ), 10, 2 );
 		add_filter( 'woocommerce_gateway_title', array( $this, 'filter_gateway_title' ), 10, 2 );
-		add_filter( 'woocommerce_get_order_item_totals', array( $this, 'filter_order_item_totals' ), 10, 2 );
-	}
 
+		// Add Gift Card "send-to" email address to the order meta.
+		add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'add_gift_card_add_to_cart_details_to_order' ), 10, 4 );
+		add_filter( 'woocommerce_order_item_display_meta_key', array( $this, 'modify_gift_card_line_item_key' ), 10, 3 );
+		add_action( 'wc_square_gift_card_activated', array( $this, 'trigger_email_for_gift_card_sent' ) );
+		add_filter( 'woocommerce_hidden_order_itemmeta', array( $this, 'hide_gift_card_line_item_meta' ) );
+		add_filter( 'woocommerce_get_order_item_totals', array( $this, 'filter_order_item_totals' ), 10, 2 );
+		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'render_admin_missing_billing_details_notice' ) );
+		add_action( 'before_woocommerce_pay_form', array( $this, 'render_missing_billing_details_notice' ), 10, 1 );
+		add_filter( 'woocommerce_order_email_verification_required', array( $this, 'no_verification_on_guest_save' ) );
+	}
 
 	/**
 	 * Ensures the Square order item meta is hidden.
@@ -140,7 +168,7 @@ class Order {
 	public function maybe_sync_stock_for_order_via_other_gateway( $order_id, $posted_data, $order ) {
 
 		// Confirm we are not processing the order through the Square gateway.
-		if ( ! $order instanceof \WC_Order || Plugin::GATEWAY_ID === $order->get_payment_method() ) {
+		if ( ! $order instanceof \WC_Order || in_array( $order->get_payment_method(), $this->square_payment_gateways, true ) ) {
 			return;
 		}
 
@@ -153,14 +181,14 @@ class Order {
 	 *
 	 * This functions sets a process in motion that gathers products that will be processed on shutdown.
 	 *
-	 * @since x.x.x
+	 * @since 4.0.0
 	 *
 	 * @param \WC_Order $order Order object.
 	 */
 	public function maybe_sync_stock_for_store_api_order_via_other_gateway( $order ) {
 
 		// Confirm we are not processing the order through the Square gateway.
-		if ( ! $order instanceof \WC_Order || Plugin::GATEWAY_ID === $order->get_payment_method() ) {
+		if ( ! $order instanceof \WC_Order || in_array( $order->get_payment_method(), $this->square_payment_gateways, true ) ) {
 			return;
 		}
 
@@ -245,6 +273,100 @@ class Order {
 		$this->products_to_sync[ $product_id ] = $adjustment;
 	}
 
+	/**
+	 * Stage inventory updates for products in the order.
+	 * This function only used for WooCommerce 7.6 and above.
+	 *
+	 * @param \WC_Order_Item_Product $item   Order item data.
+	 * @param array                  $change Change Details.
+	 * @param \WC_Order              $order  Order data.
+	 * @return void
+	 *
+	 * @since 4.1.0
+	 */
+	public function maybe_stage_stock_updates_for_product( $item, $change, $order ) {
+		$product = $change['product'] ?? false;
+
+		/**
+		 * Bail If
+		 * 1. Order is processed using Square payment gateway OR
+		 * 2. Inventory sync is not enabled OR
+		 * 3. Square sync is in progress OR
+		 * 4. Square sync is not enabled for the product
+		 */
+		if (
+			! $order instanceof \WC_Order ||
+			in_array( $order->get_payment_method(), $this->square_payment_gateways, true ) ||
+			! wc_square()->get_settings_handler()->is_inventory_sync_enabled() ||
+			defined( 'DOING_SQUARE_SYNC' ) ||
+			! $product ||
+			! Product::is_synced_with_square( $product )
+		) {
+			return;
+		}
+
+		// Get stock adjustment for the product.
+		$product_id = $product->get_id();
+		$previous   = $change['from'] ?? false;
+		$current    = $change['to'] ?? false;
+		$adjustment = (int) $current - $previous;
+
+		if ( false === $previous || false === $current || 0 === $adjustment ) {
+			return;
+		}
+
+		// Stage the inventory update.
+		$this->products_to_sync[ $product_id ] = $adjustment;
+	}
+
+	/**
+	 * Maybe restore stock for an order that was cancelled or moved to pending.
+	 * This is only for orders that were not processed through the Square gateway.
+	 *
+	 * @param int $order_id Order ID.
+	 *
+	 * @since 4.1.0
+	 */
+	public function maybe_sync_inventory_for_stock_increase( $order_id ) {
+		if ( ! wc_square()->get_settings_handler()->is_inventory_sync_enabled() ) {
+			return;
+		}
+
+		// Confirm we are not processing the order through the Square gateway.
+		$order = wc_get_order( $order_id );
+		if ( ! $order instanceof \WC_Order || in_array( $order->get_payment_method(), $this->square_payment_gateways, true ) ) {
+			return;
+		}
+
+		$trigger_increase = $order->get_order_stock_reduced();
+
+		// Only continue if we're increasing stock.
+		if ( ! $trigger_increase ) {
+			return;
+		}
+
+		// Cache the product's previous stock value.
+		add_action( 'woocommerce_variation_before_set_stock', array( $this, 'cache_product_previous_stock' ) );
+		add_action( 'woocommerce_product_before_set_stock', array( $this, 'cache_product_previous_stock' ) );
+
+		// Stage the inventory update.
+		add_action( 'woocommerce_variation_set_stock', array( $this, 'maybe_stage_inventory_updates_for_product' ) );
+		add_action( 'woocommerce_product_set_stock', array( $this, 'maybe_stage_inventory_updates_for_product' ) );
+
+		// Sync the staged inventory updates.
+		add_action( 'woocommerce_restore_order_stock', array( $this, 'maybe_sync_staged_inventory_updates' ) );
+	}
+
+	/**
+	 * Cache the product's previous stock value.
+	 *
+	 * @param WC_Product $product Product object.
+	 *
+	 * @since 4.1.0
+	 */
+	public function cache_product_previous_stock( $product ) {
+		$this->previous_stock[ $product->get_id() ] = $product->get_stock_quantity();
+	}
 
 	/**
 	 * Initializes a synchronization event for any staged inventory updates in this request.
@@ -280,6 +402,9 @@ class Order {
 		wc_square()->log( 'New order from other gateway inventory syncing..' );
 		$idempotency_key = wc_square()->get_idempotency_key( md5( serialize( $inventory_adjustments ) ) . '_change_inventory' );
 		wc_square()->get_api()->batch_change_inventory( $idempotency_key, $inventory_adjustments );
+
+		// Reset the staged inventory updates.
+		$this->products_to_sync = array();
 	}
 
 	/**
@@ -298,7 +423,7 @@ class Order {
 
 		// Confirm we are not processing the order through the Square gateway.
 		$order = wc_get_order( $order_id );
-		if ( ! $order instanceof \WC_Order || Plugin::GATEWAY_ID === $order->get_payment_method() ) {
+		if ( ! $order instanceof \WC_Order || in_array( $order->get_payment_method(), $this->square_payment_gateways, true ) ) {
 			return;
 		}
 
@@ -344,6 +469,172 @@ class Order {
 		wc_square()->log( 'Order from other gateway Refund inventory updates syncing..' );
 		$idempotency_key = wc_square()->get_idempotency_key( md5( serialize( $inventory_adjustments ) ) . '_change_inventory' );
 		wc_square()->get_api()->batch_change_inventory( $idempotency_key, $inventory_adjustments );
+	}
+
+	/**
+	 * Add gift card recipient data to order line item meta.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param \WC_Order_Item_Product $item          The order item product.
+	 * @param string                 $cart_item_key The cart item key.
+	 * @param array                  $values        Values associated with a cart item key.
+	 * @param \WC_Order              $order         Woo Order.
+	 */
+	public function add_gift_card_add_to_cart_details_to_order( $item, $cart_item_key, $values, $order ) {
+		$product = wc_get_product( $values['product_id'] );
+
+		if ( ! $product instanceof \WC_Product ) {
+			return;
+		}
+
+		// Return if the product is not a gift card product.
+		if ( ! Product::is_gift_card( $product ) ) {
+			return;
+		}
+
+		// Add meta if a new gift card is purchased.
+		if ( ! empty( $values['square-gift-card-send-to-email'] ) ) {
+			if ( ! empty( $values['square-gift-card-sender-name'] ) ) {
+				$item->add_meta_data( 'square-gift-card-sender-name', $values['square-gift-card-sender-name'] );
+			}
+
+			$item->add_meta_data( 'square-gift-card-send-to-email', $values['square-gift-card-send-to-email'] );
+			$item->add_meta_data( '_square-gift-card-purchase-type', 'new' );
+
+			if ( ! empty( $values['square-gift-card-sent-to-first-name'] ) ) {
+				$item->add_meta_data( 'square-gift-card-sent-to-first-name', $values['square-gift-card-sent-to-first-name'] );
+			}
+
+			if ( ! empty( $values['square-gift-card-sent-to-message'] ) ) {
+				$item->add_meta_data( 'square-gift-card-sent-to-message', $values['square-gift-card-sent-to-message'] );
+			}
+		}
+
+		// Add meta if an existing gift card is loaded with amount.
+		if ( ! empty( $values['square-gift-card-gan'] ) ) {
+			$item->add_meta_data( 'square-gift-card-gan', $values['square-gift-card-gan'] );
+			$item->add_meta_data( '_square-gift-card-purchase-type', 'load' );
+		}
+
+		// Fallback when gift card product is added to card directly from the /shop page which
+		// bypasses adding recipient email address, so we default to purchasing a new gift card
+		// without a recipient email address.
+		if ( empty( $values['square-gift-card-send-to-email'] ) && empty( $values['square-gift-card-gan'] ) ) {
+			$item->add_meta_data( '_square-gift-card-purchase-type', 'new' );
+		}
+	}
+
+	/**
+	 * Filters the meta key into a human-readable format.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string                 $display_key The value that will be displayed in the order line item.
+	 * @param \WC_Meta_Data          $meta        The order line item meta data object.
+	 * @param \WC_Order_Item_Product $order_item  Instance of the order item product.
+	 *
+	 * @return string
+	 */
+	public function modify_gift_card_line_item_key( $display_key, $meta, $order_item ) {
+		if ( 'square-gift-card-sender-name' === $meta->key ) {
+			return __( "Sender's name", 'woocommerce-square' );
+		}
+
+		if ( 'square-gift-card-send-to-email' === $meta->key ) {
+			return __( "Recipient's email", 'woocommerce-square' );
+		}
+
+		if ( 'square-gift-card-sent-to-first-name' === $meta->key ) {
+			return __( "Recipient's name", 'woocommerce-square' );
+		}
+
+		if ( 'square-gift-card-sent-to-message' === $meta->key ) {
+			return __( 'Message', 'woocommerce-square' );
+		}
+
+		if ( 'square-gift-card-gan' === $meta->key ) {
+			return __( 'Gift card number', 'woocommerce-square' );
+		}
+
+		return $display_key;
+	}
+
+	/**
+	 * Triggers an email to the recipient of the gift card.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param \WC_Order $order WooCommerce order.
+	 */
+	public function trigger_email_for_gift_card_sent( $order ) {
+		wc_square()->get_email_handler()->get_gift_card_sent()->trigger( $order );
+	}
+
+	/**
+	 * Hides the meta that indicates the type of gift card purchase,
+	 * new or reload.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param array $meta_array Array of line order item meta.
+	 * @return array
+	 */
+	public function hide_gift_card_line_item_meta( $meta_array ) {
+		$meta_array[] = '_square-gift-card-purchase-type';
+
+		return $meta_array;
+	}
+
+	/**
+	 * Returns the type of gift card purchase type - `new` or `load`.
+	 *
+	 * - `new` indicates a new gift card is purchased.
+	 * - `load` indicates an existing gift card is loaded with additional funds.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param \WC_Order $order WooCommerce order.
+	 *
+	 * @return string|boolean Types of gift card purchase, false otherwise.
+	 */
+	public static function get_gift_card_purchase_type( $order ) {
+		$order_items = $order->get_items();
+
+		/** @var \WC_Order_Item_Product $order_item */
+		foreach ( $order_items as $order_item ) {
+			$purchase_type = $order_item->get_meta( '_square-gift-card-purchase-type' );
+
+			if ( ! empty( $purchase_type ) ) {
+				return $purchase_type;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns the gift card number from the order line item.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param \WC_Order $order WooCommerce order.
+	 *
+	 * @return string|boolean The gift card number, false otherwise.
+	 */
+	public static function get_gift_card_gan( $order ) {
+		$order_items = $order->get_items();
+
+		/** @var \WC_Order_Item_Product $order_item */
+		foreach ( $order_items as $order_item ) {
+			$gan = $order_item->get_meta( 'square-gift-card-gan' );
+
+			if ( ! empty( $gan ) ) {
+				return $gan;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -484,7 +775,8 @@ class Order {
 			return;
 		}
 
-		?><tr class="square_gift_card item">
+		?>
+		<tr class="square_gift_card item">
 			<td class="thumb">
 				<div style="width: 38px;">
 					<img src="<?php echo esc_url( WC_SQUARE_PLUGIN_URL . '/assets/images/gift-card.png' ); ?>" />
@@ -559,7 +851,7 @@ class Order {
 			return sprintf(
 				/* translators: %1$s - Amount charged on gift card. */
 				__( 'Square Gift Card (%1$s)', 'woocommerce-square' ),
-				get_woocommerce_currency_symbol( $order->get_currency() ) . $order->get_total(),
+				get_woocommerce_currency_symbol( $order->get_currency() ) . $order->get_total()
 			);
 		}
 
@@ -628,5 +920,146 @@ class Order {
 		);
 
 		return $total_rows;
+	}
+
+	/**
+	 * Renders a notice if the billing country is not set in manual order.
+	 *
+	 * @since 4.2.0
+	 * @param \WC_Order $order
+	 */
+	public function render_admin_missing_billing_details_notice( $order ) {
+		$created_via = $order->get_created_via();
+
+		if ( $order->is_paid() ) {
+			return;
+		}
+
+		if ( ! ( '' === $created_via || 'admin' === $created_via ) ) {
+			return;
+		}
+
+		$billing_country = $order->get_billing_country();
+
+		if ( ! empty( $billing_country ) ) {
+			return;
+		}
+
+		?>
+		<p style="color: #b32d2e; display: none;" class="form-field form-field-wide square-billing-details-info"><?php esc_html_e( 'Billing country is a mandatory field for Square payment gateway.', 'woocommerce-square' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Renders a notice if the billing country is not set in manual order.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param \WC_Order $order
+	 */
+	public function render_missing_billing_details_notice( $order ) {
+		if ( is_user_logged_in() ) {
+			return;
+		}
+
+		if ( ! empty( $order->get_billing_country() ) ) {
+			return;
+		}
+
+		require_once WC()->plugin_path() . '/includes/admin/wc-meta-box-functions.php';
+
+		?>
+		<div style="display: none;" id="square-pay-for-order-billing-details-wrapper">
+		<?php
+			wc_print_notice( __( 'Billing country is not set which is required for payment using Square. Please update the billing country before continuing.', 'woocommerce-square' ), 'notice', array( 'error-scope' => 'square-billing-not-set' ) );
+		?>
+
+		<form action="" method="POST">
+			<h3><?php esc_html_e( 'Update billing details:', 'woocommerce-square' ); ?></h2>
+			<div id="order_data">
+			<?php
+			foreach ( WC()->countries->get_address_fields( '', 'billing_' ) as $key => $field ) {
+				if ( 'billing_email' === $key ) {
+					continue;
+				}
+
+				if ( is_callable( array( $order, 'get_' . $key ) ) ) {
+					$current_value = $order->{"get_$key"}( 'edit' );
+				} else {
+					$current_value = $order->get_meta( '_' . $key );
+				}
+
+				woocommerce_form_field( $key, $field, $current_value );
+			}
+
+			wp_nonce_field( 'wc_verify_email', 'check_submission' );
+			?>
+
+					<input type="submit" name="wc-square-save-guest-details" value="<?php esc_html_e( 'Save details', 'woocommerce-square' ); ?>">
+				</div>
+			</form>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Saves billing details of a guest user on the Pay for order page.
+	 *
+	 * @since 4.2.0
+	 */
+	public function save_guest_details() {
+		if ( ! isset( $_POST['wc-square-save-guest-details'] ) ) {
+			return;
+		}
+
+		$nonce = isset( $_POST['check_submission'] ) ? wc_clean( wp_unslash( $_POST['check_submission'] ) ) : '';
+
+		if ( ! wp_verify_nonce( $nonce, 'wc_verify_email' ) ) {
+			return;
+		}
+
+		$order_id = absint( get_query_var( 'order-pay' ) );
+		$order    = wc_get_order( $order_id );
+		$props    = array();
+
+		foreach ( WC()->countries->get_address_fields( '', 'billing_' ) as $key => $field ) {
+			if ( 'billing_email' === $key ) {
+				continue;
+			}
+
+			if ( is_callable( array( $order, 'set_' . $key ) ) ) {
+				$props[ $key ] = isset( $_POST[ $key ] ) ? wc_clean( wp_unslash( $_POST[ $key ] ) ) : '';
+			} else {
+				$order->update_meta_data( $key, wc_clean( wp_unslash( $_POST[ $key ] ) ) );
+			}
+		}
+
+		$order->set_props( $props );
+		$order->add_order_note(
+			esc_html__( 'Customer has updated their billing details from the Pay for order page.', 'woocommerce-square' ),
+			0,
+			true
+		);
+		$order->save();
+	}
+
+	/**
+	 * Disables email verification when billing details are updated by guest on the
+	 * pay for order page.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param bool $email_verification_required If email verification is required.
+	 *
+	 * @return boolean
+	 */
+	public function no_verification_on_guest_save( $email_verification_required ) {
+		// Nonce already verified before filter `woocommerce_order_email_verification_required`.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['wc-square-save-guest-details'] ) ) {
+			return false;
+		}
+
+		return $email_verification_required;
 	}
 }

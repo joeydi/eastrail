@@ -30,6 +30,7 @@ use \WooCommerce\Square\Framework\PaymentGateway\Api\Payment_Gateway_API_Respons
 use WooCommerce\Square\Gateway\API\Responses\Create_Payment as Create_Payment;
 use WooCommerce\Square\Utilities\Money_Utility;
 use WooCommerce\Square\Handlers\Order;
+use WooCommerce\Square\WC_Order_Square;
 
 
 defined( 'ABSPATH' ) || exit;
@@ -347,6 +348,18 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 				 */
 				do_action( 'wc_payment_gateway_' . $this->get_id() . '_payment_processed', $order, $this );
 
+				$gift_card_purchase_type = Order::get_gift_card_purchase_type( $order );
+
+				// To create/activate/load a gift card, a payment must be in COMPLETE state.
+				if ( self::TRANSACTION_TYPE_CHARGE === wc_square()->get_gateway()->get_option( 'transaction_type' ) ) {
+					if ( 'new' === $gift_card_purchase_type ) {
+						$this->create_gift_card( $order );
+					} elseif ( 'load' === $gift_card_purchase_type ) {
+						$gan = Order::get_gift_card_gan( $order );
+						$this->load_gift_card( $gan, $order );
+					}
+				}
+
 				return array(
 					'result'   => 'success',
 					'redirect' => $this->get_return_url( $order ),
@@ -365,6 +378,88 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 		return $default;
 	}
 
+	/**
+	 * Creates a gift card and activates it.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param \WC_Order $order
+	 */
+	public function create_gift_card( $order ) {
+		$gift_card_line_item_id = $this->get_order_meta( $order, 'gift_card_line_item_id' );
+
+		/** @var API\Responses\Get_Gift_Card $response */
+		$response = $this->get_api()->create_gift_card( $gift_card_line_item_id );
+
+		if ( ! $response->get_data() instanceof \Square\Models\CreateGiftCardResponse ) {
+			return false;
+		}
+
+		/**
+		 * Fires after creation of the gift card.
+		 *
+		 * @since 4.2.0
+		 *
+		 * @param \WC_Order $order Woo Order.
+		 */
+		do_action( 'wc_square_gift_card_created', $order );
+
+		$gift_card_id = $response->get_id();
+
+		$response = $this->get_api()->activate_gift_card( $gift_card_id, $this->get_order_meta( $order, 'square_order_id' ), $gift_card_line_item_id );
+
+		/** @var \Square\Models\GiftCardActivity $gift_card_activity */
+		$gift_card_activity = $response->get_data();
+
+		if ( ! $gift_card_activity instanceof \Square\Models\CreateGiftCardActivityResponse ) {
+			return false;
+		}
+
+		$gan = $gift_card_activity->getGiftCardActivity()->getGiftCardGan();
+		$this->update_order_meta( $order, 'gift_card_number', $gan );
+
+		$order->add_order_note(
+			sprintf(
+				/* translators: %1$s - Gift Card Account Number */
+				esc_html__( 'Gift card with number: %1$s created and activated.', 'woocommerce-square' ),
+				esc_html( $gan )
+			)
+		);
+
+		/**
+		 * Fires after activation of the gift card.
+		 *
+		 * @since 4.2.0
+		 *
+		 * @param \WC_Order $order Woo Order.
+		 */
+		do_action( 'wc_square_gift_card_activated', $order );
+
+		return true;
+	}
+
+	/**
+	 * Loads an existing gift card with an amount.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string    $gan   The gift card number.
+	 * @param \WC_Order $order WooCommerce order.
+	 * @return boolean
+	 */
+	public function load_gift_card( $gan, $order ) {
+		/** @var API\Responses\Get_Gift_Card $response */
+		$response = $this->get_api()->load_gift_card( $gan, $order );
+
+		/** @var \Square\Models\GiftCardActivity $gift_card_activity */
+		$gift_card_activity = $response->get_data();
+
+		if ( ! $gift_card_activity instanceof \Square\Models\CreateGiftCardActivityResponse ) {
+			return false;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Handles updating a user's payment method during payment.
@@ -464,16 +559,18 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 	 * @since 3.0.0
 	 * @see WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway::get_order()
 	 * @param int|\WC_Order $order_id order ID being processed
-	 * @return \WC_Order object with payment and transaction information attached
+	 * @return WC_Order_Square object with payment and transaction information attached
 	 */
 	public function get_order( $order_id ) {
 		$order = parent::get_order( $order_id );
 
-		// payment info
-		if ( Square_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-payment-token' ) ) {
+		// paying with tokenized payment method (we've already verified that this token exists in the validate_fields method)
+		$token_id = Square_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-payment-token' );
 
-			// paying with tokenized payment method (we've already verified that this token exists in the validate_fields method)
-			$token = $this->get_payment_tokens_handler()->get_token( $order->get_user_id(), Square_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-payment-token' ) );
+		// payment info
+		if ( $token_id ) {
+			$token = \WC_Payment_Tokens::get( $token_id );
+			$token = $this->get_payment_tokens_handler()->get_token( $order->get_user_id(), $token->get_token() );
 
 			$order->payment->token          = $token->get_token();
 			$order->payment->account_number = $token->get_last4();
@@ -516,7 +613,7 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 	 *
 	 * @since 3.0.0
 	 *
-	 * @param \WC_Order $order the order object
+	 * @param WC_Order_Square $order the order object
 	 * @param Payment_Gateway_API_Response_Interface $response optional credit card transaction response
 	 * @return Payment_Gateway_API_Response_Interface the response
 	 * @throws \Exception network timeouts, etc
@@ -553,6 +650,8 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 			} else {
 				$card_type = 'card';
 			}
+
+			$what = Payment_Gateway_Helper::payment_type_to_name( $card_type );
 
 			// credit card order note
 			$message = sprintf(
@@ -612,7 +711,7 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 	 *
 	 * @since 3.7.0
 	 *
-	 * @param \WC_Order $order WooCommerce order object.
+	 * @param WC_Order_Square $order WooCommerce order object.
 	 *
 	 * @return Create_Payment The payment response.
 	 */
@@ -1056,12 +1155,12 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 	 * request.
 	 *
 	 * @since 3.0.0
-	 * @return \WC_Order generated order object
+	 * @return WC_Order_Square generated order object
 	 */
 	protected function get_order_for_add_payment_method() {
 
 		// mock order, as all gateway API implementations require an order object for tokenization
-		$order = new \WC_Order( 0 );
+		$order = new WC_Order_Square( 0 );
 		$order = $this->get_order( $order );
 
 		$user = get_userdata( get_current_user_id() );
@@ -1124,7 +1223,7 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 		 * transaction.
 		 *
 		 * @since 3.0.0
-		 * @param \WC_Order $order order object
+		 * @param WC_Order_Square $order order object
 		 * @param Payment_Gateway_Direct $this instance
 		 */
 		return apply_filters( 'wc_payment_gateway_' . $this->get_id() . '_get_order_for_add_payment_method', $order, $this );
@@ -1136,7 +1235,7 @@ abstract class Payment_Gateway_Direct extends Payment_Gateway {
 	 * customer ID
 	 *
 	 * @since 3.0.0
-	 * @param \WC_Order $order mock order
+	 * @param WC_Order_Square $order mock order
 	 * @param \WooCommerce\Square\Framework\PaymentGateway\Api\Payment_Gateway_API_Create_Payment_Token_Response $response
 	 */
 	protected function add_add_payment_method_customer_data( $order, $response ) {
