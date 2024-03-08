@@ -117,6 +117,26 @@
             "append": ""
         },
         {
+            "key": "field_65eb32dab810a",
+            "label": "Footer Message",
+            "name": "footer_message",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "full",
+            "media_upload": 1,
+            "delay": 0
+        },
+        {
             "key": "field_627bef032b0f7",
             "label": "Footer Contact Info",
             "name": "footer_contact_info",
@@ -237,5 +257,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1689610332
+    "modified": 1709912811
 }

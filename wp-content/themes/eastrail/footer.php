@@ -4,9 +4,16 @@
 
 <footer>
     <div class="container">
-        <a class="logo" href="<?php echo site_url(); ?>" title="<?php bloginfo('sitename'); ?>">
-            <img width="170" height="100" src="<?php echo ET::theme_url('static/img/eastrail-partners-logo.jpg'); ?>" alt="Eastrail Partners">
-        </a>
+        <div class="row">
+            <div class="col-sm-4 col-xl-6">
+                <a class="logo" href="<?php echo site_url(); ?>" title="<?php bloginfo('sitename'); ?>">
+                    <img width="170" height="100" src="<?php echo ET::theme_url('static/img/eastrail-partners-logo.jpg'); ?>" alt="Eastrail Partners">
+                </a>
+            </div>
+            <div class="col-sm-8 col-xl-6 mb-30 mb-sm-0">
+                <?php the_field('footer_message', 'options'); ?>
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-md-8 order-md-2 col-xl-6">
