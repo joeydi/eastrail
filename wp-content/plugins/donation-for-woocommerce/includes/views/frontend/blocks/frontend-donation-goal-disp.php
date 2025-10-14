@@ -2,6 +2,7 @@
 	<div class="wc_progressBarContainer" data-campaign-id="<?php echo esc_attr( $object->campaign['campaign_id'] ); ?>">
 		<ul>
 			<?php
+			$progress = 0;
 			if ( 'fixed_amount' === $goalType || 'percentage_amount' === $goalType  ) {
 				$fixedInitialAmount = !empty( $object->goal['fixed_initial_amount'] ) ? $object->goal['fixed_initial_amount'] : 0;
 				$fixedAmount = !empty( $object->goal['fixed_amount'] ) ? $object->goal['fixed_amount'] : 0;
@@ -52,7 +53,7 @@
 			} 
 			 
 			if ( 'no_of_days' === $goalType  ) {
-				$no_of_days = !empty( $object->goal['no_of_days'] ) ? $object->goal['no_of_days'] : 0;							
+				$no_of_days = !empty( $object->goal['no_of_days'] ) ? $object->goal['no_of_days'] : 0;                          
 				$end_date = gmdate('Y-m-d', strtotime($no_of_days));
 				$current_date = gmdate('Y-m-d');
 				$date1 = new DateTime($current_date);  //current date or any date
@@ -66,7 +67,7 @@
 					}
 				} else {
 					$progress = 100;
-				}						
+				}                       
 				?>
 				<li class="wc_progress_details">
 					<div class="raised_amount">	

@@ -35,7 +35,9 @@ use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway_Direct;
 use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway_Helper;
 use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway;
 use WooCommerce\Square\Framework\Square_Helper;
+use WooCommerce\Square\Gateway\API\Responses\Create_Payment;
 use WooCommerce\Square\Gateway\Gift_Card;
+use WooCommerce\Square\Utilities\Performance_Logger;
 
 /**
  * The Square payment gateway class.
@@ -78,14 +80,6 @@ class Gateway extends Payment_Gateway_Direct {
 	private $digital_wallet = null;
 
 	/**
-	 * Holds the instance of the Gift_Card class.
-	 * @since 4.2.0
-	 *
-	 * @var null|Gift_Card
-	 */
-	private $gift_card = null;
-
-	/**
 	 * Constructs the class.
 	 *
 	 * @since 2.0.0
@@ -102,7 +96,6 @@ class Gateway extends Payment_Gateway_Direct {
 				'supports'           => array(
 					self::FEATURE_PRODUCTS,
 					self::FEATURE_CARD_TYPES,
-					self::FEATURE_DETAILED_CUSTOMER_DECLINE_MESSAGES,
 					self::FEATURE_PAYMENT_FORM,
 					self::FEATURE_CREDIT_CARD_AUTHORIZATION,
 					self::FEATURE_CREDIT_CARD_CHARGE,
@@ -145,12 +138,11 @@ class Gateway extends Payment_Gateway_Direct {
 		// AJAX handler for get order amount
 		add_action( 'wp_ajax_wc_' . $this->get_id() . '_get_order_amount', array( $this, 'get_order_amount' ) );
 		add_action( 'wp_ajax_nopriv_wc_' . $this->get_id() . '_get_order_amount', array( $this, 'get_order_amount' ) );
+		add_action( 'wp_ajax_wc_' . $this->get_id() . '_should_charge_order', array( $this, 'should_charge_order' ) );
+		add_action( 'wp_ajax_nopriv_wc_' . $this->get_id() . '_should_charge_order', array( $this, 'should_charge_order' ) );
 
 		// Init Square digital wallets.
 		$this->digital_wallet = new Digital_Wallet( $this );
-
-		// Init Square gift card.
-		$this->gift_card = new Gift_Card( $this );
 	}
 
 	/**
@@ -187,14 +179,18 @@ class Gateway extends Payment_Gateway_Direct {
 	 * @since 2.0.0
 	 */
 	public function log_js_data() {
-
 		check_ajax_referer( 'wc_' . $this->get_id() . '_log_js_data', 'security' );
 
-		$message = sprintf( "Square.js %1\$s:\n ", ! empty( $_REQUEST['type'] ) ? ucfirst( wc_clean( $_REQUEST['type'] ) ) : 'Request' );
+		$message = sprintf( "Square.js %1\$s:\n ", ! empty( $_REQUEST['type'] ) ? ucfirst( wc_clean( wp_unslash( $_REQUEST['type'] ) ) ) : 'Request' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		// add the data
 		if ( ! empty( $_REQUEST['data'] ) ) {
-			$message .= print_r( wc_clean( $_REQUEST['data'] ), true );
+			$message .= print_r( wc_clean( wp_unslash( $_REQUEST['data'] ) ), true ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.PHP.DevelopmentFunctions.error_log_print_r
+		}
+
+		// If the type is performance, don't add the request type to the message, it's already in the message.
+		if ( ! empty( $_REQUEST['type'] ) && 'performance' === $_REQUEST['type'] && ! empty( $_REQUEST['data'] ) ) {
+			$message = wc_clean( wp_unslash( $_REQUEST['data'] ) );
 		}
 
 		$this->get_plugin()->log( $message, $this->get_id() );
@@ -279,6 +275,22 @@ class Gateway extends Payment_Gateway_Direct {
 		$this->get_payment_form_instance()->render_js();
 	}
 
+	/**
+	 * Retrieves the validation exception for the gateway.
+	 *
+	 * This function is used to fetch the exception that occurs during
+	 * the validation of fields in the payment gateway. It can be utilized
+	 * in the `validation_fields` method to handle and process validation errors.
+	 *
+	 * @since 4.9.3
+	 *
+	 * @return Exception|null The validation exception if one exists, or null if no exception occurred.
+	 */
+	public function get_validation_exception() {
+		if ( ! Square_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-payment-nonce' ) ) {
+			throw new \Exception( 'Payment nonce is missing' );
+		}
+	}
 
 	/**
 	 * Validates the entered payment fields.
@@ -288,7 +300,6 @@ class Gateway extends Payment_Gateway_Direct {
 	 * @return bool
 	 */
 	public function validate_fields() {
-
 		$is_valid = true;
 
 		if ( $this->is_gift_card_applied() ) {
@@ -296,11 +307,6 @@ class Gateway extends Payment_Gateway_Direct {
 		}
 
 		try {
-
-			if ( '' === Square_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-buyer-verification-token' ) ) {
-				throw new \Exception( '3D Secure Verification Token is missing' );
-			}
-
 			if ( Square_Helper::get_post( 'wc-' . $this->get_id_dasherized() . '-payment-token' ) ) {
 				return $is_valid;
 			}
@@ -312,9 +318,15 @@ class Gateway extends Payment_Gateway_Direct {
 
 			$is_valid = false;
 
-			Square_Helper::wc_add_notice( __( 'An error occurred, please try again or try an alternate form of payment.', 'woocommerce-square' ), 'error' );
+			if ( $this->debug_checkout() || $this->is_detailed_customer_decline_messages_enabled() ) {
+				Square_Helper::wc_add_notice( $exception->getMessage(), 'error' );
+			} else {
+				Square_Helper::wc_add_notice( __( 'An error occurred, please try again or try an alternate form of payment.', 'woocommerce-square' ), 'error' );
+			}
 
-			$this->add_debug_message( $exception->getMessage(), 'error' );
+			if ( $this->debug_log() ) {
+				$this->add_debug_message( $exception->getMessage(), 'error' );
+			}
 		}
 
 		return $is_valid;
@@ -403,12 +415,13 @@ class Gateway extends Payment_Gateway_Direct {
 	 * @throws \Exception
 	 */
 	protected function do_transaction( $order ) {
+		Performance_Logger::start( 'create_order', $this->get_plugin() );
+		$is_error = false;
 
 		// if there is no associated Square order ID, create one
 		if ( empty( $order->square_order_id ) ) {
 
 			try {
-
 				$location_id = $this->get_plugin()->get_settings_handler()->get_location_id();
 				$response    = $this->get_api()->create_order( $location_id, $order );
 
@@ -437,6 +450,7 @@ class Gateway extends Payment_Gateway_Direct {
 				$order->payment_total = Square_Helper::number_format( Money_Utility::cents_to_float( $response->getTotalMoney()->getAmount() ) );
 
 			} catch ( \Exception $exception ) {
+				$is_error = true;
 
 				// log the error, but continue with payment
 				if ( $this->debug_log() ) {
@@ -445,40 +459,23 @@ class Gateway extends Payment_Gateway_Direct {
 			}
 		}
 
+		Performance_Logger::end( 'create_order', $this->get_plugin(), $is_error );
 		return parent::do_transaction( $order );
 	}
 
-
 	/**
-	 * Stores gift card details as order meta.
+	 * Performs a credit card transaction for the given order and returns the result.
 	 *
-	 * @since 4.2.0
+	 * @since 4.6.0
 	 *
-	 * @param \Square\Models\Order $square_order
-	 * @param \WC_Order $order
+	 * @param WC_Order_Square     $order the order object
+	 * @param Create_Payment|null $response optional credit card transaction response
+	 * @return Create_Payment     the response
+	 * @throws \Exception network timeouts, etc
 	 */
-	public function maybe_save_gift_card_order_details( $square_order, $order ) {
-		$line_items = $square_order->getLineItems();
-
-		/** @var \Square\Models\OrderLineItem */
-		foreach ( $line_items as $line_item ) {
-			if ( \Square\Models\OrderLineItemItemType::GIFT_CARD !== $line_item->getItemType() ) {
-				continue;
-			}
-
-			$gift_card_line_item_id = $line_item->getUid();
-			$gift_card_amount       = Square_Helper::number_format(
-				Money_Utility::cents_to_float(
-					$line_item->getTotalMoney()->getAmount()
-				)
-			);
-
-			$this->update_order_meta( $order, 'gift_card_line_item_id', $gift_card_line_item_id );
-			$this->update_order_meta( $order, 'gift_card_balance', $gift_card_amount );
-			$this->update_order_meta( $order, 'is_gift_card_purchased', 'yes' );
-		}
+	protected function do_payment_method_transaction( $order, $response = null ) {
+		return $this->do_credit_card_transaction( $order, $response );
 	}
-
 
 	/**
 	 * Adds transaction data to the order.
@@ -498,6 +495,18 @@ class Gateway extends Payment_Gateway_Direct {
 
 		if ( $response->get_square_order_id() ) {
 			$this->update_order_meta( $order, 'square_order_id', $response->get_square_order_id() );
+
+			// Prepare the Square order URL.
+			$is_sandbox = $this->get_plugin()->get_settings_handler()->is_sandbox();
+			$square_url = $is_sandbox ? 'https://app.squareupsandbox.com/dashboard/orders/overview/' : 'https://app.squareup.com/dashboard/orders/overview/';
+
+			$order->add_order_note(
+				sprintf(
+					// translators: %s is the Square order ID linked to the Square order in the admin.
+					__( 'Square Order ID: %s', 'woocommerce-square' ),
+					'<a href="' . esc_url( $square_url . $response->get_square_order_id() ) . '" target="_blank">' . esc_html( $response->get_square_order_id() ) . '</a>'
+				)
+			);
 		}
 
 		// store the plugin version on the order
@@ -616,17 +625,6 @@ class Gateway extends Payment_Gateway_Direct {
 	 *
 	 * @since 4.2.0
 	 *
-	 * @return Gift_Card;
-	 */
-	public function get_gift_card_handler() {
-		return $this->gift_card;
-	}
-
-	/**
-	 * Returns the gift card object.
-	 *
-	 * @since 4.2.0
-	 *
 	 * @return Digital_Wallet;
 	 */
 	public function get_digital_wallet_handler() {
@@ -644,101 +642,7 @@ class Gateway extends Payment_Gateway_Direct {
 	 * @see WC_Settings_API::init_form_fields()
 	 */
 	public function init_form_fields() {
-
-		// common top form fields
-		$this->form_fields = array(
-			'enabled'     => array(
-				'title'   => esc_html__( 'Enable / Disable', 'woocommerce-square' ),
-				'label'   => esc_html__( 'Enable this gateway', 'woocommerce-square' ),
-				'type'    => 'checkbox',
-				'default' => 'no',
-			),
-
-			'title'       => array(
-				'title'    => esc_html__( 'Title', 'woocommerce-square' ),
-				'type'     => 'text',
-				'desc_tip' => esc_html__( 'Payment method title that the customer will see during checkout.', 'woocommerce-square' ),
-				'default'  => $this->get_default_title(),
-			),
-
-			'description' => array(
-				'title'    => esc_html__( 'Description', 'woocommerce-square' ),
-				'type'     => 'textarea',
-				'desc_tip' => esc_html__( 'Payment method description that the customer will see during checkout.', 'woocommerce-square' ),
-				'default'  => $this->get_default_description(),
-			),
-
-		);
-
-		// both credit card authorization & charge supported
-		if ( $this->supports_credit_card_authorization() && $this->supports_credit_card_charge() ) {
-			$this->form_fields = $this->add_authorization_charge_form_fields( $this->form_fields );
-		}
-
-		// card types support
-		if ( $this->supports_card_types() ) {
-			$this->form_fields = $this->add_card_types_form_fields( $this->form_fields );
-		}
-
-		// tokenization support
-		if ( $this->supports_tokenization() ) {
-			$this->form_fields = $this->add_tokenization_form_fields( $this->form_fields );
-		}
-
-		// Square digital wallet (Apple Pay and Google Pay settings)
-		if ( $this->is_digital_wallet_available() ) {
-			$this->form_fields = $this->add_digital_wallets_form_fields( $this->form_fields );
-		}
-
-		$this->form_fields = $this->add_gift_cards_form_fields( $this->form_fields );
-
-		$this->form_fields['advanced_settings_title'] = array(
-			'title' => esc_html__( 'Advanced Settings', 'woocommerce-square' ),
-			'type'  => 'title',
-		);
-
-		// add "detailed customer decline messages" option if the feature is supported
-		if ( $this->supports( self::FEATURE_DETAILED_CUSTOMER_DECLINE_MESSAGES ) ) {
-			$this->form_fields['enable_customer_decline_messages'] = array(
-				'title'   => esc_html__( 'Detailed Decline Messages', 'woocommerce-square' ),
-				'type'    => 'checkbox',
-				'label'   => esc_html__( 'Check to enable detailed decline messages to the customer during checkout when possible, rather than a generic decline message.', 'woocommerce-square' ),
-				'default' => 'no',
-			);
-		}
-
-		// debug mode
-		$this->form_fields['debug_mode'] = array(
-			'title'   => esc_html__( 'Debug Mode', 'woocommerce-square' ),
-			'type'    => 'select',
-			'class'   => 'wc-enhanced-select',
-			/* translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag */
-			'desc'    => sprintf( esc_html__( 'Show Detailed Error Messages and API requests/responses on the checkout page and/or save them to the %1$sdebug log%2$s', 'woocommerce-square' ), '<a href="' . Square_Helper::get_wc_log_file_url( $this->get_id() ) . '">', '</a>' ),
-			'default' => self::DEBUG_MODE_OFF,
-			'options' => array(
-				self::DEBUG_MODE_OFF      => esc_html__( 'Off', 'woocommerce-square' ),
-				self::DEBUG_MODE_CHECKOUT => esc_html__( 'Show on Checkout Page', 'woocommerce-square' ),
-				self::DEBUG_MODE_LOG      => esc_html__( 'Save to Log', 'woocommerce-square' ),
-				/* translators: show debugging information on both checkout page and in the log */
-				self::DEBUG_MODE_BOTH     => esc_html__( 'Both', 'woocommerce-square' ),
-			),
-		);
-
-		// if there is more than just the production environment available
-		if ( count( $this->get_environments() ) > 1 ) {
-			$this->form_fields = $this->add_environment_form_fields( $this->form_fields );
-		}
-
-		/**
-		 * Payment Gateway Form Fields Filter.
-		 *
-		 * Actors can use this to add, remove, or tweak gateway form fields
-		 *
-		 * @since 4.0.0
-		 * @param array $form_fields array of form fields in format required by WC_Settings_API
-		 * @param Payment_Gateway $this gateway instance
-		 */
-		$this->form_fields = apply_filters( 'wc_payment_gateway_' . $this->get_id() . '_form_fields', $this->form_fields, $this );
+		$this->form_fields = array();
 	}
 
 	/**
@@ -884,32 +788,6 @@ class Gateway extends Payment_Gateway_Direct {
 		return $form_fields;
 	}
 
-	/**
-	 * Adds the Gift Cards setting fields.
-	 *
-	 * @since 3.7.0
-	 *
-	 * @param array $form_fields
-	 * @return array
-	 */
-	public function add_gift_cards_form_fields( $form_fields ) {
-		$form_fields['gift_card_settings'] = array(
-			'title'       => esc_html__( 'Gift Card settings', 'woocommerce-square' ),
-			'description' => esc_html__( 'Take payments on your store with a Gift Card.', 'woocommerce-square' ),
-			'type'        => 'title',
-		);
-
-		$form_fields['enable_gift_cards'] = array(
-			'title'       => esc_html__( 'Enable / Disable', 'woocommerce-square' ),
-			'description' => esc_html__( 'Allow customers to pay with a gift card.', 'woocommerce-square' ),
-			'type'        => 'checkbox',
-			'default'     => '',
-			'label'       => esc_html__( 'Enable Gift Cards', 'woocommerce-square' ),
-		);
-
-		return $form_fields;
-	}
-
 	/** Conditional methods *******************************************************************************************/
 
 
@@ -947,14 +825,25 @@ class Gateway extends Payment_Gateway_Direct {
 	 * Square requires we create a new customer & customer card before referencing that customer in a transaction.
 	 *
 	 * @since 2.0.0
+	 * @since 4.9.7 - Changed to false to do tokenization after sale.
 	 *
 	 * @return bool
 	 */
 	public function tokenize_before_sale() {
 
-		return true;
+		return false;
 	}
 
+	/**
+	 * Determines whether new payment customers/tokens should be created after processing a payment.
+	 *
+	 * @since 4.9.7
+	 *
+	 * @return bool
+	 */
+	public function tokenize_after_sale() {
+		return true;
+	}
 
 	/**
 	 * Determines if 3d secure is enabled.
@@ -1203,14 +1092,27 @@ class Gateway extends Payment_Gateway_Direct {
 	 * @return array
 	 */
 	public function filter_available_gateways( $gateways ) {
-		$allowed_gateways = array();
+		$location_id  = $this->get_plugin()->get_settings_handler()->get_location_id();
+		$is_connected = $this->get_plugin()->get_settings_handler()->is_connected();
+
+		if ( $is_connected ) {
+			foreach ( $this->get_plugin()->get_settings_handler()->get_locations() as $location ) {
+				if ( $location_id === $location->getId() && get_woocommerce_currency() !== $location->getCurrency() ) {
+					unset( $gateways[ Plugin::GATEWAY_ID ] );
+				}
+			}
+		}
 
 		if ( ! Gift_Card::cart_contains_gift_card() ) {
 			return $gateways;
 		}
 
-		if ( array_key_exists( Plugin::GATEWAY_ID, $gateways ) ) {
-			$allowed_gateways[ Plugin::GATEWAY_ID ] = $gateways[ Plugin::GATEWAY_ID ];
+		$allowed_gateways = array();
+		$plugin_gateways  = wc_square()->get_gateway_ids();
+		foreach ( $gateways as $gateway_id => $gateway ) {
+			if ( in_array( $gateway_id, $plugin_gateways, true ) ) {
+				$allowed_gateways[ $gateway_id ] = $gateway;
+			}
 		}
 
 		return $allowed_gateways;
@@ -1244,6 +1146,20 @@ class Gateway extends Payment_Gateway_Direct {
 	 */
 	public function wc_ajax_square_checkout_validate( $data, $errors = null ) {
 		$error_messages = null;
+
+		// Check Square payment validation.
+		if ( ! $this->validate_fields() ) {
+			try {
+				$this->get_validation_exception();
+			} catch ( \Exception $exception ) {
+				if ( $this->debug_checkout() || $this->is_detailed_customer_decline_messages_enabled() ) {
+					$errors->add( 'validation', $exception->getMessage() );
+				} else {
+					$errors->add( 'validation', __( 'An error occurred, please try again or try an alternate form of payment.', 'woocommerce-square' ) );
+				}
+			}
+		}
+
 		if ( ! is_null( $errors ) ) {
 			$error_messages = $errors->get_error_messages();
 		}
@@ -1263,8 +1179,8 @@ class Gateway extends Payment_Gateway_Direct {
 	 * Returns the $order object with a unique transaction ref member added
 	 *
 	 * @since 2.2.1
-	 * @param WC_Order $order the order object
-	 * @return WC_Order order object with member named unique_transaction_ref
+	 * @param \WC_Order $order the order object
+	 * @return \WC_Order order object with member named unique_transaction_ref
 	 */
 	protected function get_order_with_unique_transaction_ref( $order ) {
 		$order_id = $order->get_id();
@@ -1278,7 +1194,9 @@ class Gateway extends Payment_Gateway_Direct {
 		}
 
 		// keep track of the retry count
-		$this->update_order_meta( $order, 'retry_count', $retry_count );
+		if ( $order_id > 0 ) { // TODO: look to remove this once fix is in Woo and is our minimum version. See https://github.com/woocommerce/woocommerce/issues/55728 for tracking.
+			$this->update_order_meta( $order, 'retry_count', $retry_count );
+		}
 
 		$order->unique_transaction_ref = time() . '-' . $order_id . ( $retry_count >= 0 ? '-' . $retry_count : '' );
 		return $order;
@@ -1313,8 +1231,8 @@ class Gateway extends Payment_Gateway_Direct {
 		$image_extension = apply_filters( 'wc_payment_gateway_' . $this->get_plugin()->get_id() . '_use_svg', true ) ? '.svg' : '.png';
 
 		// first, is the card image available within the plugin?
-		if ( is_readable( $this->get_plugin()->get_plugin_path() . '/assets/images/card-' . $image_type . $image_extension ) ) {
-			return \WC_HTTPS::force_https_url( $this->get_plugin()->get_plugin_url() . '/assets/images/card-' . $image_type . $image_extension );
+		if ( is_readable( $this->get_plugin()->get_plugin_path() . '/build/images/card-' . $image_type . $image_extension ) ) {
+			return \WC_HTTPS::force_https_url( $this->get_plugin()->get_plugin_url() . '/build/images/card-' . $image_type . $image_extension );
 		}
 
 		// Fall back to framework image URL.
@@ -1357,5 +1275,55 @@ class Gateway extends Payment_Gateway_Direct {
 			$total_amount = WC()->cart->total;
 		}
 		wp_send_json_success( $total_amount );
+	}
+
+	/**
+	 * Check if request is to change payment method.
+	 *
+	 * @since 4.9.7
+	 *
+	 * @return boolean
+	 */
+	public function is_change_payment_method_request() {
+		return class_exists( 'WC_Subscriptions_Change_Payment_Gateway' ) && \WC_Subscriptions_Change_Payment_Gateway::$is_request_to_change_payment;
+	}
+
+	/**
+	 * Returns whether the order should be charged.
+	 *
+	 * @since 4.9.7
+	 */
+	public function should_charge_order() {
+		check_ajax_referer( 'wc_' . $this->get_id() . '_should_charge_order', 'security' );
+
+		$is_pay_order = isset( $_POST['is_pay_order'] ) && 'true' === sanitize_key( $_POST['is_pay_order'] );
+		if ( $is_pay_order ) {
+			$order_id = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
+			$order    = wc_get_order( $order_id );
+			if ( empty( $order ) ) {
+				wp_send_json_error( __( 'Order not found.', 'woocommerce-square' ) );
+			}
+
+			$total_amount            = $order->get_total();
+			$is_charged_upon_release = class_exists( 'WC_Pre_Orders_Order' ) && class_exists( 'WC_Pre_Orders_Product' ) && \WC_Pre_Orders_Order::order_contains_pre_order( $order_id ) && \WC_Pre_Orders_Product::product_is_charged_upon_release( \WC_Pre_Orders_Order::get_pre_order_product( $order_id ) );
+
+			if ( $is_charged_upon_release ) {
+				// If the order is a charged upon release pre-order, we don't need to charge the order.
+				$total_amount = 0;
+			}
+
+			wp_send_json_success( $total_amount > 0 );
+		} else {
+			$total_amount = WC()->cart->total;
+
+			$is_charged_upon_release = class_exists( 'WC_Pre_Orders_Cart' ) && class_exists( 'WC_Pre_Orders_Product' ) && \WC_Pre_Orders_Cart::cart_contains_pre_order() && \WC_Pre_Orders_Product::product_is_charged_upon_release( \WC_Pre_Orders_Cart::get_pre_order_product() );
+
+			if ( $is_charged_upon_release ) {
+				// If the cart contains a charged upon release pre-order, we don't need to charge the order.
+				$total_amount = 0;
+			}
+
+			wp_send_json_success( $total_amount > 0 );
+		}
 	}
 }

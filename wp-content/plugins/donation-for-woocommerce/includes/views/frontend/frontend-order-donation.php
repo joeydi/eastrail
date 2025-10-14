@@ -8,18 +8,26 @@
 if ( get_woocommerce_currency_symbol() ) {
 	$currency_symbol =  get_woocommerce_currency_symbol();
 }
+
 $wp_rand = wp_rand( 1, 999 );
 $donation_product = !empty( $object->product['product_id'] ) ? $object->product['product_id'] : '';
 $donation_values = !empty( $object->campaign['predAmount'] ) ? $object->campaign['predAmount'] : array();
 $donation_value_labels = !empty( $object->campaign['predLabel'] ) ? $object->campaign['predLabel'] : array();
 $donation_min_value = !empty( $object->campaign['freeMinAmount'] ) ? $object->campaign['freeMinAmount'] : 0;
-$donation_max_value = !empty( $object->campaign['freeMaxAmount'] ) ? $object->campaign['freeMaxAmount'] : '';
+$donation_max_value = !empty( $object->campaign['freeMaxAmount'] ) ? $object->campaign['freeMaxAmount'] : 1000;
 $display_donation = !empty($object->campaign['amount_display']) ? $object->campaign['amount_display'] : 'both';
+$dispCustomType = $object->campaign['dispCustomType'];
+$freeAmountPlaceHolder = $object->campaign['freeAmountPlaceHolder'];
 $where_currency_symbole = !empty($object->campaign['currencyPos']) ? $object->campaign['currencyPos'] : 'before';
 $donation_label  = !empty( $object->campaign['donationTitle'] ) ? $object->campaign['donationTitle'] : '';
 $donation_button_text  = !empty( $object->campaign['donationBtnTxt'] ) ? $object->campaign['donationBtnTxt'] : esc_attr__('Donate', 'wc-donation');
 $donation_button_color  = !empty( $object->campaign['donationBtnBgColor'] ) ? $object->campaign['donationBtnBgColor'] : '333333';
 $donation_button_text_color  = !empty( $object->campaign['donationBtnTxtColor'] ) ? $object->campaign['donationBtnTxtColor'] : 'FFFFFF';
+
+$tributeColor = $object->campaign['tributeColor'];
+$currencyBgColor = $object->campaign['currencyBgColor'];
+$currencySymbolColor = $object->campaign['currencySymbolColor'];
+
 $display_donation_type = !empty( $object->campaign['DonationDispType'] ) ? $object->campaign['DonationDispType'] : 'select';
 
 $RecurringDisp = !empty( $object->campaign['RecurringDisp'] ) ? $object->campaign['RecurringDisp'] : 'disabled';
@@ -46,12 +54,12 @@ $progressOnWidget = !empty( $object->goal['show_on_widget'] ) ? $object->goal['s
 $donation_tributes = get_option( 'wc-donation-tributes' );
 $all_tributes = !empty( $object->campaign['tributes'] ) ? $object->campaign['tributes'] : array();
 $donation_gift_aid = get_option( 'wc-donation-gift-aid' );
-
+$setTimerDonation = WcDonation::setTimerDonation($object);
 // var_dump(get_option( 'wc-donation-gift-aid-area', array() ));
 
-if ( !is_array( get_option( 'wc-donation-gift-aid-area', array() ) ) ) {	
+if ( !is_array( get_option( 'wc-donation-gift-aid-area', array() ) ) ) {
 	$donation_gift_aid_area[] = get_option( 'wc-donation-gift-aid-area', array() );
-} else {	
+} else {
 	$donation_gift_aid_area = get_option( 'wc-donation-gift-aid-area', array() );
 }
 
@@ -64,6 +72,7 @@ $is_cart = is_cart();
 $is_checkout = is_checkout();
 
 $blocks = ( is_array($object->campaign['ordering']) && count($object->campaign['ordering']) > 0 ) ? $object->campaign['ordering'] : array(
+	'description',
 	'amount',
 	'cause',
 	'tribute',
@@ -72,7 +81,7 @@ $blocks = ( is_array($object->campaign['ordering']) && count($object->campaign['
 	'subscription',
 	'main-goal',
 	'button',
-	'extra-fee-summary'
+	'extra-fee-summary',
 );
 
 
@@ -90,12 +99,13 @@ if ( empty( $donation_product ) || empty($post_exist) || ( isset($post_exist->po
 	$result = wc_add_notice($message, $notice_type); 
 	return $result;
 }
+$social_share = isset( $object->campaign['social_share'] ) ? $object->campaign['social_share'] : false;
 
 if ( 'enabled' === $goalDisp && 'enabled' === $closeForm ) {
 	$progress = 0;
 
 	if ( 'fixed_amount' === $goalType || 'percentage_amount' === $goalType  ) { 
-		$fixedAmount = !empty( $object->goal['fixed_amount'] ) ? $object->goal['fixed_amount'] : 0;		
+		$fixedAmount = !empty( $object->goal['fixed_amount'] ) ? $object->goal['fixed_amount'] : 0;
 		if ( $fixedAmount > 0 ) {
 			$progress = ( $get_donations['total_donation_amount']/$fixedAmount ) * 100;
 		}
@@ -144,242 +154,242 @@ if ( 'enabled' === $goalDisp && 'enabled' === $closeForm ) {
 
 	<?php
 	if ( 'before' === $where_currency_symbole ) {
-		if ( 'checkout' == $type ) {
+		if ( 'checkout' == $_type ) {
 			?>
 			#wc_donation_on_checkout .price-wrapper::before {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 			<?php
 		}
 
-		if ( 'cart' == $type ) {
+		if ( 'cart' == $_type ) {
 			?>
 			#wc_donation_on_cart .price-wrapper::before {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 			<?php
 		}
 
-		if ( 'widget' == $type ) {
+		if ( 'widget' == $_type ) {
 			?>
 			#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> .price-wrapper::before {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 			
 			<?php
 		}
 
-		if ( 'shortcode' == $type ) {
+		if ( 'shortcode' == $_type ) {
 			?>
 			#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> .price-wrapper::before {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 
 			<?php
 		}
 
-		if ( 'single' == $type ) {
+		if ( 'single' == $_type ) {
 			?>
 			#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> .price-wrapper::before {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 
 			<?php
 		}
 	} else {
-		if ( 'checkout' == $type ) {
+		if ( 'checkout' == $_type ) {
 			?>
 			#wc_donation_on_checkout .price-wrapper::after {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 			<?php
 		}
 
-		if ( 'cart' == $type ) {
+		if ( 'cart' == $_type ) {
 			?>
 			#wc_donation_on_cart .price-wrapper::after {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 			<?php
 		}
 
-		if ( 'widget' == $type ) {
+		if ( 'widget' == $_type ) {
 			?>
 			#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> .price-wrapper::after {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 			
 			<?php
 		}
 
-		if ( 'shortcode' == $type ) {
+		if ( 'shortcode' == $_type ) {
 			?>
 			#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> .price-wrapper::after {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 			<?php
 		}
 		
-		if ( 'single' == $type ) {
+		if ( 'single' == $_type ) {
 			?>
 			#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> .price-wrapper::after {
-				background: #<?php esc_html_e( $donation_button_color ); ?>;
-				color: #<?php esc_html_e( $donation_button_text_color ); ?>;
+				background: #<?php esc_html_e( $currencyBgColor ); ?>;
+				color: #<?php esc_html_e( $currencySymbolColor ); ?>
 			}
 			<?php
 		}
 	} 
 
-	if ( 'checkout' == $type ) {
+	if ( 'checkout' == $_type ) {
 		?>
 		#wc_donation_on_checkout .wc-input-text {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 
 		#wc_donation_on_checkout .checkmark {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $tributeColor ); ?>!important
 		}
 		#wc_donation_on_checkout .wc-label-radio input:checked ~ .checkmark {
-			background-color: #<?php esc_html_e( $donation_button_color); ?>;
+			background-color: #<?php esc_html_e( $tributeColor); ?>
 		}
 		#wc_donation_on_checkout .wc-label-radio .checkmark:after {
-			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_checkout .wc-label-button {
 			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 		#wc_donation_on_checkout label.wc-label-button.wc-active {
 			background-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_checkout .wc_progressBarContainer > ul > li.wc_progress div.progressbar {
-			background: #<?php esc_html_e( $progressBarColor ); ?>;
+			background: #<?php esc_html_e( $progressBarColor ); ?>
 		}
 		<?php
 	}
 
-	if ( 'cart' == $type ) {
+	if ( 'cart' == $_type ) {
 		?>
 		#wc_donation_on_cart .wc-input-text {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 
 		#wc_donation_on_cart .checkmark {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $tributeColor ); ?>!important
 		}
 		#wc_donation_on_cart .wc-label-radio input:checked ~ .checkmark {
-			background-color: #<?php esc_html_e( $donation_button_color); ?>;
+			background-color: #<?php esc_html_e( $tributeColor); ?>
 		}
 		#wc_donation_on_cart .wc-label-radio .checkmark:after {
-			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_cart .wc-label-button {
 			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 		#wc_donation_on_cart label.wc-label-button.wc-active {
 			background-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_cart .wc_progressBarContainer > ul > li.wc_progress div.progressbar {
-			background: #<?php esc_html_e( $progressBarColor ); ?>;
+			background: #<?php esc_html_e( $progressBarColor ); ?>
 		}
 		<?php
 	}
 
-	if ( 'widget' == $type ) {
+	if ( 'widget' == $_type ) {
 		?>
 		#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> .wc-input-text {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 
 		#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> .checkmark {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $tributeColor ); ?>!important
 		}
 		#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> .wc-label-radio input:checked ~ .checkmark {
-			background-color: #<?php esc_html_e( $donation_button_color); ?>;
+			background-color: #<?php esc_html_e( $tributeColor); ?>
 		}
 		#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> .wc-label-radio .checkmark:after {
-			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> .wc-label-button {
 			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 		#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> label.wc-label-button.wc-active {
 			background-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_widget_<?php echo esc_attr($campaign_id); ?> .wc_progressBarContainer > ul > li.wc_progress div.progressbar {
-			background: #<?php esc_html_e( $progressBarColor ); ?>;
+			background: #<?php esc_html_e( $progressBarColor ); ?>
 		}
 		<?php
 	}
 
-	if ( 'shortcode' == $type ) {
+	if ( 'shortcode' == $_type ) {
 		?>
 		#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> .wc-input-text {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 
 		#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> .checkmark {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $tributeColor ); ?>!important
 		}
 		#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> .wc-label-radio input:checked ~ .checkmark {
-			background-color: #<?php esc_html_e( $donation_button_color); ?>;
+			background-color: #<?php esc_html_e( $tributeColor); ?>
 		}
 		#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> .wc-label-radio .checkmark:after {
-			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> .wc-label-button {
 			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 		#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> label.wc-label-button.wc-active {
 			background-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_shortcode_<?php echo esc_attr($campaign_id); ?> .wc_progressBarContainer > ul > li.wc_progress div.progressbar {
-			background: #<?php esc_html_e( $progressBarColor ); ?>;
+			background: #<?php esc_html_e( $progressBarColor ); ?>
 		}
 		<?php
 	}
 	
-	if ( 'single' == $type ) {
+	if ( 'single' == $_type ) {
 		?>
 		#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> .wc-input-text {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 
 		#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> .checkmark {
-			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			border-color: #<?php esc_html_e( $tributeColor ); ?>!important
 		}
 		#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> .wc-label-radio input:checked ~ .checkmark {
-			background-color: #<?php esc_html_e( $donation_button_color); ?>;
+			background-color: #<?php esc_html_e( $tributeColor); ?>
 		}
 		#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> .wc-label-radio .checkmark:after {
-			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			border-color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> .wc-label-button {
 			border-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_color ); ?>!important;
+			color: #<?php esc_html_e( $donation_button_color ); ?>!important
 		}
 		#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> label.wc-label-button.wc-active {
 			background-color: #<?php esc_html_e( $donation_button_color ); ?>!important;
-			color: #<?php esc_html_e( $donation_button_text_color); ?>!important;
+			color: #<?php esc_html_e( $donation_button_text_color); ?>!important
 		}
 		#wc_donation_on_single_<?php echo esc_attr($campaign_id); ?> .wc_progressBarContainer > ul > li.wc_progress div.progressbar {
-			background: #<?php esc_html_e( $progressBarColor ); ?>;
+			background: #<?php esc_html_e( $progressBarColor ); ?>
 		}
 		<?php
 	}
@@ -387,15 +397,24 @@ if ( 'enabled' === $goalDisp && 'enabled' === $closeForm ) {
 	?>
 </style>
 <div class="wc-donation-in-action" data-donation-type="<?php echo esc_attr($display_donation); ?>">
+	<div class="campaign-title">
+		<h4><?php echo esc_attr( get_the_title( $campaign_id ) ); ?></h4>
+	</div>	
+	<div class="block-campaign-thumbnail">
+		<?php if ( ! empty( get_the_post_thumbnail( $campaign_id, array( '160', '160' ) ) ) ) : ?>
+			<?php echo get_the_post_thumbnail( $campaign_id, array( '160', '160' ) ); ?>
+		<?php else : ?>
+			<img width="160" height="160" src="<?php echo esc_url( WC_DONATION_URL . 'assets/images/no-image-cart-campaign.png' ); ?>" class="attachment-160x160 size-160x160 wp-post-image">
+		<?php endif; ?>
+	</div>
 	<div class="in-action-elements">
 		<?php
 
 		if ( is_array( $blocks ) && count( $blocks ) > 0 ) {
 			foreach ( $blocks as $block ) {
-				require( WC_DONATION_PATH . 'includes/views/frontend/blocks/frontend-donation-' . $block . '-disp.php' );
+				require WC_DONATION_PATH . 'includes/views/frontend/blocks/frontend-donation-' . $block . '-disp.php';
 			}
 		}
-
 
 		/* Donation Tributes Block Start */
 		// require( WC_DONATION_PATH . 'includes/views/frontend/blocks/frontend-donation-amount-disp.php' );

@@ -1,3 +1,21 @@
+### 5.7.0 | 2025-06-02
+- Updated the API to return WP_Error instead of throwing an exception when an error occurs.
+- Deprecated GF_MailChimp_Exception.
+- AF: Updated process_feed() return value for compatibility with Gravity Forms 2.9.4, so the framework can save the feed status to the entry meta.
+
+### 5.6.0 | 2024-12-12
+- Fixed an issue where the List field passes the raw entry value to Mailchimp, instead of the expected comma-separated list of values.
+- Fixed code placement to be consistent with the WordPress coding standards.
+
+### 5.5.0 | 2024-09-23
+- Added support for instructing the Mailchimp API to skip merge field validation by using the [gform_mailchimp_subscription](https://docs.gravityforms.com/gform_mailchimp_subscription/) filter to add the `skip_merge_validation` argument to the request.
+- Updated the status indicator component to be compatible with Gravity Forms v2.8.8.
+- Removed the deprecated gform_mailchimp_args_pre_subscribe filter.
+
+### 5.4.0 | 2024-04-17
+- Fixed an issue where the status of an existing subscribed list/audience member changes to pending when double opt-in is enabled on the feed.
+- Reminder: The gform_mailchimp_args_pre_subscribe filter is deprecated and will be removed in a future version. Please use the [gform_mailchimp_subscription](https://docs.gravityforms.com/gform_mailchimp_subscription/) filter instead.
+
 ### 5.3.0 | 2024-02-29
 - Updated feed processing to include the tags in the request to the add/update member endpoint instead of making a separate request to the member tags endpoint.
 - Fixed an issue where an "Unable to add/update subscriber: Invalid Resource" error occurs when mapped field values include HTML entities.

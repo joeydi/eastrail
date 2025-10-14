@@ -1,14 +1,14 @@
 <?php
 $flag_for_widget_progress = false;
-		
-if ( 'widget' === $type && 'enabled' === $progressOnWidget ) {
+
+if ( 'widget' === $_type && 'enabled' === $progressOnWidget ) {
 	$flag_for_widget_progress = true;
 } 
 
-if ( 'widget' !== $type ) {
+if ( 'widget' !== $_type ) {
 	$flag_for_widget_progress = true;
 }
 
 if ( 'enabled' === $goalDisp && $flag_for_widget_progress ) {
-	require( WC_DONATION_PATH . 'includes/views/frontend/blocks/frontend-donation-goal-disp.php' );
+	require WC_DONATION_PATH . 'includes/views/frontend/blocks/frontend-donation-goal-disp.php' ;
 }

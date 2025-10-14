@@ -22,7 +22,7 @@ class WcdonationPdf {
 	/**
 	 * Add plugin menu page .
 	 */
-	public function __construct() {		
+	public function __construct() {     
 
 		$this->wc_donation_pdf = new DOMPDF();
 
@@ -61,7 +61,6 @@ class WcdonationPdf {
 		// $this->wc_donation_pdf_receipt();
 
 		// print_r( $this->wc_donation_pdf );
-
 	}
 
 	private function _create_pdf_name( $my_order = '' ) {
@@ -82,7 +81,7 @@ class WcdonationPdf {
 		return $file_name;
 	}
 
-	public function bulk_reports_download_pdf ( $report_ids = array(), $user_id = '' ) {		
+	public function bulk_reports_download_pdf( $report_ids = array(), $user_id = '' ) {        
 
 		if ( ! empty( $user_id ) ) {
 			$args = array(
@@ -98,8 +97,8 @@ class WcdonationPdf {
 						'key'     => 'user_id',
 						'value'   => $user_id,
 						'compare' => '=',
-					)
-				)
+					),
+				),
 			);
 
 			$report_ids = get_posts( $args );
@@ -107,7 +106,7 @@ class WcdonationPdf {
 
 		if ( is_array( $report_ids ) && count( $report_ids ) > 0 ) {
 
-			ob_start();			
+			ob_start();         
 			if ( file_exists( get_stylesheet_directory() . '/donation/views/report_bulk_pdf.php' ) ) {
 				include get_stylesheet_directory() . '/donation/views/report_bulk_pdf.php';
 			} else {
@@ -134,7 +133,7 @@ class WcdonationPdf {
 			include get_stylesheet_directory() . '/donation/views/report_single_pdf.php';
 		} else {
 			include WC_DONATION_PATH . 'includes/views/admin/report_single_pdf.php';
-		}		
+		}       
 		$output = ob_get_clean();
 		// loading html for pdf
 		$this->wc_donation_pdf->loadHtml( $output, 'UTF-8' );
@@ -181,5 +180,4 @@ class WcdonationPdf {
 
 		return $output_file;
 	}
-
 }

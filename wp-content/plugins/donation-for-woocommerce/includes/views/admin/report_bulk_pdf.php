@@ -17,8 +17,7 @@ $message = apply_filters( 'wc_donation_change_pdf_message', esc_html__('Thank yo
 do_action( 'wc_donation_before_pdf_details' );
 ?>
 <p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo esc_html__('Please find the donation transactions', 'wc-donation'); ?></p>
-<p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo esc_html( $message ); ?></p>
-<table style="width: 100%;background-color: #ffffff;border-collapse: collapse;border-width: 1px;border-color: #00000f;border-style: solid;font-size:14px;">
+<table style="font-family: DejaVu Sans;width: 100%;background-color: #ffffff;border-collapse: collapse;border-width: 1px;border-color: #00000f;border-style: solid;font-size:14px;">
 	<?php
 	/**
 	* Filter.
@@ -35,6 +34,8 @@ do_action( 'wc_donation_before_pdf_details' );
 	?>
 	<thead style="background-color: <?php echo esc_attr( $bgColor ); ?>;color: <?php echo esc_attr( $txtColor ); ?>">
 		<tr>
+			<th style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html__( 'Fullname', 'wc-donation' ); ?></th>
+			<th style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html__( 'Address', 'wc-donation' ); ?></th>
 			<th style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html__( 'Campaign', 'wc-donation' ); ?></th>
 			<th style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html__( 'Amount', 'wc-donation' ); ?></th>
 			<th style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html__( 'Order ID', 'wc-donation' ); ?></th>
@@ -51,9 +52,9 @@ do_action( 'wc_donation_before_pdf_details' );
 			$order_id = get_post_meta( $report_id, 'order_id', true );
 			$product_id = get_post_meta( $report_id, 'product_id', true );
 			$my_order = wc_get_order( $order_id );
-			if ( is_object( $my_order ) ) {				
+			if ( is_object( $my_order ) ) {             
 				$currency = get_woocommerce_currency_symbol($my_order->get_currency());
-				foreach ( $my_order->get_items() as $item_id => $item ) {					    		
+				foreach ( $my_order->get_items() as $item_id => $item ) {                               
 					$donation_type = get_post_meta( $item->get_product_id(), 'is_wc_donation', true);
 					if ( ! empty($donation_type) && 'donation' == $donation_type && $item->get_product_id() == $product_id ) {
 						$campaign_id = wc_get_order_item_meta( $item_id, 'campaign_id', true );
@@ -62,6 +63,8 @@ do_action( 'wc_donation_before_pdf_details' );
 						$tribute = wc_get_order_item_meta( $item_id, 'tribute', true );
 						?>
 						<tr>
+							<td style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html( $my_order->get_formatted_billing_full_name() ); ?></td>
+							<td style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html( str_replace( '<br/>', ', ', $my_order->get_formatted_billing_address() ) ); ?></td>
 							<td style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html( get_the_title( $campaign_id  ) ); ?></td>
 							<td style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html( $currency . '' . $item->get_total() ); ?></td>
 							<td style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html( $my_order->get_id() ); ?></td>

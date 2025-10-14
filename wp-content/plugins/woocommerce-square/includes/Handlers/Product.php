@@ -155,24 +155,6 @@ class Product {
 
 					$variation->update_meta_data( self::SQUARE_VARIATION_ID_META_KEY, $catalog_variation->getId() );
 
-					/**
-					 * Allow overriding variation name during product import from Square
-					 *
-					 * @since 3.3.0
-					 *
-					 * @param string                             $variation_name Variation name to update.
-					 * @param \SquareConnect\Model\CatalogObject $catalog_variation Catalog item variation being imported.
-					 * @param \SquareConnect\Model\CatalogItem   $catalog_item Catalog item being imported.
-					 * @param \WC_Product_Variation              $variation Variation being updated.
-					 * @return false|string String to override the variation name, false to disable updating
-					 *                      and keep existing name.
-					 * @since 3.3.0
-					 */
-					$variation_name = apply_filters( 'wc_square_update_product_set_variation_name', $catalog_variation->getItemVariationData()->getName(), $catalog_variation, $catalog_item, $variation );
-					if ( false !== $variation_name ) {
-						$variation->set_name( $variation_name );
-					}
-
 					self::update_price_money( $variation, $catalog_variation );
 
 					if ( $with_inventory && wc_square()->get_settings_handler()->is_inventory_sync_enabled() ) {
@@ -248,7 +230,8 @@ class Product {
 			$product->set_description( $product_description );
 		}
 
-		$category_id = Category::get_category_id_by_square_id( $catalog_item->getCategoryId() );
+		$square_category_id = Category::get_square_category_id( $catalog_item );
+		$category_id        = Category::get_category_id_by_square_id( $square_category_id );
 
 		if ( $category_id ) {
 			wp_set_object_terms( $product->get_id(), intval( $category_id ), 'product_cat' );
@@ -256,7 +239,7 @@ class Product {
 			$message = sprintf(
 				/* translators: Placeholder: %s category ID */
 				__( 'Square category with id (%s) was not imported to your Store. Please run Import Products from Square settings.', 'woocommerce-square' ),
-				$catalog_item->getCategoryId()
+				$square_category_id
 			);
 
 			$records = Records::get_records();
@@ -433,7 +416,7 @@ class Product {
 		$square_id = $product->get_meta( self::SQUARE_VARIATION_ID_META_KEY );
 
 		if ( ! $square_id ) {
-			throw new \Exception( __( 'Product not synced with Square', 'woocommerce-square' ) );
+			throw new \Exception( esc_html__( 'Product not synced with Square', 'woocommerce-square' ) );
 		}
 
 		// if saving the product, flag as syncing so updating the stock won't trigger another sync
@@ -461,13 +444,15 @@ class Product {
 			}
 		}
 
-		$is_inventory_tracking = isset( $inventory_tracking[ $square_id ] ) ? $inventory_tracking[ $square_id ] : true;
+		$inventory_tracking_data = $inventory_tracking[ $square_id ] ?? array();
+		$is_inventory_tracking   = $inventory_tracking_data['track_inventory'] ?? true;
+		$sold_out                = $inventory_tracking_data['sold_out'] ?? false;
 
 		if ( $is_inventory_tracking ) {
 			$product->set_manage_stock( true );
 			$product->set_stock_quantity( $stock );
 		} else {
-			$product->set_stock_status( 'instock' );
+			$product->set_stock_status( $sold_out ? 'outofstock' : 'instock' );
 			$product->set_manage_stock( false );
 		}
 
@@ -511,9 +496,11 @@ class Product {
 			$inventory_tracking = Helper::get_catalog_inventory_tracking( $response->get_data()->getObjects() );
 
 			foreach ( $response->get_data()->getObjects() as $catalog_object ) {
-				$square_id             = $catalog_object->getId();
-				$stock                 = $inventory_hash[ $square_id ] ?? 0;
-				$is_inventory_tracking = isset( $inventory_tracking[ $square_id ] ) ? $inventory_tracking[ $square_id ] : true;
+				$square_id               = $catalog_object->getId();
+				$stock                   = $inventory_hash[ $square_id ] ?? 0;
+				$inventory_tracking_data = $inventory_tracking[ $square_id ] ?? array();
+				$is_inventory_tracking   = $inventory_tracking_data['track_inventory'] ?? true;
+				$sold_out                = $inventory_tracking_data['sold_out'] ?? false;
 
 				$product_id = $products_map[ $square_id ]['product_id'];
 				$product    = wc_get_product( $product_id );
@@ -526,7 +513,7 @@ class Product {
 					$product->set_manage_stock( true );
 					$product->set_stock_quantity( $stock );
 				} else {
-					$product->set_stock_status( 'instock' );
+					$product->set_stock_status( $sold_out ? 'outofstock' : 'instock' );
 					$product->set_manage_stock( false );
 				}
 
@@ -1622,7 +1609,7 @@ class Product {
 	 * @param \WC_Product|\WC_Product_Variation $product
 	 * @param \Square\Models\CatalogObject $catalog_variation
 	 */
-	private static function update_price_money( $product, \Square\Models\CatalogObject $catalog_variation ) {
+	public static function update_price_money( $product, \Square\Models\CatalogObject $catalog_variation ) {
 		$location_overrides = $catalog_variation->getItemVariationData()->getLocationOverrides();
 
 		if ( is_null( $location_overrides ) ) {
@@ -1656,13 +1643,12 @@ class Product {
 	 */
 	public static function get_parent_product_id_by_variation_id( $variation_id ) {
 		global $wpdb;
-
 		return $wpdb->get_var(
 			$wpdb->prepare(
 				"
 				SELECT pr.post_parent
-				FROM wp_posts pr
-				INNER JOIN wp_posts pp ON pp.ID = pr.post_parent
+				FROM {$wpdb->prefix}posts pr
+				INNER JOIN {$wpdb->prefix}posts pp ON pp.ID = pr.post_parent
 				WHERE pr.ID=%d AND pr.post_type IN ('product', 'product_variation') AND pp.post_type = 'product';
 				",
 				$variation_id
@@ -1675,7 +1661,7 @@ class Product {
 	 *
 	 * @since 4.2.0
 	 *
-	 * @param WC_Product $product WooCommerce product.
+	 * @param \WC_Product $product WooCommerce product.
 	 *
 	 * @return bool
 	 */
@@ -1686,6 +1672,10 @@ class Product {
 
 		if ( $product->is_type( 'variation' ) ) {
 			$product = wc_get_product( $product->get_parent_id() );
+		}
+
+		if ( ! $product instanceof \WC_Product ) {
+			return false;
 		}
 
 		return $product->meta_exists( self::SQUARE_GIFT_CARD_KEY ) && 'yes' === $product->get_meta( self::SQUARE_GIFT_CARD_KEY, true );

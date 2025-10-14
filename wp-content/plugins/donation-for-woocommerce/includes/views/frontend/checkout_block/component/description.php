@@ -1,0 +1,1 @@
+<p class="description"><?php esc_attr_e( strip_tags( $camaign_description ) ); ?></p>

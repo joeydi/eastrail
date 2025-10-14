@@ -121,7 +121,7 @@ if ( ! class_exists( '\SafeSVG\Optimizer' ) ) {
 			wp_enqueue_script(
 				'safe-svg-admin-scripts',
 				SAFE_SVG_PLUGIN_URL . 'dist/safe-svg-admin.js',
-				[ 'wp-data', 'utils' ],
+				[ 'wp-data', 'wp-editor', 'utils' ],
 				SAFE_SVG_VERSION,
 				true
 			);
@@ -155,7 +155,11 @@ if ( ! class_exists( '\SafeSVG\Optimizer' ) ) {
 			$svg_id        = filter_input( INPUT_GET, 'svg_id', FILTER_SANITIZE_NUMBER_INT );
 			$attachment_id = ! empty( $svg_id ) ? $svg_id : attachment_url_to_postid( $svg_url );
 
-			if ( empty( $attachment_id ) || ! current_user_can( 'edit_post', $attachment_id ) ) {
+			if (
+				empty( $_GET['optimized_svg'] ) ||
+				empty( $attachment_id ) ||
+				! current_user_can( 'edit_post', $attachment_id )
+			) {
 				return;
 			}
 
@@ -166,10 +170,10 @@ if ( ! class_exists( '\SafeSVG\Optimizer' ) ) {
 				return;
 			}
 
-			$maybe_dirty = $_GET['optimized_svg'];
+			$maybe_dirty = stripcslashes( $_GET['optimized_svg'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 			$sanitizer   = new Sanitizer();
 			$sanitizer->minify( true );
-			$sanitized = $sanitizer->sanitize( stripcslashes( $maybe_dirty ) );
+			$sanitized = $sanitizer->sanitize( $maybe_dirty );
 
 			if ( empty( $sanitized ) ) {
 				return;

@@ -3,7 +3,7 @@
  * Donation goal HTML
  */
 
-$goalDisp = !empty( get_post_meta ( $this->campaign_id, 'wc-donation-goal-display-option', true  ) ) ? get_post_meta ( $this->campaign_id, 'wc-donation-goal-display-option', true  ) : 'disabled'; 
+$goalDisp = !empty( get_post_meta ( $this->campaign_id, 'wc-donation-goal-display-option', true  ) ) ? get_post_meta ( $this->campaign_id, 'wc-donation-goal-display-option', true  ) : 'disabled';
 $goalType = !empty( get_post_meta ( $this->campaign_id, 'wc-donation-goal-display-type', true  ) ) ? get_post_meta ( $this->campaign_id, 'wc-donation-goal-display-type', true  ) : 'fixed_amount';
 $fixedAmount = !empty( get_post_meta ( $this->campaign_id, 'wc-donation-goal-fixed-amount-field', true  ) ) ? get_post_meta ( $this->campaign_id, 'wc-donation-goal-fixed-amount-field', true  ) : '';
 $fixedInitialAmount = !empty( get_post_meta ( $this->campaign_id, 'wc-donation-goal-fixed-initial-amount-field', true  ) ) ? get_post_meta ( $this->campaign_id, 'wc-donation-goal-fixed-initial-amount-field', true  ) : '';
@@ -77,7 +77,7 @@ $progressOnWidget = !empty( get_post_meta ( $this->campaign_id, 'wc-donation-pro
 
 <div class="select-wrapper wc-donation-goal-target" id="blk_fixed_amount">
 	<label class="wc-donation-label" for="wc-donation-goal-fixed-amount-field"><?php echo esc_attr( __( 'Goal Amount', 'wc-donation' ) ); ?></label>
-	<input type="number" id="wc-donation-goal-fixed-amount-field" Placeholder="<?php echo esc_html__('Enter Goal Amount', 'wc-donation'); ?>" name="wc-donation-goal-fixed-amount-field" value="<?php echo esc_attr($fixedAmount); ?>">
+	<input type="number" id="wc-donation-goal-fixed-amount-field" Placeholder="<?php echo esc_html__('Enter Goal Amount', 'wc-donation'); ?>" name="wc-donation-goal-fixed-amount-field" min="1" value="<?php echo esc_attr($fixedAmount); ?>">
 	<div class="wc-donation-tooltip-box">
 		<small class="wc-donation-tooltip">Enter amount without symbol.</small>
 	</div>
@@ -85,7 +85,7 @@ $progressOnWidget = !empty( get_post_meta ( $this->campaign_id, 'wc-donation-pro
 
 <div class="select-wrapper wc-donation-goal-target" id="blk_fixed_initial_amount">
 	<label class="wc-donation-label" for="wc-donation-goal-fixed-initial-amount-field"><?php echo esc_attr( __( 'Initial Goal Amount', 'wc-donation' ) ); ?></label>
-	<input type="number" id="wc-donation-goal-fixed-initial-amount-field" Placeholder="<?php echo esc_html__('Enter Initial Goal Amount', 'wc-donation'); ?>" name="wc-donation-goal-fixed-initial-amount-field" value="<?php echo esc_attr($fixedInitialAmount); ?>">
+	<input type="number" id="wc-donation-goal-fixed-initial-amount-field" Placeholder="<?php echo esc_html__('Enter Initial Goal Amount', 'wc-donation'); ?>" name="wc-donation-goal-fixed-initial-amount-field" min="1" value="<?php echo esc_attr($fixedInitialAmount); ?>">
 	<div class="wc-donation-tooltip-box">
 		<small class="wc-donation-tooltip">Enter amount without symbol.</small>
 	</div>
@@ -93,7 +93,7 @@ $progressOnWidget = !empty( get_post_meta ( $this->campaign_id, 'wc-donation-pro
 
 <div class="select-wrapper wc-donation-goal-target" id="blk_no_of_donation">
 	<label class="wc-donation-label" for="wc-donation-goal-no-of-donation-field"><?php echo esc_attr( __( 'No. of Donations', 'wc-donation' ) ); ?></label>
-	<input type="text" id="wc-donation-goal-no-of-donation-field" Placeholder="<?php echo esc_html__('Enter No. of Donations', 'wc-donation'); ?>" name="wc-donation-goal-no-of-donation-field" value="<?php echo esc_attr($no_of_donation); ?>">
+	<input type="number" id="wc-donation-goal-no-of-donation-field" Placeholder="<?php echo esc_html__('2113Enter No. of Donations', 'wc-donation'); ?>" name="wc-donation-goal-no-of-donation-field" min="1" value="<?php echo esc_attr($no_of_donation); ?>">
 	<div class="wc-donation-tooltip-box">
 		<small class="wc-donation-tooltip">Enter number of donation you want.</small>
 	</div>

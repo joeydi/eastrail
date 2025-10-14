@@ -4,16 +4,26 @@ namespace WooCommerce\Square\Gateway;
 
 defined( 'ABSPATH' ) || exit;
 
-use WooCommerce\Square\Framework\Square_Helper;
-use WooCommerce\Square\Handlers\Product;
 use WooCommerce\Square\Plugin;
+use WooCommerce\Square\Framework\Square_Helper;
+use WooCommerce\Square\Handlers\Products;
+use WooCommerce\Square\Handlers\Product;
 use WooCommerce\Square\Utilities\Money_Utility;
+use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway;
+use WooCommerce\Square\Gateway;
 
-class Gift_Card {
+class Gift_Card extends Payment_Gateway {
 	/**
-	 * @var \WooCommerce\Square\Gateway $gateway
+	 * Square settings option name.
+	 *
+	 * @var string
 	 */
-	public $gateway = null;
+	const SQUARE_PAYMENT_SETTINGS_OPTION_NAME = 'woocommerce_gift_cards_pay_settings';
+
+	/**
+	 * @var API API base instance
+	 */
+	private $api;
 
 	/**
 	 * Checks if Gift Card is enabled.
@@ -22,20 +32,27 @@ class Gift_Card {
 	 * @return bool
 	 */
 	public function is_gift_card_enabled() {
-		return 'yes' === $this->gateway->get_option( 'enable_gift_cards', 'no' );
+		return 'yes' === $this->get_option( 'enabled', 'no' );
 	}
 
 	/**
 	 * Setup the Gift Card class
 	 *
-	 * @param \WooCommerce\Square\Gateway $gateway The payment gateway object.
 	 * @since 3.7.0
 	 */
-	public function __construct( $gateway ) {
-		$this->gateway = $gateway;
+	public function __construct() {
+		parent::__construct(
+			Plugin::GIFT_CARD_PAY_GATEWAY_ID,
+			wc_square(),
+			array(
+				'method_title'       => __( 'Gift Cards (Square)', 'woocommerce-square' ),
+				'method_description' => $this->get_default_description(),
+				'payment_type'       => self::PAYMENT_TYPE_GIFT_CARD_PAY,
+			)
+		);
 
-		add_action( 'wp', array( $this, 'init_gift_cards' ) );
-		add_action( 'init', array( $this, 'add_gift_card_image_placeholder' ) );
+		add_action( 'wc_square_woocommerce_gift_cards_pay_settings_settings_updated', array( $this, 'add_gift_card_image_placeholder' ) );
+		add_action( 'delete_attachment', array( $this, 'delete_gift_card_image_placeholder' ) );
 		add_action( 'wp_ajax_wc_square_check_gift_card_balance', array( $this, 'apply_gift_card' ) );
 		add_action( 'wp_ajax_nopriv_wc_square_check_gift_card_balance', array( $this, 'apply_gift_card' ) );
 		add_action( 'wp_ajax_wc_square_gift_card_remove', array( $this, 'remove_gift_card' ) );
@@ -45,21 +62,126 @@ class Gift_Card {
 	}
 
 	/**
-	 * Loads resources required for the Gift Card feature.
+	 * Returns true if the gateway is properly configured to perform transactions
 	 *
-	 * @since 3.7.0
+	 * @since 4.7.0
+	 *
+	 * @return boolean true if the gateway is properly configured
 	 */
-	public function init_gift_cards() {
-		// Return if Gateway or Gift Card is not enabled.
-		if ( ! ( 'yes' === $this->gateway->get_option( 'enabled', 'no' ) && $this->is_gift_card_enabled() ) ) {
-			return;
+	public function is_configured() {
+		// Always false for Gift Cards to hide on the checkout page.
+		return false;
+	}
+
+	/**
+	 * Gets the API instance.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @return Gateway\API
+	 */
+	public function get_api() {
+		if ( ! $this->api ) {
+			$settings  = $this->get_plugin()->get_settings_handler();
+			$this->api = new Gateway\API( $settings->get_access_token(), $settings->get_location_id(), $settings->is_sandbox() );
+			$this->api->set_api_id( $this->get_id() );
 		}
 
-		if ( ! self::does_checkout_support_gift_card() ) {
-			return;
+		return $this->api;
+	}
+
+
+	/**
+	 * Gets the configured application ID.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @return string application ID
+	 */
+	public function get_application_id() {
+		$square_application_id = 'sq0idp-wGVapF8sNt9PLrdj5znuKA';
+
+		if ( $this->get_plugin()->get_settings_handler()->is_sandbox() ) {
+			$square_application_id = $this->get_plugin()->get_settings_handler()->get_option( 'sandbox_application_id' );
 		}
 
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		/**
+		 * Filters the configured application ID.
+		 *
+		 * @since 4.5.0
+		 *
+		 * @param string $application_id application ID
+		 */
+		return apply_filters( 'wc_square_application_id', $square_application_id );
+	}
+
+	/**
+	 * Gets the gateway settings fields.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @return array
+	 */
+	protected function get_method_form_fields() {
+		return array();
+	}
+
+	/**
+	 * Initialize payment tokens handler.
+	 *
+	 * @since 4.7.0
+	 */
+	protected function init_payment_tokens_handler() {
+		// No payment tokens for Gift Cards Pay, do nothing.
+	}
+
+	/**
+	 * Get the default payment method title, which is configurable within the
+	 * admin and displayed on checkout.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @return string payment method title to show on checkout
+	 */
+	protected function get_default_title() {
+		return esc_html__( 'Square Gift Cards', 'woocommerce-square' );
+	}
+
+	/**
+	 * Get the default payment method description, which is configurable
+	 * within the admin and displayed on checkout.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @return string payment method description to show on checkout
+	 */
+	protected function get_default_description() {
+		return esc_html__( 'Allow customers to purchase and redeem gift cards during checkout.', 'woocommerce-square' );
+	}
+
+	/**
+	 * Initialize payment gateway settings fields
+	 *
+	 * @since 4.7.0
+	 *
+	 * @see WC_Settings_API::init_form_fields()
+	 */
+	public function init_form_fields() {
+		$this->form_fields = array();
+	}
+
+	/**
+	 * Performs a credit card transaction for the given order and returns the result.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @param WC_Order_Square     $order the order object
+	 * @param Create_Payment|null $response optional credit card transaction response
+	 * @return Create_Payment     the response
+	 * @throws \Exception network timeouts, etc
+	 */
+	protected function do_payment_method_transaction( $order, $response = null ) {
+		return false;
 	}
 
 	/**
@@ -88,8 +210,12 @@ class Gift_Card {
 	 *
 	 * @since 4.2.0
 	 */
-	public function add_gift_card_image_placeholder() {
-		$placeholder_image = get_option( 'wc_square_gift_card_placeholder_id', false );
+	public function add_gift_card_image_placeholder( $settings ) {
+		if ( ! \WooCommerce\Square\Handlers\Products::should_use_default_gift_card_placeholder_image() ) {
+			return;
+		}
+
+		$placeholder_image = Products::get_gift_card_default_placeholder_id();
 
 		if ( ! empty( $placeholder_image ) ) {
 			if ( ! is_numeric( $placeholder_image ) ) {
@@ -100,7 +226,7 @@ class Gift_Card {
 		}
 
 		$upload_dir = wp_upload_dir();
-		$source     = WC_SQUARE_PLUGIN_PATH . '/assets/images/gift-card-featured-image.png';
+		$source     = WC_SQUARE_PLUGIN_PATH . '/build/images/gift-card-featured-image.png';
 		$filename   = $upload_dir['basedir'] . '/wc-square-gift-card-placeholder.png';
 
 		if ( ! file_exists( $filename ) ) {
@@ -108,7 +234,8 @@ class Gift_Card {
 		}
 
 		if ( ! file_exists( $filename ) ) {
-			update_option( 'wc_square_gift_card_placeholder_id', 0 );
+			$settings['placeholder_id'] = 0;
+			update_option( self::SQUARE_PAYMENT_SETTINGS_OPTION_NAME, $settings );
 			return;
 		}
 
@@ -124,11 +251,13 @@ class Gift_Card {
 		$attach_id = wp_insert_attachment( $attachment, $filename );
 
 		if ( is_wp_error( $attach_id ) ) {
-			update_option( 'wc_square_gift_card_placeholder_id', 0 );
+			$settings['placeholder_id'] = 0;
+			update_option( self::SQUARE_PAYMENT_SETTINGS_OPTION_NAME, $settings );
 			return;
 		}
 
-		update_option( 'wc_square_gift_card_placeholder_id', $attach_id );
+		$settings['placeholder_id'] = $attach_id;
+		update_option( self::SQUARE_PAYMENT_SETTINGS_OPTION_NAME, $settings );
 
 		// Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
 		require_once ABSPATH . 'wp-admin/includes/image.php';
@@ -136,6 +265,30 @@ class Gift_Card {
 		// Generate the metadata for the attachment, and update the database record.
 		$attach_data = wp_generate_attachment_metadata( $attach_id, $filename );
 		wp_update_attachment_metadata( $attach_id, $attach_data );
+	}
+
+	/**
+	 * Disables the `Gift card product placeholder image` setting when the
+	 * gift card placeholder image is deleted from the library.
+	 *
+	 * @since 4.8.1
+	 *
+	 * @param int $post_id Attachment ID of the media being deleted.
+	 */
+	public function delete_gift_card_image_placeholder( $post_id ) {
+		$attachment_id      = Products::get_gift_card_default_placeholder_id();
+		$gift_card_settings = get_option( self::SQUARE_PAYMENT_SETTINGS_OPTION_NAME, array() );
+
+		if ( $attachment_id !== $post_id ) {
+			return;
+		}
+
+		if ( isset( $gift_card_settings['is_default_placeholder'] ) && 'yes' === $gift_card_settings['is_default_placeholder'] ) {
+			$gift_card_settings['is_default_placeholder'] = 'no';
+			$gift_card_settings['placeholder_id']         = 0;
+
+			update_option( self::SQUARE_PAYMENT_SETTINGS_OPTION_NAME, $gift_card_settings );
+		}
 	}
 
 	/**
@@ -168,7 +321,7 @@ class Gift_Card {
 	 * @return boolean
 	 */
 	public static function cart_contains_upon_release_pre_order() {
-		if ( ! class_exists( '\WC_Pre_Orders_Cart' ) ) {
+		if ( ! class_exists( '\WC_Pre_Orders_Cart' ) || ! class_exists( '\WC_Pre_Orders_Product' ) ) {
 			return false;
 		}
 
@@ -188,6 +341,18 @@ class Gift_Card {
 	 * @since 3.7.0
 	 */
 	public function enqueue_scripts() {
+		$settings = get_option( 'woocommerce_square_credit_card_settings', array() );
+		$enabled  = isset( $settings['enabled'] ) ? $settings['enabled'] : 'no';
+
+		// Return if Credit Card Gateway or Gift Card is not enabled.
+		if ( ! ( 'yes' === $enabled && $this->is_gift_card_enabled() ) ) {
+			return;
+		}
+
+		if ( ! self::does_checkout_support_gift_card() ) {
+			return;
+		}
+
 		/**
 		 * Hook to filter JS args for Gift cards.
 		 *
@@ -197,22 +362,22 @@ class Gift_Card {
 		$args = apply_filters(
 			'wc_square_gift_card_js_args',
 			array(
-				'applicationId'       => $this->gateway->get_application_id(),
+				'applicationId'       => $this->get_application_id(),
 				'locationId'          => wc_square()->get_settings_handler()->get_location_id(),
-				'gatewayId'           => $this->gateway->get_id(),
-				'gatewayIdDasherized' => $this->gateway->get_id_dasherized(),
+				'gatewayId'           => $this->get_id(),
+				'gatewayIdDasherized' => $this->get_id_dasherized(),
 				'generalError'        => __( 'An error occurred, please try again or try an alternate form of payment.', 'woocommerce-square' ),
 				'ajaxUrl'             => \WC_AJAX::get_endpoint( '%%endpoint%%' ),
 				'applyGiftCardNonce'  => wp_create_nonce( 'wc-square-apply-gift-card' ),
-				'logging_enabled'     => $this->gateway->debug_log(),
+				'logging_enabled'     => $this->debug_log(),
 				'orderId'             => absint( get_query_var( 'order-pay' ) ),
 			)
 		);
 
-		if ( is_checkout() || is_product() ) {
+		if ( is_checkout() || is_product() || has_block( 'woocommerce/single-product' ) ) {
 			wp_enqueue_script(
 				'wc-square-gift-card',
-				$this->gateway->get_plugin()->get_plugin_url() . '/assets/js/frontend/gift-card.min.js',
+				$this->get_plugin()->get_plugin_url() . '/build/assets/frontend/wc-square-gift-card.js',
 				array( 'jquery' ),
 				Plugin::VERSION,
 				true
@@ -221,10 +386,10 @@ class Gift_Card {
 			wc_enqueue_js( sprintf( 'window.wc_square_gift_card_handler = new WC_Square_Gift_Card_Handler( %s );', wp_json_encode( $args ) ) );
 		}
 
-		if ( is_checkout() || is_product() ) {
+		if ( is_checkout() || is_product() || has_block( 'woocommerce/single-product' ) ) {
 			wp_enqueue_style(
 				'wc-square-gift-card',
-				$this->gateway->get_plugin()->get_plugin_url() . '/assets/css/frontend/wc-square-gift-card.min.css',
+				$this->get_plugin()->get_plugin_url() . '/build/assets/frontend/wc-square-gift-card.css',
 				array(),
 				Plugin::VERSION
 			);
@@ -268,7 +433,7 @@ class Gift_Card {
 			}
 		} else {
 			if ( $payment_token ) {
-				$api_response   = $this->gateway->get_api()->retrieve_gift_card( $payment_token );
+				$api_response   = $this->get_api()->retrieve_gift_card( $payment_token );
 				$gift_card_data = $api_response->get_data();
 
 				if ( $gift_card_data instanceof \Square\Models\RetrieveGiftCardFromNonceResponse ) {
@@ -302,7 +467,9 @@ class Gift_Card {
 			}
 		}
 
-		$charge_type = $payment_token && ! $response['has_balance'] ? 'PARTIAL' : 'FULL';
+		$charge_type        = $payment_token && ! $response['has_balance'] ? 'PARTIAL' : 'FULL';
+		$available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
+		$cash_app_available = isset( $available_gateways[ plugin::CASH_APP_PAY_GATEWAY_ID ] );
 
 		ob_start();
 		?>
@@ -316,11 +483,19 @@ class Gift_Card {
 			<tbody>
 				<tr>
 					<td><?php esc_html_e( 'Gift card', 'woocommerce-square' ); ?></td>
-					<td><?php echo wc_price( $cart_total - $response['difference'], array( 'currency' => get_woocommerce_currency() ) ); ?></td>
+					<td><?php echo wc_price( $cart_total - $response['difference'], array( 'currency' => get_woocommerce_currency() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wc_price is already escaped ?></td>
 				</tr>
 				<tr>
-					<td><?php esc_html_e( 'Credit card', 'woocommerce-square' ); ?></td>
-					<td><?php echo wc_price( $response['difference'], array( 'currency', get_woocommerce_currency() ) ); ?></td>
+					<td>
+						<?php
+						if ( $cash_app_available ) {
+							esc_html_e( 'Credit card/Cash App Pay', 'woocommerce-square' );
+						} else {
+							esc_html_e( 'Credit card', 'woocommerce-square' );
+						}
+						?>
+					</td>
+					<td><?php echo wc_price( $response['difference'], array( 'currency', get_woocommerce_currency() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wc_price is already escaped ?></td>
 				</tr>
 			</tbody>
 		</table>
@@ -343,12 +518,12 @@ class Gift_Card {
 					if ( $response['is_error'] ) {
 						printf( esc_html__( 'There was an error while applying the gift card.', 'woocommerce-square' ) );
 					} else {
-						printf(
-							wp_kses_post(
+						echo wp_kses_post(
+							sprintf(
 								/* translators: %s - amount to be charged on the gift card. */
-								__( '%s will be applied from the gift card.', 'woocommerce-square' )
-							),
-							wc_price( $cart_total - $response['difference'], array( 'currency' => get_woocommerce_currency() ) )
+								__( '%s will be applied from the gift card.', 'woocommerce-square' ),
+								wc_price( $cart_total - $response['difference'], array( 'currency' => get_woocommerce_currency() ) )
+							)
 						);
 					}
 					?>
@@ -357,20 +532,21 @@ class Gift_Card {
 					<?php
 					if ( ! $response['is_error'] ) {
 						if ( $response['has_balance'] ) {
-							printf(
-								wp_kses_post(
+							echo wp_kses_post(
+								sprintf(
 									/* translators: %s - balance amount in the gift card after placing the order. */
-									__( 'The remaining gift card balance after placing this order will be <strong>%s</strong>', 'woocommerce-square' )
-								),
-								wc_price( $response['post_balance'], array( 'currency' => get_woocommerce_currency() ) )
+									__( 'The remaining gift card balance after placing this order will be <strong>%s</strong>', 'woocommerce-square' ),
+									wc_price( $response['post_balance'], array( 'currency' => get_woocommerce_currency() ) )
+								)
 							);
 						} else {
-							printf(
-								wp_kses_post(
-									/* translators: %s - remaining amount to be paid using the credit card. */
-									__( "Your gift card doesn't have enough funds to cover the order total. The remaining amount of <strong>%s</strong> would need to be paid with a credit card.", 'woocommerce-square' )
+							echo wp_kses_post(
+								sprintf(
+									/* translators: %1$s - remaining amount to be paid using the credit card or cash app pay; %2$s - payment method. */
+									__( "Your gift card doesn't have enough funds to cover the order total. The remaining amount of <strong>%1\$s</strong> would need to be paid with a %2\$s.", 'woocommerce-square' ),
+									wc_price( $response['difference'], array( 'currency' => get_woocommerce_currency() ) ),
+									$cash_app_available ? __( 'credit card or cash app pay', 'woocommerce-square' ) : __( 'credit card', 'woocommerce-square' ),
 								),
-								wc_price( $response['difference'], array( 'currency' => get_woocommerce_currency() ) )
 							);
 						}
 					}
@@ -437,7 +613,7 @@ class Gift_Card {
 	public function apply_gift_card() {
 		check_ajax_referer( 'wc-square-apply-gift-card', 'security' );
 
-		$payment_token = isset( $_POST['token'] ) ? wc_clean( wp_unslash( $_POST['token'] ) ) : false;
+		$payment_token = isset( $_POST['token'] ) ? wc_clean( wp_unslash( $_POST['token'] ) ) : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		if ( ! $payment_token ) {
 			wp_send_json_error();
@@ -476,8 +652,7 @@ class Gift_Card {
 	 * @return boolean
 	 */
 	public static function is_new() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return isset( $_POST['square-gift-card-buying-option'] ) ? 'new' === wc_clean( wp_unslash( $_POST['square-gift-card-buying-option'] ) ) : false;
+		return isset( $_POST['square-gift-card-buying-option'] ) ? 'new' === wc_clean( wp_unslash( $_POST['square-gift-card-buying-option'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	}
 
 	/**
@@ -488,7 +663,6 @@ class Gift_Card {
 	 * @return boolean
 	 */
 	public static function is_load() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		return isset( $_POST['square-gift-card-buying-option'] ) ? 'load' === wc_clean( wp_unslash( $_POST['square-gift-card-buying-option'] ) ) : false;
+		return isset( $_POST['square-gift-card-buying-option'] ) ? 'load' === wc_clean( wp_unslash( $_POST['square-gift-card-buying-option'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	}
 }

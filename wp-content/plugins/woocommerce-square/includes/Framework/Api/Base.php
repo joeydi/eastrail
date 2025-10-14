@@ -144,7 +144,7 @@ abstract class Base {
 
 		// check for WP HTTP API specific errors (network timeout, etc)
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( $response->get_error_message(), (int) $response->get_error_code() );
+			throw new \Exception( esc_html( $response->get_error_message() ), (int) $response->get_error_code() );
 		}
 
 		// set response data
@@ -264,7 +264,7 @@ abstract class Base {
 		$query = $this->get_request_query();
 		if ( $query ) {
 
-			$url_parts = parse_url( $uri );
+			$url_parts = parse_url( $uri ); // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
 
 			// if the URL already has some query params, add to them
 			if ( ! empty( $url_parts['query'] ) ) {
@@ -599,6 +599,26 @@ abstract class Base {
 	abstract protected function get_plugin();
 
 	/**
+	 * Set the Content-Type request header
+	 *
+	 * @since 4.6.3
+	 * @param string $content_type The request content type.
+	 */
+	protected function set_request_content_type_header( $content_type ) {
+		$this->request_headers['content-type'] = $content_type;
+	}
+
+	/**
+	 * Set the Accept request header
+	 *
+	 * @since 4.6.3
+	 * @param string $type The request accept type.
+	 */
+	protected function set_request_accept_header( $type ) {
+		$this->request_headers['accept'] = $type;
+	}
+
+	/**
 	 * Set the response handler class name. This class will be instantiated
 	 * to parse the response for the request.
 	 *
@@ -625,7 +645,7 @@ abstract class Base {
 			return;
 		}
 
-		curl_setopt( $handle, CURLOPT_SSLVERSION, 6 );
+		curl_setopt( $handle, CURLOPT_SSLVERSION, 6 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
 	}
 
 	/**

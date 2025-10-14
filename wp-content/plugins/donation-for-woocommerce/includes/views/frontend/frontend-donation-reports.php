@@ -23,29 +23,29 @@ if ( isset( $_REQUEST['clear_filter'] ) ) {
 				'key'     => 'user_id',
 				'value'   => $user_id,
 				'compare' => '=',
-			)
-		)		
+			),
+		),
 	);
 } elseif ( isset( $_REQUEST['year'] ) ) {
 	$active_year = 'active';
 	$this_year = gmdate('Y');
 	$date_query = array(
 		'column'  => 'post_date',
-		'year'   => $this_year
+		'year'   => $this_year,
 	);
 } elseif ( isset( $_REQUEST['last_month'] ) ) {
 	$active_last_month = 'active';
 	$last_month = gmdate('m', strtotime('last month') );
 	$date_query = array(
 		'column'  => 'post_date',
-		'month'   => $last_month
+		'month'   => $last_month,
 	);
 } elseif ( isset( $_REQUEST['this_month'] ) ) {
 	$active_this_month = 'active';
 	$this_month = gmdate('m');
 	$date_query = array(
 		'column'  => 'post_date',
-		'month'   => $this_month
+		'month'   => $this_month,
 	);
 } elseif ( isset( $_REQUEST['last_week'] ) ) {
 	$active_last_Week = 'active';
@@ -59,11 +59,10 @@ if ( isset( $_REQUEST['clear_filter'] ) ) {
 	);
 } elseif ( isset( $_REQUEST['DateFrom'] ) && isset( $_REQUEST['DateTo'] ) && isset( $_REQUEST['custom'] ) ) {
 	$date_query = array(
-		'column'  => 'post_date',
+		'column'  => 'post_date', // 'post_modified', 'post_date_gmt', 'post_modified_gmt'
 		'after' => sanitize_text_field( $_REQUEST['DateFrom'] ), // any strtotime()-acceptable format!
 		'before' => sanitize_text_field( $_REQUEST['DateTo'] ),
 		'inclusive' => true, // include the selected days as well
-		'column'    => 'post_date' // 'post_modified', 'post_date_gmt', 'post_modified_gmt'
 	);
 }
 
@@ -79,9 +78,9 @@ $args = array(
 			'key'     => 'user_id',
 			'value'   => $user_id,
 			'compare' => '=',
-		)
+		),
 	),
-	'date_query' => @$date_query
+	'date_query' => @$date_query,
 );
 
 $reports = get_posts( $args );
@@ -95,7 +94,7 @@ if ( is_array( $reports ) && count( $reports ) > 0 ) {
 		$donor_email = $my_order->get_billing_email();
 		$campaign_id = get_post_meta( $report_id, 'campaign_id', true );
 		$product_id = get_post_meta( $report_id, 'product_id', true );
-		$product = wc_get_product( $product_id );			
+		$product = wc_get_product( $product_id );
 		$product_sku = $product->get_sku();
 		$donation_amount = get_post_meta( $report_id, 'donation_amount', true );
 		$tribute = get_post_meta( $report_id, 'tribute', true );

@@ -25,7 +25,6 @@ $donation_button_cancel_text = !empty( get_option('wc-donation-round-button-canc
 
 $RecurringDisp = !empty( $object->campaign['RecurringDisp'] ) ? $object->campaign['RecurringDisp'] : 'disabled';
 
-
 if ( empty( $donation_product ) ) { 
 	$message = __('You have enabled donation on this page but didn\'t select campaign for it.', 'wc-donation');
 	$notice_type = 'error';

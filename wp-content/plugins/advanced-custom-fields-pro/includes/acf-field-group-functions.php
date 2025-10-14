@@ -1,4 +1,13 @@
 <?php
+/**
+ * @package ACF
+ * @author  WP Engine
+ *
+ * © 2025 Advanced Custom Fields (ACF®). All rights reserved.
+ * "ACF" is a trademark of WP Engine.
+ * Licensed under the GNU General Public License v2 or later.
+ * https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 /**
  * acf_get_field_group
@@ -509,4 +518,62 @@ function acf_get_combined_field_group_settings_tabs() {
 	$combined_field_group_settings_tabs = array_merge( $default_field_group_settings_tabs, $field_group_settings_tabs );
 
 	return $combined_field_group_settings_tabs;
+}
+
+/**
+ * Checks if a field group has the provided location rule.
+ *
+ * @since 6.2.8
+ *
+ * @param integer $post_id  The post ID of the field group.
+ * @param string  $location The location type to check for.
+ * @return boolean
+ */
+function acf_field_group_has_location_type( int $post_id, string $location ) {
+	if ( empty( $post_id ) || empty( $location ) ) {
+		return false;
+	}
+
+	$field_group = acf_get_field_group( (int) $post_id );
+
+	if ( empty( $field_group['location'] ) ) {
+		return false;
+	}
+
+	foreach ( $field_group['location'] as $rule_group ) {
+		$params = array_column( $rule_group, 'param' );
+
+		if ( in_array( $location, $params, true ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Retrieves the field group title, or display title if set.
+ *
+ * @since 6.6
+ *
+ * @param array|integer $field_group The field group array or ID.
+ * @return string The field group title.
+ */
+function acf_get_field_group_title( $field_group ): string {
+	if ( is_numeric( $field_group ) ) {
+		$field_group = acf_get_field_group( $field_group );
+	}
+
+	$title = '';
+	if ( ! empty( $field_group['title'] ) && is_string( $field_group['title'] ) ) {
+		$title = $field_group['title'];
+	}
+
+	// Override with the Display Title if set.
+	if ( ! empty( $field_group['display_title'] ) && is_string( $field_group['display_title'] ) ) {
+		$title = $field_group['display_title'];
+	}
+
+	// Filter and return.
+	return apply_filters( 'acf/get_field_group_title', esc_html( $title ), $field_group );
 }

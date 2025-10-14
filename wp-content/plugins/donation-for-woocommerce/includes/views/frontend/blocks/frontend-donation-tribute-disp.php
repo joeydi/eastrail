@@ -17,6 +17,9 @@ if ( 'yes' === $donation_tributes && is_array( $all_tributes ) && count( $all_tr
 			?>
 			<div style="clear:both;"></div>
 			<input type="hidden" id="wc_donation_trubte_name_<?php echo esc_attr($campaign_id) . '_' . esc_attr($wp_rand); ?>" class="wc_donation_trubte_name" Placeholder="<?php echo esc_html__( 'Enter Name', 'wc-donation' ); ?>" value="">
+			<?php if ( 'yes' == get_option( 'wc-donation-messages' ) ) : ?>
+				<input type="hidden" id="wc_donation_trubte_message_<?php echo esc_attr($campaign_id) . '_' . esc_attr($wp_rand); ?>" class="wc_donation_trubte_message" Placeholder="<?php echo esc_html__( 'Enter Message', 'wc-donation' ); ?>" value="">
+			<?php endif; ?>
 			<input type="hidden" id="_hidden_tribute_<?php echo esc_attr($campaign_id) . '_' . esc_attr($wp_rand); ?>" name="tribute" value="">
 		</div>
 	</div>

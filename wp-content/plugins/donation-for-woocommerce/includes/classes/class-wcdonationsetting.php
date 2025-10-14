@@ -22,17 +22,16 @@ class WcdonationSetting {
 	 * Add plugin menu page .
 	 */
 	public function __construct() {
-		
 		add_action( 'admin_menu', array( $this, 'create_sub_menu' ) );
 		add_action( 'init', array( $this, 'wc_donation_posttype' ) );
 		$this->plugin_page_slug = 'wc-donation-setting';
 		
 		//On save post
 		add_action( 'save_post', array( $this, 'wc_donation_save_post' ), 999, 3 );
-		add_action( 'pre_get_posts', array( $this, 'get_products_without_donation') );
+		add_action( 'pre_get_posts', array( $this, 'get_products_without_donation' ) );
 
-		add_filter('manage_wc-donation_posts_columns', array( $this, 'wc_donation_modify_column_names') );
-		add_action('manage_wc-donation_posts_custom_column', array( $this, 'wc_donation_add_custom_column'), 9, 2);
+		add_filter('manage_wc-donation_posts_columns', array( $this, 'wc_donation_modify_column_names' ) );
+		add_action('manage_wc-donation_posts_custom_column', array( $this, 'wc_donation_add_custom_column' ), 9, 2);
 
 		add_action( 'wp_ajax_wc_donation_sync_data', array( $this, 'wc_donation_sync_data' ) );
 
@@ -40,11 +39,192 @@ class WcdonationSetting {
 		
 		add_filter( 'woocommerce_cart_item_quantity', array( $this, 'wc_cart_item_quantity' ), 99, 3 );
 
+		add_action( 'admin_head', array( $this, 'wc_donation_list_table_languages_column' ) );
+
+		add_action('wp_trash_post', array( $this, 'wc_donation_trash_post' ), 90, 2);
+
+		add_action('untrash_post', array( $this, 'wc_donation_trash_post' ), 90, 2);
+
+		add_action( 'wp_ajax_feature_enable_action', array( $this, 'handle_feature_enable_action' ) );
+
+		add_filter('bulk_actions-edit-wc-donation', array( $this, 'remove_bulk_edit_action' ) );
+
+		add_action('wp_ajax_save_wc_donation_settings', array( $this, 'save_wc_donation_settings' ) );
+
+		add_action('wp_ajax_delete_wc_donation_campaign', array( $this, 'delete_wc_donation_campaign' ) );
+
+		add_action('wp_ajax_load_wc_donation_campaign', array( $this, 'load_wc_donation_campaign' ) );
+	}
+	public function load_wc_donation_campaign() {
+		if (!isset($_POST['nonce']) || !wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'save_wc_donation_settings_nonce')) {
+			wp_send_json_error(array( 'message' => __('Invalid request.', 'wc-donation') ));
+			return;
+		}
+		
+		if (!isset($_POST['campaign_id'])) {
+			wp_send_json_error(array( 'message' => __('Invalid request.', 'wc-donation') ));
+		}
+
+		$campaign_id = intval($_POST['campaign_id']);
+		$settings = get_option('wc_donation_settings', array());
+		
+		if (isset($settings['campaign_ids'][$campaign_id])) {
+			$campaign_data = $settings['campaign_ids'][$campaign_id];
+			wp_send_json_success(array(
+				'donation_amount' => $campaign_data['donation_amount'],
+				'product_ids'     => $campaign_data['product_ids'],
+			));
+		} else {
+			wp_send_json_error(array( 'message' => __('Campaign not found.', 'wc-donation') ));
+		}
+	}
+
+	public function delete_wc_donation_campaign() {
+		if (!isset($_POST['nonce']) || !wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'save_wc_donation_settings_nonce')) {
+			wp_send_json_error(array( 'message' => __('Invalid request.', 'wc-donation') ));
+			return;
+		}
+
+		// Verify nonce if you are using one
+		if (!isset($_POST['campaign_id'])) {
+			wp_send_json_error(array( 'message' => __('Invalid request.', 'wc-donation') ));
+		}
+
+		$campaign_id = intval($_POST['campaign_id']);
+		$settings = get_option('wc_donation_settings', array());
+		
+		// Remove the campaign data
+		if (isset($settings['campaign_ids'][$campaign_id])) {
+			unset($settings['campaign_ids'][$campaign_id]);
+			update_option('wc_donation_settings', $settings);
+			wp_send_json_success(array( 'message' => __('Campaign unlinked successfully.', 'wc-donation') ));
+		} else {
+			wp_send_json_error(array( 'message' => __('Campaign not found.', 'wc-donation') ));
+		}
+	}
+
+	public function save_wc_donation_settings() {
+		if (!isset($_POST['nonce']) || !wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'save_wc_donation_settings_nonce')) {
+			wp_send_json_error(array( 'message' => __('Invalid request.', 'wc-donation') ));
+			return;
+		}
+
+		if (!isset($_POST['settings'])) {
+			wp_send_json_error(array( 'message' => __('Invalid data.', 'wc-donation') ));
+			return;
+		}
+
+		$settings = sanitize_url( wp_unslash( $_POST['settings'] ) );
+
+		parse_str($settings, $settings_array);
+
+		if (isset($settings_array['wc_donation_settings'])) {
+			$settings = $settings_array['wc_donation_settings'];
+
+			$existing_settings = get_option('wc_donation_settings', array());
+
+			$final_array = is_array($existing_settings) ? $existing_settings : array( 'campaign_ids' => array() );
+
+			$campaign_id = is_array($settings['campaign_ids']) ? reset($settings['campaign_ids']) : $settings['campaign_ids'];
+			$campaign_id = intval($campaign_id);
+
+			$donation_amount = isset($settings['donation_amount']) ? floatval($settings['donation_amount']) : 0;
+			$product_ids = isset($settings['product_ids']) ? array_map('intval', (array) $settings['product_ids']) : array();
+
+			if (!$campaign_id || $donation_amount <= 0 || empty($product_ids)) {
+				wp_send_json_error(array( 'message' => __('Each campaign must have a valid donation amount and product IDs.', 'wc-donation') ));
+				return;
+			}
+			
+			// Check if the campaign exists and remove products not in the submitted list
+			if (isset($final_array['campaign_ids'][$campaign_id])) {
+				$existing_product_ids = $final_array['campaign_ids'][$campaign_id]['product_ids'];
+
+				// Identify products to remove
+				$products_to_remove = array_diff($existing_product_ids, $product_ids);
+
+				foreach ($products_to_remove as $product_to_remove) {
+					// Remove product from the database
+					foreach ($final_array['campaign_ids'] as &$campaign) {
+						$key = array_search($product_to_remove, $campaign['product_ids']);
+						if ( false !== $key ) {
+							unset($campaign['product_ids'][$key]);
+						}
+					}
+				}
+			}
+
+			// Ensure no duplicate product IDs across campaigns
+			foreach ($final_array['campaign_ids'] as $existing_campaign_id => $data) {
+				if ($existing_campaign_id != $campaign_id && !empty(array_intersect($product_ids, $data['product_ids']))) {
+					wp_send_json_error(array(
+						'message' => __('Product ID is already linked to another campaign.', 'wc-donation'),
+					));
+					return;
+				}
+			}
+
+			// Update or add the campaign
+			$final_array['campaign_ids'][$campaign_id] = array(
+				'donation_amount' => $donation_amount,
+				'product_ids' => $product_ids,
+			);
+
+			update_option('wc_donation_settings', $final_array);
+			wp_send_json_success(array( 'message' => __('Settings saved successfully!', 'wc-donation') ));
+		} else {
+			wp_send_json_error(array( 'message' => __('Failed to parse settings data.', 'wc-donation') ));
+		}
+	}
+
+
+	public function remove_bulk_edit_action( $bulk_actions ) {
+		if (isset($bulk_actions['edit'])) {
+			unset($bulk_actions['edit']);
+		}
+		return $bulk_actions;
+	}
+	public function handle_feature_enable_action() {
+		// Check the nonce
+		if ( isset( $_POST['security'] ) && wp_verify_nonce( sanitize_text_field( $_POST['security'] ), 'donation_feature_nonce' ) ) {
+
+			$donation_id = isset( $_POST['donation_id'] ) ? intval( $_POST['donation_id'] ) : 0;
+			$is_feature_enable = isset( $_POST['feature_donation'] ) ? sanitize_text_field( $_POST['feature_donation'] ) : 'no';
+
+			if ( 'yes' == $is_feature_enable ) {
+				update_post_meta( $donation_id, 'feature_donation', 'no' );
+			} else {
+				update_post_meta( $donation_id, 'feature_donation', 'yes' );
+				update_post_meta ( $donation_id, 'wc-donation-disp-single-page', 'yes'  );
+			}
+			$response = 'success';
+		} else {
+			$response = 'Nonce Invalid.';
+		}
+
+		wp_send_json( $response );
+	}
+
+	public function wc_donation_trash_post( $post_id, $previous_status ) {
+
+		if ( 'wc-donation' === get_post_type($post_id) && 'publish' === $previous_status ) {
+			$product_id = get_post_meta($post_id, 'wc_donation_product', true);
+			if ( ! empty($product_id) ) {
+				wp_trash_post($product_id);
+			}
+		}
+
+		if ( 'wc-donation' === get_post_type($post_id) && 'trash' === $previous_status ) {
+			$product_id = get_post_meta($post_id, 'wc_donation_product', true);
+			if ( ! empty($product_id) ) {
+				wp_untrash_post($product_id);
+			}
+		}
 	}
 
 	public function wc_donation_page_block_sorting() {
 		
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), 'donation_reset_nonce' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $_POST['nonce'] ), '_wcdnonce' ) ) {
 			exit('Unauthorized');
 		}
 
@@ -66,15 +246,15 @@ class WcdonationSetting {
 			'total_donars' => '',
 			'total_donation_count' => '',
 			'total_donation_amount' => '',
-			'status' => ''
+			'status' => '',
 		);
 
 		$campaign_ids = get_posts( array(
 			'post_type' => 'wc-donation',
 			'post_status' => 'publish',
 			'numberposts' => -1,
-			'fields' => 'ids'
-		) );		
+			'fields' => 'ids',
+		) );        
 
 		if ( is_array( $campaign_ids ) && count( $campaign_ids ) > 0 ) {
 			foreach ($campaign_ids as $campaign_id ) {
@@ -126,7 +306,7 @@ class WcdonationSetting {
 		wp_die();
 	}
 
-	public static function get_donation_total_count ( $product_id ) {
+	public static function get_donation_total_count( $product_id ) {
 		global $wpdb;
 
 		// Find total donation count in the DB order table
@@ -147,7 +327,7 @@ class WcdonationSetting {
 		}
 		return $total_donation_count[0];
 	}
-	public static function get_donation_donors ( $product_id ) {
+	public static function get_donation_donors( $product_id ) {
 		global $wpdb;
 		// Find total donors in the DB posts table
 		$total_donors = $wpdb->get_col( $wpdb->prepare( "
@@ -169,7 +349,7 @@ class WcdonationSetting {
 		return $total_donors[0];
 	}
 
-	public static function get_donation_total ( $product_id ) {
+	public static function get_donation_total( $product_id ) {
 		global $wpdb;
 
 		// Find total doantions in the DB order table
@@ -199,10 +379,13 @@ class WcdonationSetting {
 		} else {
 			update_post_meta( $product_id, 'total_donation_amount', 0);
 		}
+		if ( null == $total_donation_amount[0] ) {
+			$total_donation_amount[0] = 0;
+		}
 		return round($total_donation_amount[0], 2);
 	}
 
-	public static function has_bought_items( $product_id = 0, $all_columns = ''  ) {
+	public static function has_bought_items( $product_id = 0, $all_columns = '' ) {
 		
 		switch ( $all_columns ) {
 			case 'total_donors':
@@ -224,27 +407,35 @@ class WcdonationSetting {
 		}
 
 		return $count;
-
 	}
 	
 
-	public function wc_donation_modify_column_names ( $columns ) {
-
-		unset($columns['title']);
-		unset($columns['date']);
+	public function wc_donation_modify_column_names( $columns ) {
 		
-		$columns['campaign_name'] = __('Campaign', 'wc-donation');		
+		$temp = $columns['title'];
+
+		unset($columns['date']);
+		unset($columns['title']);
+		unset( $columns['taxonomy-wc_donation_categories'] );
+
+		$columns['campaign_name'] = __('Campaign', 'wc-donation');      
 		$columns['amount'] = __('Amount', 'wc-donation');
 		$columns['total_donations'] = __('Total Donations', 'wc-donation');
 		$columns['total_donation_amount'] = __('Total Amount', 'wc-donation');
-		$columns['initial_goal_amount'] = __('Initial Goal Amount', 'wc-donation');
+		$columns['goal_amount'] = __('Goal Amount', 'wc-donation');
 		$columns['total_donors'] = __('Total Donors', 'wc-donation');
+		$columns['featured_campaign'] = __('Featured', 'wc-donation');
 		$columns['shortcode'] = __('Shortcode', 'wc-donation');
 		$columns['actions'] = __('Actions', 'wc-donation');
+
+		if ( class_exists('SitePress') ) {
+			$columns['title']   = $temp;
+		}
+
 		return $columns;
 	}
 
-	public function wc_donation_add_custom_column ( $column, $postId ) {
+	public function wc_donation_add_custom_column( $column, $postId ) {
 
 		$object = WcdonationCampaignSetting::get_product_by_campaign($postId);
 
@@ -258,7 +449,7 @@ class WcdonationSetting {
 
 		$amounts = array();
 		if ( !empty($object->campaign['amount_display']) && ( 'both' == $object->campaign['amount_display'] || 'free-value' == $object->campaign['amount_display'] ) ) {
-			//enter min value in array	
+			//enter min value in array  
 			array_push($amounts, $donation_min_value);
 			
 			//enter max value in array
@@ -278,8 +469,8 @@ class WcdonationSetting {
 		$product_id = get_post_meta($postId, 'wc_donation_product', true);
 		$total_donation_amount = 0;
 		$total_donors = 0;
-		$total_donation_count = 0;		
-		if ( in_array( $column, array('total_donations', 'total_donation_amount', 'total_donors') ) ) {
+		$total_donation_count = 0;      
+		if ( in_array( $column, array( 'total_donations', 'total_donation_amount', 'total_donors' ) ) ) {
 			$get_donations = $this->has_bought_items( $product_id, $column );
 		} else {
 			$get_donations = array();
@@ -296,6 +487,17 @@ class WcdonationSetting {
 		if ( isset($get_donations['total_donors']) ) {
 			$total_donors = $get_donations['total_donors'];
 		}
+
+		$feature_campaign = get_post_meta( $postId, 'feature_donation', true );
+		$class = 'not-enable-featured';
+		$feature_donation = 'no';
+		if ( isset( $feature_campaign ) && 'yes' == $feature_campaign ) {
+			$feature_donation = 'yes';
+			$class = 'enable-featured';
+		}
+		// echo '<pre>';
+		// print_r($object);
+		// echo '</pre>';
 		
 
 		switch ($column) {
@@ -305,8 +507,10 @@ class WcdonationSetting {
 				break;
 
 			case 'amount':
-				if ( is_array( $amounts ) && count( $amounts ) > 0 ) {				
+				if ( is_array( $amounts ) && count( $amounts ) > 1 ) {  
 					echo esc_attr($currency_symbol) . esc_attr(min( $amounts )) . ' - ' . esc_attr($currency_symbol) . esc_attr(max( $amounts ));
+				} elseif ( is_array( $amounts ) && 1 == count( $amounts ) ) {
+					echo esc_attr($currency_symbol) . esc_attr($amounts[0]);
 				} else {
 					echo '-';
 				}
@@ -321,8 +525,14 @@ class WcdonationSetting {
 				echo wp_kses_post(wc_price( $total_donation_amount ));
 				break;
 
-			case 'initial_goal_amount':
-				echo wp_kses_post(wc_price( $object->goal['fixed_initial_amount'] ));
+			case 'goal_amount':
+				if ( isset($object->goal['type']) && ( 'fixed_amount' == $object->goal['type'] || 'percentage_amount' == $object->goal['type'] ) ) {
+					$goal_amount = isset($object->goal['fixed_amount']) ? $object->goal['fixed_amount'] : wc_price(0);  
+				} else {
+					$goal_amount = wc_price(0);
+				}
+
+				echo wp_kses_post($goal_amount);
 				break;
 
 			case 'total_donors':
@@ -335,9 +545,16 @@ class WcdonationSetting {
 				<a href="javascript:void(0);" onclick="copyToClip('wc-donation-campaign-shortcode-<?php esc_attr_e($postId); ?>')"><span class="dashicons dashicons-admin-page"></span></a>
 				<?php
 				break;
+
+			case 'featured_campaign':
+				$nonce = wp_create_nonce('donation_feature_nonce');
+				?>
+				<a class="feature-donation-link" href="<?php echo esc_url( admin_url('admin-ajax.php?action=feature_enable_action&donation_id=' . $postId . '&wpnonce=' . $nonce . '&feature_donation=' . $feature_donation ) ); ?>"><span class="<?php esc_attr_e( $class ); ?>"></span></a>
+				<?php
+				break;
 			
 			case 'actions':
-				echo '<a href="' . esc_url(get_edit_post_link( $postId )) . '" class="wc-dashicons editIcon"> <span class="dashicons dashicons-edit"></span> </a>';				
+				echo '<a href="' . esc_url(get_edit_post_link( $postId )) . '" class="wc-dashicons editIcon"> <span class="dashicons dashicons-edit"></span> </a>';             
 				echo '<a href="' . esc_url(get_preview_post_link($postId)) . '" class="wc-dashicons viewIcon"> <span class="dashicons dashicons-visibility"></span> </a>';
 				if ( 'publish' == get_post_status($postId) ) {
 					echo '<a href="' . esc_url(get_delete_post_link( $postId )) . '" class="wc-dashicons deleteIcon" title="Delete"> <span class="dashicons dashicons-trash"></span> </a>';
@@ -352,7 +569,7 @@ class WcdonationSetting {
 				}
 				break;
 
-		}	
+		}   
 	}
 	
 	public function get_products_without_donation( $query ) {
@@ -377,16 +594,16 @@ class WcdonationSetting {
 		endif;
 	}
 
-	public static function get_campaign_id_by_product_id ( $id ) {
+	public static function get_campaign_id_by_product_id( $id ) {
 		/**
 		* Filter.
 		* 
 		* @since 3.4.5
 		*/
-		$campaigns = get_posts( apply_filters ('wc_donation_get_campaign_id_by_product_id', array (
+		$campaigns = get_posts( apply_filters ('wc_donation_get_campaign_id_by_product_id', array(
 			'fields'          => 'ids',
 			'posts_per_page'  => -1,
-			'post_type' => 'wc-donation'
+			'post_type' => 'wc-donation',
 		) ) );
 
 		foreach ( $campaigns as $campaign ) {
@@ -395,7 +612,7 @@ class WcdonationSetting {
 			if ( $prod_id == $id ) {
 				return $campaign;
 				exit;
-			}	
+			}   
 		}
 
 		return 0;
@@ -406,13 +623,14 @@ class WcdonationSetting {
 		$campaigns = get_posts( array(
 			'fields'          => 'ids',
 			'posts_per_page'  => -1,
-			'post_type' => 'wc-donation'
+			'post_type' => 'wc-donation',
+			'post_status' => array( 'publish', 'trash', 'draft' ),
 		) );
 
 		$prod_ids = array();
 
 		foreach ( $campaigns as $campaign ) {
-			$prod_ids[] = get_post_meta( $campaign, 'wc_donation_product', true );	
+			$prod_ids[] = get_post_meta( $campaign, 'wc_donation_product', true );  
 		}
 
 		return $prod_ids;
@@ -421,13 +639,20 @@ class WcdonationSetting {
 	/**
 	 * Create product for each campaign creates.
 	 */
-	public function wc_donation_save_post ( $post_id, $post, $updated ) {		
+	public function wc_donation_save_post( $post_id, $post, $updated ) {
 
-		if ( 'wc-donation' == $post->post_type && 'publish' == $post->post_status ) {			
+		if ( 'product' == $post->post_type ) {
+			$campaign_id = get_post_meta($post_id, 'wc_donation_campaign', true);
+			if ( ! empty( $campaign_id ) ) {
+				$this->update_product_meta( $campaign_id, $post_id );
+			}
+		}       
 
+		if ( 'wc-donation' == $post->post_type && 'publish' == $post->post_status ) {           
+		
 			$post_title = isset( $post->post_title ) ? $post->post_title : '';
 
-			$prod_id = get_post_meta( $post_id, 'wc_donation_product', true );			
+			$prod_id = get_post_meta( $post_id, 'wc_donation_product', true );          
 
 			if ( empty( $prod_id ) || empty( get_post_status ( $prod_id ) ) ) {
 				$this->create_product_for_donation( $post_id, $post_title );
@@ -440,18 +665,18 @@ class WcdonationSetting {
 				$attachment_id = get_post_thumbnail_id( $post_id );
 				if ( $attachment_id ) {
 					set_post_thumbnail( $prod_id, $attachment_id );
-				}				
+				}               
 				
 				/**
 				* Filter.
 				* 
 				* @since 3.4.5
 				*/
-				$product = apply_filters ( 'wc_donation_before_product_update', array (
+				$product = apply_filters ( 'wc_donation_before_product_update', array(
 					'ID' => $prod_id,
 					'post_title' => $post_title,
 					'post_name' => sanitize_title( 'WC Donation - ' . $post_title ),
-					'post_status' => 'publish'
+					'post_status' => 'publish',
 				), $post_id );
 				wp_update_post( $product );
 				$this->update_product_meta( $post_id, $prod_id );
@@ -462,28 +687,27 @@ class WcdonationSetting {
 	/**
 	 * Creating product dynamically
 	 */
-	private function create_product_for_donation ( $post_id, $post_title ) {
+	private function create_product_for_donation( $post_id, $post_title ) {
 		/**
 		* Filter.
 		* 
 		* @since 3.4.5
 		*/
-		$product_args = apply_filters ( 'wc_donation_before_product_create', array (
+		$product_args = apply_filters ( 'wc_donation_before_product_create', array(
 			'post_title' => $post_title,
 			'post_type' => 'product',
 			'post_status' => 'publish',
-			'post_name' => sanitize_title( 'WC Donation - ' . $post_title )
+			'post_name' => sanitize_title( 'WC Donation - ' . $post_title ),
 		) );
 
 		$prod_id = wp_insert_post( $product_args );
 
-		if ( ! empty($prod_id) ) {			
+		if ( ! empty($prod_id) ) {          
 			$this->update_product_meta( $post_id, $prod_id );
 		}
-
 	}
 
-	private function update_product_meta ( $post_id, $prod_id ) {
+	private function update_product_meta( $post_id, $prod_id ) {
 
 		/**
 		* Action.
@@ -499,6 +723,17 @@ class WcdonationSetting {
 
 		$singlePage = get_post_meta ( $post_id, 'wc-donation-disp-single-page', true );
 		$shopVisible = get_post_meta ( $post_id, 'wc-donation-disp-shop-page', true );
+
+		$dokan = get_post_meta ( $post_id, 'wc-donation-dokan-seller', true );
+		$productVendor = get_post_meta ( $post_id, 'wc-donation-product-vendor-seller', true );
+		
+		if ( ! empty( $dokan ) && function_exists('dokan_override_product_author') ) {
+			dokan_override_product_author( wc_get_product( $prod_id ), $dokan );
+		}
+		
+		if ( ! empty( $productVendor ) ) {
+			wp_set_object_terms( $prod_id, (int) $productVendor, 'wcpv_product_vendors' );
+		}
 
 		if ( 'yes' == $singlePage && 'yes' == $shopVisible ) {
 			wp_set_object_terms( $prod_id, array( 'exclude-from-search' ), 'product_visibility' );
@@ -517,39 +752,46 @@ class WcdonationSetting {
 			delete_post_meta( $prod_id, '_subscription_period' );
 			delete_post_meta( $prod_id, '_subscription_length' );
 
-			update_post_meta( $prod_id, '_subscription_price', '0' );		
-			update_post_meta( $prod_id, '_subscription_period_interval', $interval );		
-			update_post_meta( $prod_id, '_subscription_period', $period );		
-			update_post_meta( $prod_id, '_subscription_length', $length );	
+			update_post_meta( $prod_id, '_subscription_price', '0' );       
+			update_post_meta( $prod_id, '_subscription_period_interval', $interval );       
+			update_post_meta( $prod_id, '_subscription_period', $period );      
+			update_post_meta( $prod_id, '_subscription_length', $length );  
 			if ( 'user' == $RecurringDisp || empty($RecurringDisp ) ) {
-				update_post_meta( $prod_id, '_subscription_period_interval', '1' );		
-				update_post_meta( $prod_id, '_subscription_period', 'day' );		
+				update_post_meta( $prod_id, '_subscription_period_interval', '1' );     
+				update_post_meta( $prod_id, '_subscription_period', 'day' );        
 				update_post_meta( $prod_id, '_subscription_length', '1' );
 			}
 		}
-		update_post_meta( $prod_id, '_downloadable', 'yes' );
-		update_post_meta( $prod_id, '_stock_status', 'instock');
-		update_post_meta( $prod_id, 'total_sales', '0' );
-		update_post_meta( $prod_id, '_tax_status', 'none' );
+		/**
+		* Filter.
+		* 
+		* @since 3.6.0
+		*/
+		if ( apply_filters( 'wc_donation_delete_campaign_product_data', true ) ) :
+			update_post_meta( $prod_id, '_downloadable', 'yes' );
+			update_post_meta( $prod_id, '_stock_status', 'instock');
+			update_post_meta( $prod_id, 'total_sales', '0' );
+			update_post_meta( $prod_id, '_tax_status', 'none' );
+			update_post_meta( $prod_id, '_purchase_note', '' );
+			update_post_meta( $prod_id, '_featured', 'no' );
+			update_post_meta( $prod_id, '_weight', '' );
+			update_post_meta( $prod_id, '_length', '' );
+			update_post_meta( $prod_id, '_width', '' );
+			update_post_meta( $prod_id, '_height', '' );
+			update_post_meta( $prod_id, '_sku', $prod_id );
+			update_post_meta( $prod_id, '_product_attributes', array() );
+			update_post_meta( $prod_id, '_sale_price_dates_from', '' );
+			update_post_meta( $prod_id, '_sale_price_dates_to', '' );       
+			update_post_meta( $prod_id, '_manage_stock', 'no' );
+			update_post_meta( $prod_id, '_backorders', 'no' );
+		endif;
+		
+		update_post_meta( $prod_id, '_sale_price', '' );
 		update_post_meta( $prod_id, '_virtual', 'yes' );
 		update_post_meta( $prod_id, '_regular_price', '0' );
-		update_post_meta( $prod_id, '_sale_price', '' );
 		update_post_meta( $prod_id, '_price', '0' );
-		update_post_meta( $prod_id, '_purchase_note', '' );
-		update_post_meta( $prod_id, '_featured', 'no' );
-		update_post_meta( $prod_id, '_weight', '' );
-		update_post_meta( $prod_id, '_length', '' );
-		update_post_meta( $prod_id, '_width', '' );
-		update_post_meta( $prod_id, '_height', '' );
-		update_post_meta( $prod_id, '_sku', $prod_id );
-		update_post_meta( $prod_id, '_product_attributes', array() );
-		update_post_meta( $prod_id, '_sale_price_dates_from', '' );
-		update_post_meta( $prod_id, '_sale_price_dates_to', '' );		
-		update_post_meta( $prod_id, '_sold_individually', '' );
-		update_post_meta( $prod_id, '_manage_stock', 'no' );
-		update_post_meta( $prod_id, '_backorders', 'no' );
 		update_post_meta( $prod_id, 'is_wc_donation', 'donation' );
-
+		update_post_meta( $prod_id, '_sold_individually', '' );
 		//set campaign attachment_id to product attachment id
 		$attachment_id = get_post_thumbnail_id( $post_id );
 		if ( $attachment_id ) {
@@ -574,7 +816,7 @@ class WcdonationSetting {
 	 *
 	 * @see get_post_type_labels() for label keys.
 	 */
-	public function wc_donation_posttype () {
+	public function wc_donation_posttype() {
 		$labels = array(
 			'name'                  => _x( 'WC Donation', 'Post type general name', 'wc-donation' ),
 			'singular_name'         => _x( 'WC Donation', 'Post type singular name', 'wc-donation' ),
@@ -626,25 +868,35 @@ class WcdonationSetting {
 	/**
 	 * Craete plugin menu page
 	 */
-	public function create_sub_menu () {
+	public function create_sub_menu() {
 
 		add_submenu_page ( 
-			__( 'edit.php?post_type=wc-donation', 'wc-donation' ), 
+			'edit.php?post_type=wc-donation', 
 			__( 'Home', 'wc-donation' ),
 			__( 'Home', 'wc-donation' ),
 			__( 'manage_options', 'wc-donation' ),
 			__( 'home', 'wc-donation' ),
-			array ( $this, 'wc_donation_home_view' ),
+			array( $this, 'wc_donation_home_view' ),
 			0
 		);
 
 		add_submenu_page ( 
-			__( 'edit.php?post_type=wc-donation', 'wc-donation' ), 
+			'edit.php?post_type=wc-donation', 
+			__( 'Dashboard', 'wc-donation' ),
+			__( 'Dashboard', 'wc-donation' ),
+			__( 'manage_options', 'wc-donation' ),
+			__( 'dashboard', 'wc-donation' ),
+			array( $this, 'wc_donation_dashboard_view' ),
+			1
+		);
+
+		add_submenu_page ( 
+			'edit.php?post_type=wc-donation',
 			__( 'General Settings', 'wc-donation' ),
 			__( 'General Settings', 'wc-donation' ),
 			__( 'manage_options', 'wc-donation' ),
 			__( 'general', 'wc-donation' ),
-			array ( $this, 'wc_donation_setting_view' ),
+			array( $this, 'wc_donation_setting_view' ),
 			10
 		);
 
@@ -654,37 +906,52 @@ class WcdonationSetting {
 	/**
 	 * Wc Donation Home View
 	 */
-	public function wc_donation_home_view () {
-		include WC_DONATION_PATH . '/includes/views/admin/home.php';
+	public function wc_donation_home_view() {
+		include WC_DONATION_PATH . 'includes/views/admin/home.php';
+	}
+
+	/**
+	 * Wc Donation Dashboard View
+	 */
+	public function wc_donation_dashboard_view() {
+		echo '<div id="wc-donation-dashboard-view"></div>';
 	}
 
 	/**
 	 * General Setting View
 	 */
-	public function wc_donation_setting_view () {
-		include WC_DONATION_PATH . '/includes/views/admin/general-setting.php';
+	public function wc_donation_setting_view() {
+		include WC_DONATION_PATH . 'includes/views/admin/general-setting.php';
 	}
 
 	/**
 	 * Regiser settings
 	 */
-	public function register_settings() {		
+	public function register_settings() {       
 		
 		if ( isset( $_POST[ 'option_page' ] ) ) {
 			if ( ! empty( $_POST[ 'option_page' ] && !wp_verify_nonce(sanitize_text_field($_POST['_wpnonce']), 'wc-donation-general-settings-group') ) ) {
 				$option_page = sanitize_text_field( $_POST[ 'option_page' ] );
-
-
 				
 				switch ( $option_page ) {
 					
 					case 'wc-donation-general-settings-group':
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-checkout-product');
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-cart-product');
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-cart-location');
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-campaign-display-type');
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-cart-campaign-popup-title');
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-cart-campaign-display-format');
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-cart-campaign-popup-button-title');
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-cart-campaign-format-type');
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-fees-product');
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-round-product');
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-on-checkout' );
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-checkout-location' );
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-on-cart' );
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-deactivate-campaign-thumbnail' );
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-deactivate-campaign-causes' );
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-deactivate-campaign-description' );
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-on-round' );
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-card-fee' );
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-recommended' );
@@ -704,8 +971,14 @@ class WcdonationSetting {
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-gift-aid-checkbox-title' );
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-gift-aid-explanation' );
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-gift-aid-declaration' );
+
+						register_setting('wc-donation-general-settings-group', 'wc_donation_enable_option');
+						register_setting('wc-donation-general-settings-group', 'wc-donation-on-product');
+
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-pdf-receipt' );
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-tributes' );
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-messages' );
+						register_setting( 'wc-donation-general-settings-group', 'wc-donation-donor-wall' );
 						register_setting( 'wc-donation-general-settings-group', 'wc-donation-api' );
 						break;
 				}
@@ -731,6 +1004,17 @@ class WcdonationSetting {
 		return $product_quantity;
 	}
 
+	public function wc_donation_list_table_languages_column() {
+		if ( class_exists('SitePress') ) : 
+			?>
+			<style>
+				.post-type-wc-donation table.posts tr {
+					grid-template-columns: repeat(10, 1fr) !important;
+				}
+			</style>
+			<?php 
+		endif;
+	}
 }
 
 new WcdonationSetting();

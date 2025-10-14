@@ -1,4 +1,13 @@
 <?php
+/**
+ * @package ACF
+ * @author  WP Engine
+ *
+ * © 2025 Advanced Custom Fields (ACF®). All rights reserved.
+ * "ACF" is a trademark of WP Engine.
+ * Licensed under the GNU General Public License v2 or later.
+ * https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -27,7 +36,6 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 		 * @param   n/a
 		 * @return  n/a
 		 */
-
 		function initialize() {
 
 			// vars
@@ -52,7 +60,6 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 		 * @param   n/a
 		 * @return  n/a
 		 */
-
 		function submit() {
 
 			// vars
@@ -80,7 +87,6 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 		 * @param   n/a
 		 * @return  n/a
 		 */
-
 		function submit_download() {
 
 			// vars
@@ -114,7 +120,6 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 		 * @param   n/a
 		 * @return  n/a
 		 */
-
 		function submit_generate() {
 
 			// vars
@@ -145,7 +150,6 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 		 * @param   n/a
 		 * @return  n/a
 		 */
-
 		function load() {
 
 			// active
@@ -175,7 +179,6 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 		 * @param   n/a
 		 * @return  n/a
 		 */
-
 		function html() {
 
 			// single (generate PHP)
@@ -205,7 +208,10 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 
 			$choices      = array();
 			$selected     = $this->get_selected_keys();
-			$field_groups = acf_get_internal_post_type_posts( 'acf-field-group' );
+			$field_groups = array_filter(
+				acf_get_internal_post_type_posts( 'acf-field-group' ),
+				'acf_internal_post_object_contains_valid_key'
+			);
 
 			if ( $field_groups ) {
 				foreach ( $field_groups as $field_group ) {
@@ -227,7 +233,10 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 
 			$choices    = array();
 			$selected   = $this->get_selected_keys();
-			$post_types = acf_get_internal_post_type_posts( 'acf-post-type' );
+			$post_types = array_filter(
+				acf_get_internal_post_type_posts( 'acf-post-type' ),
+				'acf_internal_post_object_contains_valid_key'
+			);
 
 			if ( $post_types ) {
 				foreach ( $post_types as $post_type ) {
@@ -249,7 +258,10 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 
 			$choices    = array();
 			$selected   = $this->get_selected_keys();
-			$taxonomies = acf_get_internal_post_type_posts( 'acf-taxonomy' );
+			$taxonomies = array_filter(
+				acf_get_internal_post_type_posts( 'acf-taxonomy' ),
+				'acf_internal_post_object_contains_valid_key'
+			);
 
 			if ( $taxonomies ) {
 				foreach ( $taxonomies as $taxonomy ) {
@@ -271,7 +283,10 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 
 			$choices       = array();
 			$selected      = $this->get_selected_keys();
-			$options_pages = acf_get_internal_post_type_posts( 'acf-ui-options-page' );
+			$options_pages = array_filter(
+				acf_get_internal_post_type_posts( 'acf-ui-options-page' ),
+				'acf_internal_post_object_contains_valid_key'
+			);
 
 			if ( $options_pages ) {
 				foreach ( $options_pages as $options_page ) {
@@ -317,7 +332,6 @@ if ( ! class_exists( 'ACF_Admin_Tool_Export' ) ) :
 		 * @param   n/a
 		 * @return  n/a
 		 */
-
 		function html_archive() {
 
 			?>

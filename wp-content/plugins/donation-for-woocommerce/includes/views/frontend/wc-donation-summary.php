@@ -3,7 +3,7 @@
 	<p class="wc-donation-summary-desc"><?php esc_html_e( $summary_desc ); ?></p>
 	<div class="wc-donation-summary-calc">
 		<span class="currency"><?php echo esc_attr($currency_symbol); ?></span>
-		<?php		
+		<?php 
 		$arr  = str_split($donation_amount);
 		if ( is_array( $arr ) && count( $arr ) > 0 ) {
 			foreach ( $arr as $digit ) {

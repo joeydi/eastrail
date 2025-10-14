@@ -177,6 +177,11 @@ class Category {
 
 			$inserted_term = wp_insert_term( $name, 'product_cat' );
 
+			if ( is_wp_error( $inserted_term ) ) {
+				wc_square()->log( 'Error inserting category: ' . $inserted_term->get_error_message() );
+				return null;
+			}
+
 			$category_id = isset( $inserted_term['term_id'] ) ? $inserted_term['term_id'] : null;
 		}
 
@@ -216,21 +221,46 @@ class Category {
 	public static function get_category_id_by_square_id( $square_id ) {
 		global $wpdb;
 
-		$query = $wpdb->prepare(
-			"
-			SELECT t.term_id FROM {$wpdb->prefix}terms AS t
-			LEFT JOIN {$wpdb->prefix}term_taxonomy AS tt ON t.term_id = tt.term_id
-			LEFT JOIN {$wpdb->prefix}termmeta AS tm ON t.term_id = tm.term_id
-			WHERE tt.taxonomy = 'product_cat'
-			AND tm.meta_key = '%s'
-			AND tm.meta_value = '%s'
-			",
-			self::SQUARE_ID_META_KEY,
-			$square_id
+		return $wpdb->get_var(
+			$wpdb->prepare(
+				"
+				SELECT t.term_id FROM {$wpdb->prefix}terms AS t
+				LEFT JOIN {$wpdb->prefix}term_taxonomy AS tt ON t.term_id = tt.term_id
+				LEFT JOIN {$wpdb->prefix}termmeta AS tm ON t.term_id = tm.term_id
+				WHERE tt.taxonomy = 'product_cat'
+				AND tm.meta_key = %s
+				AND tm.meta_value = %s
+				",
+				self::SQUARE_ID_META_KEY,
+				$square_id
+			)
 		);
-
-		return $wpdb->get_var( $query );
 	}
 
+	/**
+	 * Get category ID from ITEM catalog object.
+	 *
+	 * @param \Square\Models\CatalogItem $catalog_item the catalog item object
+	 * @return string|null
+	 */
+	public static function get_square_category_id( $catalog_item ) {
+		$catalog_category_id = null;
+		// Try to get the category from the reporting category first.
+		$catalog_category = $catalog_item->getReportingCategory();
 
+		// If no reporting category, try to get the first category from the categories list.
+		if ( empty( $catalog_category ) ) {
+			$catalog_categories = $catalog_item->getCategories();
+			if ( ! empty( $catalog_categories ) ) {
+				$catalog_category = $catalog_categories[0];
+			}
+		}
+
+		// If we have a category, get the ID.
+		if ( ! empty( $catalog_category ) ) {
+			$catalog_category_id = $catalog_category->getId();
+		}
+
+		return $catalog_category_id;
+	}
 }

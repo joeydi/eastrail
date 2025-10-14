@@ -20,12 +20,11 @@ class WcdonationAPI {
 	/**
 	 * Add plugin menu page .
 	 */
-	public function __construct() {	
+	public function __construct() { 
 
-		$this->_DONATION_API = get_option( 'wc-donation-api', false );		
+		$this->_DONATION_API = get_option( 'wc-donation-api', false );      
 
-		add_action('rest_api_init', array( $this, 'wc_donation_register_routes') );
-
+		add_action('rest_api_init', array( $this, 'wc_donation_register_routes' ) );
 	}
 
 	public function wc_donation_register_routes() {
@@ -34,8 +33,8 @@ class WcdonationAPI {
 			$this->_campaign_route,
 			array(
 				'methods' => WP_REST_SERVER::READABLE,
-				'permission_callback' => array( $this, 'check_permission_for_read'),			  
-				'callback'    => array( $this, 'get_campaign_data'),
+				'permission_callback' => array( $this, 'check_permission_for_read' ),              
+				'callback'    => array( $this, 'get_campaign_data' ),
 			)
 		);
 
@@ -44,8 +43,8 @@ class WcdonationAPI {
 			$this->_campaign_route . '/(?P<id>\d+)',      
 			array(
 				'methods' => WP_REST_SERVER::READABLE,
-				'permission_callback' => array( $this, 'check_permission_for_read'),			  
-				'callback'    => array( $this, 'get_campaign_data'),
+				'permission_callback' => array( $this, 'check_permission_for_read' ),              
+				'callback'    => array( $this, 'get_campaign_data' ),
 			)
 		);
 
@@ -54,8 +53,8 @@ class WcdonationAPI {
 			$this->_campaign_route, 
 			array(
 				'methods' => WP_REST_SERVER::CREATABLE,
-				'permission_callback' => array( $this, 'check_permission'),
-				'callback' => array( $this, 'create_campaign'),
+				'permission_callback' => array( $this, 'check_permission' ),
+				'callback' => array( $this, 'create_campaign' ),
 			)
 		   );
 
@@ -64,8 +63,8 @@ class WcdonationAPI {
 			$this->_campaign_route . '/(?P<id>\d+)', 
 			array(
 				'methods' => WP_REST_SERVER::EDITABLE,
-				'permission_callback' => array( $this, 'check_permission'),
-				'callback' => array( $this, 'edit_campaign'),
+				'permission_callback' => array( $this, 'check_permission' ),
+				'callback' => array( $this, 'edit_campaign' ),
 			)
 		   );
 
@@ -74,16 +73,18 @@ class WcdonationAPI {
 			$this->_campaign_route . '/(?P<id>\d+)', 
 			array(
 				'methods' => WP_REST_SERVER::DELETABLE,
-				'permission_callback' => array( $this, 'check_permission'),
-				'callback' => array( $this, 'delete_campaign'),
+				'permission_callback' => array( $this, 'check_permission' ),
+				'callback' => array( $this, 'delete_campaign' ),
 			)
 		   );
 	}
 
-	public function check_permission_for_read() {		
+	public function check_permission_for_read() {       
 
-		if ( 'yes' !== $this->_DONATION_API ) {
-			return new WP_Error( 'DONATION_API_DSIABLED', esc_html__( 'The WC Donation API is disabled on this site', 'wc-donation' ), array( 'status' => 400 ) );
+		if (!isset($_GET['dfw_dashboard'])) {
+			if ( 'yes' !== $this->_DONATION_API ) {
+				return new WP_Error( 'DONATION_API_DSIABLED', esc_html__( 'The WC Donation API is disabled on this site', 'wc-donation' ), array( 'status' => 400 ) );
+			}
 		}
 
 		return true;
@@ -91,8 +92,10 @@ class WcdonationAPI {
 
 	public function check_permission() {
 
-		if ( 'yes' !== $this->_DONATION_API ) {
-			return new WP_Error( 'DONATION_API_DSIABLED', esc_html__( 'The WC Donation API is disabled on this site', 'wc-donation' ), array( 'status' => 400 ) );
+		if (!isset($_GET['dfw_dashboard'])) {
+			if ( 'yes' !== $this->_DONATION_API ) {
+				return new WP_Error( 'DONATION_API_DSIABLED', esc_html__( 'The WC Donation API is disabled on this site', 'wc-donation' ), array( 'status' => 400 ) );
+			}
 		}
 	
 		// Restrict endpoint to only users who have the edit_posts capability.
@@ -112,8 +115,6 @@ class WcdonationAPI {
 		}
 
 		return true;
-		
-
 	}
 
 	public function delete_campaign( $request ) {
@@ -148,22 +149,22 @@ class WcdonationAPI {
 				}
 
 				wp_delete_post( $prod_id, true); // Set to False if you want to send them to Trash.
-				wp_delete_post( $post->ID, true);			
-				return array(					
+				wp_delete_post( $post->ID, true);           
+				return array(                   
 					'ID' => $post->ID,
-					'message' => esc_html__( 'Campaign deleted successfully', 'wc-donation' )
+					'message' => esc_html__( 'Campaign deleted successfully', 'wc-donation' ),
 				);
 			} else {
 				return new WP_Error( 'NOT_FOUND', esc_html__('Unable to delete. Campaign ID not found!', 'wc-donation'), array( 'status' => 404 ) );
-			}			
-		}		
+			}           
+		}       
 	}
 
 	public function edit_campaign( $request ) {
 		
 		// $param = $request->get_param( 'some_param' );
 		// You can get the combined, merged set of parameters:
-		// $parameters = $request->get_params();	
+		// $parameters = $request->get_params();    
 
 		$parameters = $request->get_params();
 		$result = false;
@@ -178,23 +179,19 @@ class WcdonationAPI {
 
 			if ( isset( $parameters['status'] ) && empty( trim( $parameters['status'] ) ) ) {
 				return new WP_Error( 'Error', 'Campaign status is required', array( 'status' => 400 ) );
-			} else {
-				if ( isset( $parameters['status'] ) && 'publish' != $parameters['status'] && 'trash' != $parameters['status'] ) {
+			} elseif ( isset( $parameters['status'] ) && 'publish' != $parameters['status'] && 'trash' != $parameters['status'] ) {
 					return new WP_Error( 'Error', 'Campaign status value is incorrect', array( 'status' => 400 ) );
-				}
 			}
 
 			if ( isset( $parameters['wc-donation-amount-display-option'] ) && empty( trim( $parameters['wc-donation-amount-display-option'] ) ) ) {
 				return new WP_Error( 'Error', 'Amount Type is required', array( 'status' => 400 ) );
-			} else {
-				if ( isset( $parameters['wc-donation-amount-display-option'] ) && 'predefined' != $parameters['wc-donation-amount-display-option'] && 'free-value' != $parameters['wc-donation-amount-display-option'] && 'both' != $parameters['wc-donation-amount-display-option'] ) {
+			} elseif ( isset( $parameters['wc-donation-amount-display-option'] ) && 'predefined' != $parameters['wc-donation-amount-display-option'] && 'free-value' != $parameters['wc-donation-amount-display-option'] && 'both' != $parameters['wc-donation-amount-display-option'] ) {
 					return new WP_Error( 'Error', 'Amount Type value is incorrect', array( 'status' => 400 ) );
-				}
 			}
 
 			if ( isset( $parameters['wc-donation-amount-display-option'] ) && ( 'predefined' === $parameters['wc-donation-amount-display-option'] || 'both' === $parameters['wc-donation-amount-display-option'] ) ) {
 				if ( ! isset( $parameters['pred-amount'] ) || ( isset( $parameters['pred-amount'] ) && empty( $parameters['pred-amount'] ) ) ) {
-					return new WP_Error( 'Error', 'Donation level amount is required', array( 'status' => 400 ) );	
+					return new WP_Error( 'Error', 'Donation level amount is required', array( 'status' => 400 ) );  
 				}
 
 				if ( ! isset( $parameters['pred-label'] ) || ( isset( $parameters['pred-label'] ) && empty( $parameters['pred-label'] ) ) ) {
@@ -272,7 +269,7 @@ class WcdonationAPI {
 			
 				if ( ! isset( $parameters['wc-donation-goal-no-of-days-field'] ) || ( isset( $parameters['wc-donation-goal-no-of-days-field'] ) && empty( $parameters['wc-donation-goal-no-of-days-field'] ) ) ) {
 					return new WP_Error( 'Error', 'No. of day is required', array( 'status' => 400 ) );
-				} else {					
+				} else {                    
 					$parameters['wc-donation-goal-no-of-days-field'] = gmdate('d-M-Y', strtotime($parameters['wc-donation-goal-no-of-days-field']));
 				}
 			}
@@ -293,14 +290,14 @@ class WcdonationAPI {
 						'ID'          => $post->ID,
 						'post_title'  => isset($parameters['title']) ? $parameters['title'] : $post->post_title,
 						'post_status' => isset($parameters['status']) ? $parameters['status'] : $post->post_status,
-						'post_type'   => $post->post_type
+						'post_type'   => $post->post_type,
 					), 
 					true, 
 					true
 				);
 			} else {
 				return new WP_Error( 'NOT_FOUND', esc_html__('Unable to update. Campaign ID not found!', 'wc-donation'), array( 'status' => 404 ) );
-			}		
+			}       
 		}
 
 		$result = get_post($result);
@@ -321,20 +318,18 @@ class WcdonationAPI {
 		}
 
 		// if ( ! isset( $parameters['status'] ) || ( isset( $parameters['status'] ) && empty( trim( $parameters['status'] ) ) ) ) {
-		// 	return new WP_Error( 'Error', 'Campaign status is required', array( 'status' => 400 ) );	
+		//  return new WP_Error( 'Error', 'Campaign status is required', array( 'status' => 400 ) );    
 		// }
 
 		if ( ! isset( $parameters['wc-donation-amount-display-option'] ) || ( isset( $parameters['wc-donation-amount-display-option'] ) && empty( trim( $parameters['wc-donation-amount-display-option'] ) ) ) ) {
 			return new WP_Error( 'Error', 'Amount Type is required', array( 'status' => 400 ) );
-		} else {
-			if ( 'predefined' != $parameters['wc-donation-amount-display-option'] && 'free-value' != $parameters['wc-donation-amount-display-option'] && 'both' != $parameters['wc-donation-amount-display-option'] ) {
+		} elseif ( 'predefined' != $parameters['wc-donation-amount-display-option'] && 'free-value' != $parameters['wc-donation-amount-display-option'] && 'both' != $parameters['wc-donation-amount-display-option'] ) {
 				return new WP_Error( 'Error', 'Amount Type value is incorrect', array( 'status' => 400 ) );
-			}
 		}
 
 		if ( isset( $parameters['wc-donation-amount-display-option'] ) && ( 'predefined' === $parameters['wc-donation-amount-display-option'] || 'both' === $parameters['wc-donation-amount-display-option'] ) ) {
 			if ( ! isset( $parameters['pred-amount'] ) || ( isset( $parameters['pred-amount'] ) && empty( $parameters['pred-amount'] ) ) ) {
-				return new WP_Error( 'Error', 'Donation level amount is required', array( 'status' => 400 ) );	
+				return new WP_Error( 'Error', 'Donation level amount is required', array( 'status' => 400 ) );  
 			}
 
 			if ( ! isset( $parameters['pred-label'] ) || ( isset( $parameters['pred-label'] ) && empty( $parameters['pred-label'] ) ) ) {
@@ -412,8 +407,8 @@ class WcdonationAPI {
 			
 			if ( ! isset( $parameters['wc-donation-goal-no-of-days-field'] ) || ( isset( $parameters['wc-donation-goal-no-of-days-field'] ) && empty( $parameters['wc-donation-goal-no-of-days-field'] ) ) ) {
 				return new WP_Error( 'Error', 'No. of day is required', array( 'status' => 400 ) );
-			} else {					
-				$parameters['wc-donation-goal-no-of-days-field'] = gmdate('d-M-Y', strtotime($parameters['wc-donation-goal-no-of-days-field']));					
+			} else {                    
+				$parameters['wc-donation-goal-no-of-days-field'] = gmdate('d-M-Y', strtotime($parameters['wc-donation-goal-no-of-days-field']));                    
 			}
 		}
 
@@ -429,7 +424,7 @@ class WcdonationAPI {
 				'post_title'  => $parameters['title'],
 				//'post_status' => $parameters['status'],
 				'post_status' => 'publish',
-				'post_type'   => 'wc-donation'
+				'post_type'   => 'wc-donation',
 			), 
 			true, 
 			true
@@ -440,11 +435,11 @@ class WcdonationAPI {
 		return get_post($result);
 	}
 	
-	public function get_campaign_data( $data ) {		
+	public function get_campaign_data( $data ) {        
 
 		if ( isset( $data['id'] ) ) {
 
-			$campaign = get_post( $data['id'] );			
+			$campaign = get_post( $data['id'] );            
 
 			if ( empty($campaign) || ( ! empty($campaign) && 'wc-donation' !== $campaign->post_type ) ) {
 				return new WP_Error( 'Error', 'Invalid campaign id', array( 'status' => 404 ) );
@@ -452,11 +447,11 @@ class WcdonationAPI {
 
 			$campaign->campaign_meta = self::get_campaign_metadata( $data['id'] );
 
-			if ( isset($campaign->campaign_meta['pred-amount'][0]) ) {				
+			if ( isset($campaign->campaign_meta['pred-amount'][0]) ) {              
 				$campaign->campaign_meta['pred-amount'][0] = unserialize($campaign->campaign_meta['pred-amount'][0]);
 			}
 
-			if ( isset($campaign->campaign_meta['pred-label'][0]) ) {				
+			if ( isset($campaign->campaign_meta['pred-label'][0]) ) {               
 				$campaign->campaign_meta['pred-label'][0] = unserialize($campaign->campaign_meta['pred-label'][0]);
 			}
 
@@ -479,9 +474,9 @@ class WcdonationAPI {
 				$campaign->campaign_meta = self::get_campaign_metadata( $campaign->ID );
 
 				array_push($new_campaign, $campaign);
-			}			
+			}           
 
-			return rest_ensure_response($new_campaign);		
+			return rest_ensure_response($new_campaign);     
 		}
 	}
 
@@ -492,14 +487,26 @@ class WcdonationAPI {
 		unset($campaign_meta['_edit_last']);
 
 		if ( isset( $campaign_meta['wc_donation_product'][0] ) ) {
+
+			$cats = get_the_terms($id, 'wc_donation_categories');
+			// echo '<pre>';
+			// print_r($cats);
+			// echo '</pre>';
+			
+
+
 			$campaign_meta['total_donors'][0] = get_post_meta( $campaign_meta['wc_donation_product'][0], 'total_donors', true );
 			$campaign_meta['total_donations'][0] = get_post_meta( $campaign_meta['wc_donation_product'][0], 'total_donations', true );
 			$campaign_meta['total_donation_amount'][0] = get_post_meta( $campaign_meta['wc_donation_product'][0], 'total_donation_amount', true );
+			
+			foreach ($cats as $key => $cat) {
+
+				$campaign_meta['wc_donation_campaign_cat_id'][] = $cat->term_id;
+			}
 		}
 
 		return $campaign_meta;
 	}
-
 }
 
 new WcdonationAPI();

@@ -1,9 +1,12 @@
 <?php
 /**
- * ACF Admin Post Type Class
+ * @package ACF
+ * @author  WP Engine
  *
- * @package    ACF
- * @subpackage Admin
+ * © 2025 Advanced Custom Fields (ACF®). All rights reserved.
+ * "ACF" is a trademark of WP Engine.
+ * Licensed under the GNU General Public License v2 or later.
+ * https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if ( ! class_exists( 'ACF_Admin_UI_Options_Page' ) ) :
@@ -41,7 +44,7 @@ if ( ! class_exists( 'ACF_Admin_UI_Options_Page' ) ) :
 		}
 
 		/**
-		 * This function will customize the message shown when editing a post type.
+		 * Customizes the messages shown when editing a UI options page.
 		 *
 		 * @since 6.2
 		 *
@@ -359,6 +362,7 @@ if ( ! class_exists( 'ACF_Admin_UI_Options_Page' ) ) :
 			global $menu;
 			$acf_all_options_pages   = acf_get_options_pages();
 			$acf_parent_page_choices = array( 'None' => array( 'none' => __( 'No Parent', 'acf' ) ) );
+			$self_slug               = false;
 
 			if ( is_array( $acf_all_options_pages ) ) {
 				foreach ( $acf_all_options_pages as $options_page ) {
@@ -369,6 +373,7 @@ if ( ! class_exists( 'ACF_Admin_UI_Options_Page' ) ) :
 
 					// Can't be a child of itself.
 					if ( isset( $options_page['ID'] ) && $post_id === $options_page['ID'] ) {
+						$self_slug = $options_page['menu_slug'];
 						continue;
 					}
 
@@ -389,9 +394,13 @@ if ( ! class_exists( 'ACF_Admin_UI_Options_Page' ) ) :
 					$markup         = '/<[^>]+>.*<\/[^>]+>/';
 					$sanitized_name = preg_replace( $markup, '', $page_name );
 
-					// Ensure that the current item is not an ACF page or that ACF pages are an empty array before adding to others.
-					if ( ! empty( $acf_parent_page_choices['acfOptionsPages'] ) && ! in_array( $page_name, $acf_parent_page_choices['acfOptionsPages'], true ) || empty( $acf_parent_page_choices['acfOptionsPages'] ) ) {
-						// If matched menu slug is not in the list add it to others.
+					// Prevent options pages being parents of themselves.
+					if ( ! empty( $item[2] ) && $item[2] === $self_slug ) {
+						continue;
+					}
+
+					// If the current item is not an ACF-created options page, add it to the "Others" list.
+					if ( empty( $acf_parent_page_choices['acfOptionsPages'][ $item[2] ] ) ) {
 						$acf_parent_page_choices['Others'][ $item[2] ] = acf_esc_html( $sanitized_name );
 					}
 				}

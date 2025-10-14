@@ -194,7 +194,9 @@ class Payment_Gateway_Admin_User_Handler {
 				continue;
 			}
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is handled by WordPress
 			if ( isset( $_POST[ $gateway->get_customer_id_user_meta_name() ] ) ) {
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is handled by WordPress
 				$gateway_customer_id = sanitize_text_field( wp_unslash( $_POST[ $gateway->get_customer_id_user_meta_name() ] ) );
 				$gateway->update_customer_id( $user_id, trim( $gateway_customer_id ) );
 			}
@@ -215,6 +217,7 @@ class Payment_Gateway_Admin_User_Handler {
 
 		$plugin_title = trim( str_replace( 'WooCommerce', '', $this->get_plugin()->get_plugin_name() ) );
 
+		/* translators: %s: plugin title */
 		$title = sprintf( esc_html__( '%s Payment Tokens', 'woocommerce-square' ), $plugin_title );
 
 		/**
@@ -296,6 +299,7 @@ class Payment_Gateway_Admin_User_Handler {
 			$label = esc_html__( 'Customer ID', 'woocommerce-square' );
 
 			// If the plugin has multiple gateways configured for multiple environments, append the environment name to keep things straight
+			/* translators: %s: environment name */
 			$label .= ( $this->has_multiple_environments() ) ? ' ' . sprintf( esc_html__( '(%s)', 'woocommerce-square' ), $gateway->get_environment_name() ) : '';
 
 			$fields[] = array(

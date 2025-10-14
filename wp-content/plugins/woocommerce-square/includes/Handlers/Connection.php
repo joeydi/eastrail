@@ -37,16 +37,16 @@ class Connection {
 
 
 	/** @var string production connect URL */
-	const CONNECT_URL_PRODUCTION = 'https://connect.woocommerce.com/login/square';
+	const CONNECT_URL_PRODUCTION = 'https://api.woocommerce.com/integrations/login/square';
 
 	/** @var string sandbox connect URL */
-	const CONNECT_URL_SANDBOX = 'https://connect.woocommerce.com/login/squaresandbox';
+	const CONNECT_URL_SANDBOX = 'https://api.woocommerce.com/integrations/login/squaresandbox';
 
 	/** @var string production refresh URL */
-	const REFRESH_URL_PRODUCTION = 'https://connect.woocommerce.com/renew/square';
+	const REFRESH_URL_PRODUCTION = 'https://api.woocommerce.com/integrations/renew/square';
 
 	/** @var string sandbox refresh URL */
-	const REFRESH_URL_SANDBOX = 'https://connect.woocommerce.com/renew/squaresandbox';
+	const REFRESH_URL_SANDBOX = 'https://api.woocommerce.com/integrations/renew/squaresandbox';
 
 	/** @var Square\Plugin plugin instance */
 	protected $plugin;
@@ -96,15 +96,18 @@ class Connection {
 	public function handle_connected() {
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended - Setting variable, nonce checked next line.
-		$nonce = isset( $_GET['_wpnonce'] ) ? wc_clean( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		$nonce = isset( $_GET['_wpnonce'] ) ? wc_clean( wp_unslash( $_GET['_wpnonce'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$from = isset( $_GET['from'] ) ? wc_clean( wp_unslash( $_GET['from'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		// check the user role & nonce
 		if ( ! current_user_can( 'manage_woocommerce' ) || ! wp_verify_nonce( $nonce, 'wc_square_connected' ) ) {
 			wp_die( esc_html__( 'Sorry, you do not have permission to manage the Square connection.', 'woocommerce-square' ) );
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized - Input is santiized before use, the call to urldecode() first triggers this warning
-		$access_token = ! empty( $_GET['square_access_token'] ) ? sanitize_text_field( urldecode( $_GET['square_access_token'] ) ) : '';
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Input is sanitized before use, the call to urldecode() first triggers this warning
+		$access_token = ! empty( $_GET['square_access_token'] ) ? sanitize_text_field( wp_unslash( urldecode( $_GET['square_access_token'] ) ) ) : '';
 
 		if ( empty( $access_token ) ) {
 			$this->get_plugin()->log( 'Error: No access token was received.' );
@@ -124,8 +127,8 @@ class Connection {
 		$this->get_plugin()->get_settings_handler()->update_access_token( $access_token );
 		$this->get_plugin()->log( 'Access token successfully received.' );
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized - Input is santiized before use, the call to urldecode() first triggers this warning
-		$refresh_token = ! empty( $_GET['square_refresh_token'] ) ? sanitize_text_field( urldecode( $_GET['square_refresh_token'] ) ) : '';
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- Input is sanitized before use, the call to urldecode() first triggers this warning
+		$refresh_token = ! empty( $_GET['square_refresh_token'] ) ? sanitize_text_field( wp_unslash( urldecode( $_GET['square_refresh_token'] ) ) ) : '';
 		if ( empty( $refresh_token ) ) {
 			$this->get_plugin()->log( 'Failed to receive refresh token from connect server.' );
 		} else {
@@ -153,7 +156,7 @@ class Connection {
 			update_option( 'wc_square_auth_key_updated', true );
 		}
 
-		wp_safe_redirect( $this->get_plugin()->get_settings_url() );
+		wp_safe_redirect( 'wizard' === $from ? admin_url( 'admin.php?page=woocommerce-square-onboarding' ) : $this->get_plugin()->get_settings_url() );
 		exit;
 	}
 
@@ -170,8 +173,7 @@ class Connection {
 		// remove the refresh fail flag if previously set
 		delete_option( 'wc_square_refresh_failed' );
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended - Setting var, nonce checked next line.
-		$nonce = isset( $_GET['_wpnonce'] ) ? wc_clean( $_GET['_wpnonce'] ) : '';
+		$nonce = isset( $_GET['_wpnonce'] ) ? wc_clean( wp_unslash( $_GET['_wpnonce'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 		// check the user role & nonce
 		if ( ! current_user_can( 'manage_woocommerce' ) || ! wp_verify_nonce( $nonce, 'wc_square_disconnect' ) ) {
@@ -424,9 +426,11 @@ class Connection {
 	 * @since 2.0.0
 	 *
 	 * @param bool $is_sandbox whether to point to production or sandbox
+	 * @param array $args additional query args
+	 *
 	 * @return string
 	 */
-	public function get_connect_url( $is_sandbox = false ) {
+	public function get_connect_url( $is_sandbox = false, $args = array() ) {
 
 		if ( $is_sandbox ) {
 			$raw_url = self::CONNECT_URL_SANDBOX;
@@ -446,8 +450,13 @@ class Connection {
 		$action       = 'wc_square_connected';
 		$redirect_url = wp_nonce_url( add_query_arg( 'action', $action, admin_url() ), $action );
 
+		// Append all args.
+		foreach ( $args as $key => $value ) {
+			$redirect_url = add_query_arg( $key, $value, $redirect_url );
+		}
+
 		$args = array(
-			'redirect' => urlencode( urlencode( $redirect_url ) ),
+			'redirect' => rawurlencode( $redirect_url ),
 			'scopes'   => implode( ',', $this->get_scopes() ),
 		);
 

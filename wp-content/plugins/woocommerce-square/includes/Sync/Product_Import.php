@@ -37,12 +37,18 @@ defined( 'ABSPATH' ) || exit;
  */
 class Product_Import extends Stepped_Job {
 
+	/**
+	 * Product's existing attributes at Woo.
+	 */
+	protected $woo_attributes = array();
+
 
 	protected function assign_next_steps() {
 
 		$this->set_attr(
 			'next_steps',
 			array(
+				'fetch_options_data',
 				'import_products',
 				'import_inventory',
 			)
@@ -74,6 +80,26 @@ class Product_Import extends Stepped_Job {
 		return max( 1, min( 1000, $limit ) );
 	}
 
+
+	/**
+	 * Fetch the option (attribute) names from Square.
+	 *
+	 * @since 4.9.0
+	 *
+	 * @throws \Exception
+	 */
+	protected function fetch_options_data() {
+		$cursor     = $this->get_attr( 'fetch_options_data_cursor' ) ? $this->get_attr( 'fetch_options_data_cursor' ) : '';
+		$result     = wc_square()->get_api()->retrieve_options_data( $cursor );
+		$new_cursor = isset( $result[2] ) ? $result[2] : null;
+
+		if ( ! empty( $new_cursor ) ) {
+			$this->set_attr( 'fetch_options_data_cursor', $new_cursor );
+		} else {
+			$this->set_attr( 'fetch_options_data_cursor', null );
+			$this->complete_step( 'fetch_options_data' );
+		}
+	}
 
 	/**
 	 * Performs a product import.
@@ -160,12 +186,18 @@ class Product_Import extends Stepped_Job {
 				continue;
 			}
 
-			// import or update categories related to the products that are being imported
-			$catelog_category_id = $catalog_object->getItemData()->getCategoryId();
-
-			if ( $catelog_category_id && isset( $categories[ $catelog_category_id ] ) ) {
-				Category::import_or_update( $categories[ $catelog_category_id ] );
-				unset( $categories[ $catelog_category_id ] ); // don't import/update the same category multiple times per batch
+			// Import or update categories related to the products that are being imported.
+			$item_data = $catalog_object->getItemData();
+			if ( $item_data->getCategories() && is_array( $item_data->getCategories() ) ) {
+				foreach ( $item_data->getCategories() as $category ) {
+					if ( $category instanceof \Square\Models\CatalogObjectCategory ) {
+						$catalog_category_id = $category->getId();
+						if ( $catalog_category_id && isset( $categories[ $catalog_category_id ] ) ) {
+							Category::import_or_update( $categories[ $catalog_category_id ] );
+							unset( $categories[ $catalog_category_id ] ); // don't import/update the same category multiple times per batch.
+						}
+					}
+				}
 			}
 
 			$data = $this->extract_product_data( $catalog_object, $product );
@@ -250,7 +282,7 @@ class Product_Import extends Stepped_Job {
 		$cursor        = $search_result->get_data()->getCursor();
 		$objects       = $search_result->get_data()->getObjects() ? $search_result->get_data()->getObjects() : array();
 		$variation_ids = array_map(
-			static function( \Square\Models\CatalogObject $catalog_object ) {
+			static function ( \Square\Models\CatalogObject $catalog_object ) {
 				return $catalog_object->getId();
 			},
 			$objects
@@ -285,9 +317,9 @@ class Product_Import extends Stepped_Job {
 				$product = Product::get_product_by_square_variation_id( $catalog_object->getId() );
 
 				if ( $product && $product instanceof \WC_Product ) {
-					$is_tracking_inventory = isset( $catalog_objects_hash[ $catalog_object->getId() ] ) ?
-						$catalog_objects_hash[ $catalog_object->getId() ] :
-						false;
+					$inventory_data        = $catalog_objects_hash[ $catalog_object->getId() ] ?? array();
+					$is_tracking_inventory = $inventory_data['track_inventory'] ?? true;
+					$sold_out              = $inventory_data['sold_out'] ?? false;
 
 					/* If catalog object is tracked and has a quantity > 0 set in Square. */
 					if ( $is_tracking_inventory && isset( $inventory_hash[ $catalog_object->getId() ] ) ) {
@@ -301,7 +333,7 @@ class Product_Import extends Stepped_Job {
 
 						/* If the catalog object is not tracked in Square at all. */
 					} else {
-						$product->set_stock_status( 'instock' );
+						$product->set_stock_status( $sold_out ? 'outofstock' : 'instock' );
 						$product->set_manage_stock( false );
 					}
 
@@ -430,7 +462,7 @@ class Product_Import extends Stepped_Job {
 	 * @param array $data the Square catalog object data
 	 * @return int|null
 	 */
-	private function update_product( $product, $data ) {
+	public function update_product( $product, $data ) {
 		global $wpdb;
 		$product_id = $product->get_id();
 
@@ -523,7 +555,7 @@ class Product_Import extends Stepped_Job {
 	 * @return array|null
 	 * @throws \Exception
 	 */
-	protected function extract_product_data( $catalog_object, $product = null ) {
+	public function extract_product_data( $catalog_object, $product = null ) {
 
 		$variations = $catalog_object->getItemData()->getVariations() ? $catalog_object->getItemData()->getVariations() : array();
 
@@ -532,24 +564,101 @@ class Product_Import extends Stepped_Job {
 			return null;
 		}
 
-		$category_id = Category::get_category_id_by_square_id( $catalog_object->getItemData()->getCategoryId() );
+		$product_name        = $catalog_object->getItemData()->getName();
+		$product_description = Product::get_catalog_item_description( $catalog_object->getItemData() );
+
+		if ( $product ) {
+			/**
+			 * Allow overriding product name during import from Square
+			 *
+			 * @since 3.3.0
+			 *
+			 * @param string                           $product_name Product name to update.
+			 * @param \SquareConnect\Model\CatalogItem $catalog_object Catalog item being imported.
+			 * @param \WC_Product                      $product Product being updated.
+			 * @return false|string String to override the product name, false to disable updating
+			 *                      and keep existing name.
+			 * @since 3.3.0
+			 */
+			$product_name = apply_filters( 'wc_square_update_product_set_name', $product_name, $catalog_object, $product );
+
+			/**
+			 * Allow overriding product description during import from Square
+			 *
+			 * @since 3.3.0
+			 *
+			 * @param string                           $product_description Product description to update.
+			 * @param \SquareConnect\Model\CatalogItem $catalog_object Catalog item being imported.
+			 * @param \WC_Product                      $product Product being updated.
+			 *
+			 * @return false|string String to override the product description, false to disable updating
+			 *                      and keep existing description.
+			 * @since 3.3.0
+			 */
+			$product_description = apply_filters( 'wc_square_update_product_set_description', $product_description, $catalog_object, $product );
+		}
 
 		$data = array(
-			'title'       => $catalog_object->getItemData()->getName(),
+			'title'       => $product_name,
 			'type'        => ( 1 === count( $variations ) && ! ( $product && $product instanceof \WC_Product_Variable ) ) ? 'simple' : 'variable',
 			'sku'         => '', // make sure to reset SKU when simple product is updated to variable.
-			'description' => Product::get_catalog_item_description( $catalog_object->getItemData() ),
+			'description' => $product_description,
 			'image_id'    => Product::get_catalog_item_thumbnail_id( $catalog_object ),
-			'categories'  => array( $category_id ),
+			'categories'  => array(), // Will be populated below.
 			'square_meta' => array(
 				'item_id'      => $catalog_object->getId(),
 				'item_version' => $catalog_object->getVersion(),
 			),
+			'custom_meta' => array(),
 		);
+
+		// Process multiple categories from Square.
+		$item_data            = $catalog_object->getItemData();
+		$categories           = array();
+		$missing_category_ids = array();
+
+		if ( $item_data->getCategories() && is_array( $item_data->getCategories() ) ) {
+			foreach ( $item_data->getCategories() as $category ) {
+				if ( $category instanceof \Square\Models\CatalogObjectCategory ) {
+					$category_id = Category::get_category_id_by_square_id( $category->getId() );
+					if ( $category_id ) {
+						$categories[] = $category_id;
+					} else {
+						$missing_category_ids[] = $category->getId();
+					}
+				}
+			}
+		}
+
+		// Fetch and import missing categories.
+		if ( ! empty( $missing_category_ids ) ) {
+			try {
+				$response = wc_square()->get_api()->batch_retrieve_catalog_objects( $missing_category_ids );
+				if ( $response->get_data() instanceof \Square\Models\BatchRetrieveCatalogObjectsResponse ) {
+					$missing_categories = $response->get_data()->getObjects();
+					if ( $missing_categories && is_array( $missing_categories ) ) {
+						foreach ( $missing_categories as $missing_category ) {
+							$imported_category_id = Category::import_or_update( $missing_category );
+							if ( $imported_category_id ) {
+								$categories[] = $imported_category_id;
+							}
+						}
+					}
+				}
+			} catch ( \Exception $e ) {
+				wc_square()->log( 'Error fetching missing categories for product ' . $product_name . ': ' . $e->getMessage() );
+			}
+		}
+
+		$data['categories'] = array_unique( $categories );
 
 		// variable product
 		if ( 'variable' === $data['type'] ) {
+			$data['attributes'] = array();
 			$data['variations'] = array();
+
+			// Get Woo product's existing attributes.
+			$this->woo_attributes = $product ? $product->get_attributes() : array();
 
 			foreach ( $variations as $variation ) {
 
@@ -593,16 +702,15 @@ class Product_Import extends Stepped_Job {
 				return null;
 			}
 
-			$data['attributes'] = array(
-				array(
-					'name'      => 'Attribute',
-					'slug'      => 'attribute',
-					'position'  => 0,
-					'visible'   => true,
-					'variation' => true,
-					'options'   => str_replace( '|', ' - ', wp_list_pluck( $data['variations'], 'name' ) ),
-				),
-			);
+			$options = $catalog_object->getItemData()->getItemOptions() ? $catalog_object->getItemData()->getItemOptions() : array();
+
+			if ( count( $options ) ) {
+				$data['attributes']                      = $this->extract_attributes_from_square_options( $options, $data['variations'] );
+				$data['custom_meta']['_dynamic_options'] = true;
+			} else {
+				$data['attributes']                      = $this->extract_attributes_from_square_variations( $data['variations'] );
+				$data['custom_meta']['_dynamic_options'] = false;
+			}
 		} else { // simple product
 			try {
 
@@ -623,7 +731,7 @@ class Product_Import extends Stepped_Job {
 					array(
 						'type'    => 'alert',
 						'message' => sprintf(
-							/* translators: Placeholders: %1$s - Square item name, %2$s - failure reason */
+						/* translators: Placeholders: %1$s - Square item name, %2$s - failure reason */
 							__( 'Could not import "%1$s" from Square. %2$s', 'woocommerce-square' ),
 							$catalog_object->getItemData()->getName(),
 							$exception->getMessage()
@@ -652,11 +760,74 @@ class Product_Import extends Stepped_Job {
 		$variation_data = $variation->getItemVariationData();
 
 		if ( 'VARIABLE_PRICING' === $variation_data->getPricingType() ) {
-			throw new \Exception( __( 'Items with variable pricing cannot be imported.', 'woocommerce-square' ) );
+			throw new \Exception( esc_html__( 'Items with variable pricing cannot be imported.', 'woocommerce-square' ) );
 		}
 
 		if ( in_array( $variation_data->getSku(), array( '', null ), true ) ) {
-			throw new \Exception( __( 'Variations with missing SKUs cannot be imported.', 'woocommerce-square' ) );
+			throw new \Exception( esc_html__( 'Variations with missing SKUs cannot be imported.', 'woocommerce-square' ) );
+		}
+
+		$variation_options = $variation_data->getItemOptionValues();
+
+		$attributes = array();
+
+		foreach ( $variation_options as $variation_option ) {
+			$option_id       = $variation_option->getItemOptionId();
+			$option_value_id = $variation_option->getItemOptionValueId();
+			$result          = wc_square()->get_api()->retrieve_options_data();
+			$options_data    = isset( $result[1] ) ? $result[1] : array();
+
+			if ( isset( $options_data[ $option_id ] ) && isset( $options_data[ $option_id ]['value_ids'][ $option_value_id ] ) ) {
+				$option_name    = $options_data[ $option_id ]['name'];
+				$option_matched = $options_data[ $option_id ]['value_ids'][ $option_value_id ];
+			} else {
+				// Fetch option data from Square.
+				$response    = wc_square()->get_api()->retrieve_catalog_object( $option_id );
+				$option_name = $response->get_data()->getObject()->getItemOptionData()->getDisplayName();
+
+				$option_values_object = $response->get_data()->getObject()->getItemOptionData()->getValues();
+				$option_matched       = '';
+				$option_values        = array();
+				$option_value_ids     = array();
+
+				foreach ( $option_values_object as $option_value ) {
+					$option_value_name = $option_value->getItemOptionValueData()->getName();
+					$option_values[]   = $option_value_name;
+
+					$option_value_ids[ $option_value->getId() ] = $option_value_name;
+
+					if ( $option_value_id === $option_value->getId() ) {
+						$option_matched = $option_value_name;
+					}
+				}
+
+				$options_data[ $option_id ] = array(
+					'name'      => $option_name,
+					'values'    => $option_values,
+					'value_ids' => $option_value_ids,
+				);
+
+				set_transient( 'wc_square_options_data', $options_data );
+			}
+
+			$attributes[] = array(
+				'name'         => str_replace( 'pa_', '', $option_name ),
+				'slug'         => str_replace( 'pa_', '', sanitize_title( $option_name ) ),
+				'is_variation' => true,
+				'option'       => $option_matched,
+				'pa_prefix'    => strpos( $option_name, 'pa_' ) !== false,
+			);
+		}
+
+		if ( ! $variation_options ) {
+			$attribute_name = ! empty( reset( $this->woo_attributes ) ) ? reset( $this->woo_attributes )->get_name() : 'Attribute';
+			$attributes[]   = array(
+				'name'         => str_replace( 'pa_', '', $attribute_name ),
+				'slug'         => str_replace( 'pa_', '', sanitize_title( $attribute_name ) ),
+				'is_variation' => true,
+				'option'       => $variation_data->getName(),
+				'pa_prefix'    => strpos( $attribute_name, 'pa_' ) !== false,
+			);
 		}
 
 		$data = array(
@@ -669,16 +840,114 @@ class Product_Import extends Stepped_Job {
 				'item_variation_id'      => $variation->getId(),
 				'item_variation_version' => $variation->getVersion(),
 			),
-			'attributes'     => array(
-				array(
-					'name'         => 'Attribute',
-					'is_variation' => true,
-					'option'       => str_replace( '|', ' - ', $variation_data->getName() ),
-				),
-			),
+			'attributes'     => $attributes,
 		);
 
 		return $data;
+	}
+
+	/**
+	 * Extracts attributes from Square options.
+	 *
+	 * @since 4.9.0
+	 *
+	 * @param array $options    the Square options
+	 * @param array $variations the product variations to determine which option values are actually used
+	 * @return array
+	 * @throws \Exception
+	 */
+	protected function extract_attributes_from_square_options( $options, $variations = array() ) {
+
+		$data_attributes = array();
+
+		// Collect all option values that are actually used by variations.
+		$used_option_values = array();
+		foreach ( $variations as $variation ) {
+			if ( isset( $variation['attributes'] ) && is_array( $variation['attributes'] ) ) {
+				foreach ( $variation['attributes'] as $attribute ) {
+					if ( isset( $attribute['name'] ) && isset( $attribute['option'] ) ) {
+						$attribute_name = $attribute['name'];
+						if ( ! isset( $used_option_values[ $attribute_name ] ) ) {
+							$used_option_values[ $attribute_name ] = array();
+						}
+						$used_option_values[ $attribute_name ][] = $attribute['option'];
+					}
+				}
+			}
+		}
+
+		foreach ( $options as $option ) {
+			$option_id = $option->getItemOptionId();
+
+			$result       = wc_square()->get_api()->retrieve_options_data();
+			$options_data = isset( $result[1] ) ? $result[1] : array();
+
+			if ( isset( $options_data[ $option_id ] ) && isset( $options_data[ $option_id ]['values'] ) ) {
+				$option_name   = $options_data[ $option_id ]['name'];
+				$option_values = $options_data[ $option_id ]['values'];
+			} else {
+				// Fetch option name from Square.
+				$response             = wc_square()->get_api()->retrieve_catalog_object( $option_id );
+				$option_name          = $response->get_data()->getObject()->getItemOptionData()->getDisplayName();
+				$option_values_object = $response->get_data()->getObject()->getItemOptionData()->getValues();
+				$option_value_ids     = array();
+				$option_values        = array();
+
+				foreach ( $option_values_object as $option_value ) {
+					$option_values[]    = $option_value->getItemOptionValueData()->getName();
+					$option_value_ids[] = $option_value->getId();
+				}
+
+				$options_data[ $option_id ] = array(
+					'name'      => $option_name,
+					'values'    => $option_values,
+					'value_ids' => array_combine( $option_value_ids, $option_values ),
+				);
+				set_transient( 'wc_square_options_data', $options_data );
+			}
+
+			// Filter option values to only include those actually used by variations.
+			$clean_option_name = str_replace( 'pa_', '', $option_name );
+			$filtered_values   = $option_values;
+
+			if ( isset( $used_option_values[ $clean_option_name ] ) ) {
+				$filtered_values = array_intersect( $option_values, array_unique( $used_option_values[ $clean_option_name ] ) );
+			}
+
+			$data_attributes[] = array(
+				'name'      => $clean_option_name,
+				'slug'      => str_replace( 'pa_', '', sanitize_title( $option_name ) ),
+				'visible'   => true,
+				'variation' => true,
+				'options'   => $filtered_values,
+				'pa_prefix' => strpos( $option_name, 'pa_' ) !== false,
+			);
+		}
+
+		return $data_attributes;
+	}
+
+	/**
+	 * Extracts attributes from Square variations.
+	 *
+	 * @since 4.9.0
+	 *
+	 * @param array $variations the variations
+	 * @return array
+	 */
+	protected function extract_attributes_from_square_variations( $variations ) {
+
+		$attribute_name = ! empty( reset( $this->woo_attributes ) ) ? reset( $this->woo_attributes )->get_name() : 'Attribute';
+		$attributes[]   = array(
+			'name'      => str_replace( 'pa_', '', $attribute_name ),
+			'slug'      => str_replace( 'pa_', '', sanitize_title( $attribute_name ) ),
+			'visible'   => true,
+			'variation' => true,
+			'options'   => wp_list_pluck( $variations, 'name' ),
+			'pa_prefix' => strpos( $attribute_name, 'pa_' ) !== false,
+		);
+
+		return $attributes;
 	}
 
 
@@ -749,7 +1018,7 @@ class Product_Import extends Stepped_Job {
 
 					} else {
 
-						throw new \Exception( __( 'The SKU already exists on another product', 'woocommerce-square' ) );
+						throw new \Exception( esc_html__( 'The SKU already exists on another product', 'woocommerce-square' ) );
 					}
 				} else {
 					update_post_meta( $product_id, '_sku', '' );
@@ -774,14 +1043,49 @@ class Product_Import extends Stepped_Job {
 				$attribute_slug = sanitize_title( $attribute['name'] );
 
 				if ( isset( $attribute['slug'] ) ) {
-
 					$taxonomy       = $this->get_attribute_taxonomy_by_slug( $attribute['slug'] );
 					$attribute_slug = sanitize_title( $attribute['slug'] );
 				}
 
 				if ( $taxonomy ) {
-
 					$is_taxonomy = 1;
+
+				} elseif ( isset( $attribute['pa_prefix'] ) && $attribute['pa_prefix'] ) {
+					// Create new taxonomy attribute.
+					$is_taxonomy = 1;
+					$taxonomy    = wc_attribute_taxonomy_name( $attribute_slug );
+
+					if ( ! taxonomy_exists( $taxonomy ) ) {
+						$attribute_name = ucfirst( wc_clean( $attribute['name'] ) );
+						$attribute_args = array(
+							'label' => $attribute_name,
+							'name'  => $attribute_name,
+							'slug'  => $attribute_slug,
+						);
+
+						$attribute_id = wc_create_attribute( $attribute_args );
+
+						if ( is_wp_error( $attribute_id ) ) {
+							throw new \Exception( esc_html( $attribute_id->get_error_message() ) );
+						}
+
+						// Register the taxonomy.
+						register_taxonomy(
+							$taxonomy,
+							'product',
+							array(
+								'hierarchical' => true,
+								'show_ui'      => false,
+								'query_var'    => true,
+								'rewrite'      => false,
+							)
+						);
+					}
+				}
+
+				// Remove 'Any' from options.
+				if ( isset( $attribute['options'] ) && is_array( $attribute['options'] ) ) {
+					$attribute['options'] = array_diff( $attribute['options'], array( WC_SQUARE_OPTION_ANY ) );
 				}
 
 				if ( $is_taxonomy ) {
@@ -871,6 +1175,13 @@ class Product_Import extends Stepped_Job {
 			$term_ids = array_unique( array_map( 'intval', $data['categories'] ) );
 
 			wp_set_object_terms( $product_id, $term_ids, 'product_cat' );
+		}
+
+		// Update custom meta.
+		if ( $data['custom_meta'] ) {
+			foreach ( $data['custom_meta'] as $meta_key => $meta_value ) {
+				update_post_meta( $product_id, $meta_key, $meta_value );
+			}
 		}
 
 		// clear/invalidate cache before calling WooCommerce\Square\Handlers\Product functions (these functions call wc_get_product() and save(), overriding our changes)
@@ -1003,7 +1314,7 @@ class Product_Import extends Stepped_Job {
 			// stop if we don't have a variation ID
 			if ( is_wp_error( $variation_id ) ) {
 
-				throw new \Exception( $variation_id->get_error_message() );
+				throw new \Exception( esc_html( $variation_id->get_error_message() ) );
 			}
 
 			// SKU
@@ -1026,7 +1337,7 @@ class Product_Import extends Stepped_Job {
 
 						} else {
 
-							throw new \Exception( __( 'The SKU already exists on another product', 'woocommerce-square' ) );
+							throw new \Exception( esc_html__( 'The SKU already exists on another product', 'woocommerce-square' ) );
 						}
 					} else {
 
@@ -1055,6 +1366,8 @@ class Product_Import extends Stepped_Job {
 				$updated_attribute_keys = array();
 
 				foreach ( $variation['attributes'] as $attribute_key => $attribute ) {
+					// Set empty if attribute is to 'Any' to prevent it from being saved.
+					$attribute['option'] = isset( $attribute['option'] ) && WC_SQUARE_OPTION_ANY !== $attribute['option'] ? $attribute['option'] : '';
 
 					if ( ! isset( $attribute['name'] ) ) {
 						continue;
@@ -1320,13 +1633,13 @@ class Product_Import extends Stepped_Job {
 		// validate title field
 		if ( ! isset( $data['title'] ) ) {
 			/* translators: Placeholders: %s - missing parameter name */
-			throw new \Exception( sprintf( __( 'Missing parameter %s', 'woocommerce-square' ), 'title' ) );
+			throw new \Exception( sprintf( esc_html__( 'Missing parameter %s', 'woocommerce-square' ), 'title' ) );
 		}
 
 		// validate type
 		if ( ! array_key_exists( wc_clean( $data['type'] ), wc_get_product_types() ) ) {
 			/* translators: Placeholders: %s - comma separated list of valid product types */
-			throw new \Exception( sprintf( __( 'Invalid product type - the product type must be any of these: %s', 'woocommerce-square' ), implode( ', ', array_keys( wc_get_product_types() ) ) ) );
+			throw new \Exception( sprintf( esc_html__( 'Invalid product type - the product type must be any of these: %s', 'woocommerce-square' ), esc_html( implode( ', ', array_keys( wc_get_product_types() ) ) ) ) );
 		}
 
 		$new_product = array(
@@ -1346,7 +1659,7 @@ class Product_Import extends Stepped_Job {
 		$product_id = wp_insert_post( $new_product, true );
 
 		if ( is_wp_error( $product_id ) ) {
-			throw new \Exception( $product_id->get_error_message() );
+			throw new \Exception( esc_html( $product_id->get_error_message() ) );
 		}
 
 		return $product_id;
@@ -1385,5 +1698,4 @@ class Product_Import extends Stepped_Job {
 
 		wc_square()->log( sprintf( 'Error %s product during import: %s', 'import' === $context ? 'creating' : 'updating', $error ) );
 	}
-
 }

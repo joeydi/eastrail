@@ -55,8 +55,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function account_details() {
 
@@ -75,8 +74,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function delete_list_member( $list_id, $email_address ) {
 
@@ -98,8 +96,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function get_interest_category_interests( $list_id, $category_id ) {
 
@@ -117,8 +114,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws Exception
+	 * @return array|WP_Error
 	 */
 	public function get_list( $list_id ) {
 
@@ -136,8 +132,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function get_lists( $params ) {
 
@@ -155,8 +150,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function get_list_interest_categories( $list_id ) {
 
@@ -175,8 +169,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function get_list_member( $list_id, $email_address ) {
 
@@ -198,8 +191,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function get_list_members( $list_id, $options = array() ) {
 
@@ -217,8 +209,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function get_list_merge_fields( $list_id ) {
 
@@ -240,8 +231,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function update_list_member( $list_id, $email_address, $subscription, $method = 'PUT' ) {
 		// Make sure that method is either PUT or PATCH.
@@ -249,10 +239,16 @@ class GF_MailChimp_API {
 			throw Exception( __METHOD__ . '(): Method must be one of PUT or PATCH.' );
 		}
 
-		// Prepare subscriber hash.
-		$subscriber_hash = md5( strtolower( $email_address ) );
+		$path = 'lists/' . $list_id . '/members/' . md5( strtolower( $email_address ) );
 
-		return $this->process_request( 'lists/' . $list_id . '/members/' . $subscriber_hash, $subscription, $method );
+		if ( isset( $subscription['skip_merge_validation'] ) ) {
+			if ( $subscription['skip_merge_validation'] ) {
+				$path = add_query_arg( 'skip_merge_validation', 'true', $path );
+			}
+			unset( $subscription['skip_merge_validation'] );
+		}
+
+		return $this->process_request( $path, $subscription, $method );
 
 	}
 
@@ -268,8 +264,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function update_member_tags( $list_id, $email_address, $tags ) {
 
@@ -292,8 +287,7 @@ class GF_MailChimp_API {
 	 *
 	 * @uses   GF_MailChimp_API::process_request()
 	 *
-	 * @return array
-	 * @throws GF_MailChimp_Exception|Exception
+	 * @return array|WP_Error
 	 */
 	public function add_member_note( $list_id, $email_address, $note ) {
 
@@ -308,6 +302,8 @@ class GF_MailChimp_API {
 	 * Process Mailchimp API request.
 	 *
 	 * @since  4.0
+	 * @since  5.7 Updated to return WP_Error instead of throwing an exception.
+	 *
 	 * @access private
 	 *
 	 * @param string $path Request path.
@@ -315,15 +311,13 @@ class GF_MailChimp_API {
 	 * @param string $method Request method. Defaults to GET.
 	 * @param string $return_key Array key from response to return. Defaults to null (return full response).
 	 *
-	 * @throws GF_MailChimp_Exception|Exception If API request returns an error, exception is thrown.
-	 *
-	 * @return array
+	 * @return array|WP_Error
 	 */
 	private function process_request( $path = '', $data = array(), $method = 'GET', $return_key = null ) {
 
-		// If API key is not set, throw exception.
+		// Abort early if API key is not set.
 		if ( rgblank( $this->api_key ) ) {
-			throw new Exception( 'Access Token must be defined to process an API request.' );
+			return new WP_Error( 'empty_api_key', 'Access Token must be defined to process an API request.' );
 		}
 
 		// Build base request URL.
@@ -388,7 +382,7 @@ class GF_MailChimp_API {
 
 		// If request was not successful, throw exception.
 		if ( is_wp_error( $response ) ) {
-			throw new GF_MailChimp_Exception( $response->get_error_message() );
+			return $response;
 		}
 
 		// Decode response body.
@@ -398,27 +392,18 @@ class GF_MailChimp_API {
 		$response_code = wp_remote_retrieve_response_code( $response );
 
 		if ( ! in_array( $response_code, array( 200, 204 ) ) ) {
-
-			// If status code is set, throw exception.
-			if ( isset( $response['body']['status'] ) && isset( $response['body']['title'] ) ) {
-
-				// Initialize exception.
-				$exception = new GF_MailChimp_Exception( $response['body']['title'], $response['body']['status'] );
-
-				// Add detail.
-				$exception->setDetail( $response['body']['detail'] );
-
-				// Add errors if available.
-				if ( isset( $response['body']['errors'] ) ) {
-					$exception->setErrors( $response['body']['errors'] );
-				}
-
-				throw $exception;
-
+			$message = rgar( $response['body'], 'detail' );
+			if ( empty( $message ) ) {
+				$message = wp_remote_retrieve_response_message( $response );
+			} elseif ( ! empty( $response['body']['instance'] ) ) {
+				$message .= ' Instance: ' . $response['body']['instance'];
 			}
 
-			throw new GF_MailChimp_Exception( wp_remote_retrieve_response_message( $response ), $response_code );
+			if ( ! empty( $response['body']['title'] ) ) {
+				$message = $response['body']['title'] . ': ' . $message;
+			}
 
+			return new WP_Error( $response_code, $message, rgar( $response['body'], 'errors' ) );
 		}
 
 		// Remove links from response.
@@ -478,6 +463,8 @@ class GF_MailChimp_API {
 
 /**
  * Gravity Forms Mailchimp Exception.
+ *
+ * @depecated 5.7
  *
  * @since     4.0.3
  * @package   GravityForms

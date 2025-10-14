@@ -31,6 +31,7 @@ use WooCommerce\Square\Handlers\Product;
 use WooCommerce\Square\Sync\Records;
 use WooCommerce\Square;
 use WooCommerce\Square\Gateway\Gift_Card;
+use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
 /**
  * Products admin handler.
@@ -52,6 +53,9 @@ class Products {
 	/** @var int[] array of product IDs that have been scheduled for deletion in this request */
 	private $products_to_delete = array();
 
+	/** @var bool whether gift card features are enabled */
+	private $gift_card_enabled = 'no';
+
 	/** @var int[] array of product IDs that have been scheduled for inventory sync in this request */
 	private $products_to_inventory_sync = array();
 
@@ -67,18 +71,32 @@ class Products {
 
 		$this->plugin = $plugin;
 
-		// add common errors
+		// Get gift card features status.
+		$gift_card_settings      = get_option( Gift_Card::SQUARE_PAYMENT_SETTINGS_OPTION_NAME, array() );
+		$this->gift_card_enabled = $gift_card_settings['enabled'] ?? 'no';
+
+		add_action( 'init', array( $this, 'register_common_errors' ) );
+		add_action( 'current_screen', array( $this, 'add_tabs' ), 99 );
+
+		// add hooks
+		$this->add_products_edit_screen_hooks();
+		$this->add_product_edit_screen_hooks();
+		$this->add_product_sync_hooks();
+	}
+
+	/**
+	 * Loads register common errors.
+	 *
+	 * @since 4.8.6
+	 */
+	public function register_common_errors() {
+		// Add common errors.
 		$this->product_errors = array(
 			/* translators: Placeholder: %s - product name */
 			'missing_sku'           => __( "Please add an SKU to sync %s with Square. The SKU must match the item's SKU in your Square account.", 'woocommerce-square' ),
 			/* translators: Placeholder: %s - product name */
 			'missing_variation_sku' => __( "Please add an SKU to every variation of %s for syncing with Square. Each SKU must be unique and match the corresponding item's SKU in your Square account.", 'woocommerce-square' ),
 		);
-
-		// add hooks
-		$this->add_products_edit_screen_hooks();
-		$this->add_product_edit_screen_hooks();
-		$this->add_product_sync_hooks();
 	}
 
 	/**
@@ -113,8 +131,7 @@ class Products {
 		add_filter( 'woocommerce_csv_product_import_mapping_default_columns', array( $this, 'map_sync_status_column' ) );
 		add_filter( 'woocommerce_product_import_pre_insert_product_object', array( $this, 'import_sync_status' ), 10, 2 );
 
-		// gift card features.
-		if ( wc_square()->get_gateway()->get_gift_card_handler()->is_gift_card_enabled() ) {
+		if ( 'yes' === $this->gift_card_enabled ) {
 			add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'add_input_fields_to_gift_card_product' ) );
 			add_filter( 'woocommerce_product_is_taxable', array( $this, 'disable_taxes_for_gift_card_product' ), 10, 2 );
 			add_filter( 'woocommerce_product_needs_shipping', array( $this, 'disable_shipping_for_gift_card_product' ), 10, 2 );
@@ -124,9 +141,15 @@ class Products {
 			add_filter( 'woocommerce_get_item_data', array( $this, 'add_sent_to_email_to_cart_item' ), 10, 2 );
 			add_filter( 'woocommerce_add_to_cart_sold_individually_found_in_cart', array( $this, 'limit_gift_card_quantity_in_cart' ), 10, 2 );
 			add_filter( 'woocommerce_order_item_needs_processing', array( $this, 'filter_needs_processing' ), 10, 2 );
-			add_filter( 'woocommerce_loop_add_to_cart_link', array( $this, 'filter_shop_page_add_to_cart_button' ), 10, 3 );
 			add_filter( 'woocommerce_single_product_image_thumbnail_html', array( $this, 'filter_single_product_featured_image_placeholder' ) );
 			add_filter( 'woocommerce_product_get_image', array( $this, 'filter_gift_card_product_featured_image_placeholder' ), 10, 3 );
+
+			// Product blocks support.
+			add_filter( 'woocommerce_product_add_to_cart_text', array( $this, 'gift_card_add_to_cart_text' ), 10, 2 );
+			add_filter( 'woocommerce_product_add_to_cart_url', array( $this, 'gift_card_add_to_cart_url' ), 10, 2 );
+			add_filter( 'woocommerce_product_has_options', array( $this, 'gift_card_product_has_options' ), 10, 2 );
+			add_filter( 'woocommerce_product_supports', array( $this, 'gift_card_product_supports' ), 10, 3 );
+			add_filter( 'woocommerce_product_get_image_id', array( $this, 'gift_card_product_image_id' ), 10, 2 );
 		}
 	}
 
@@ -146,7 +169,7 @@ class Products {
 
 		add_action( 'admin_notices', array( $this, 'add_notice_product_hidden_from_catalog' ) );
 
-		if ( wc_square()->get_gateway()->get_gift_card_handler()->is_gift_card_enabled() ) {
+		if ( 'yes' === $this->gift_card_enabled ) {
 			add_filter( 'product_type_options', array( __CLASS__, 'add_gift_card_checkbox' ) );
 			add_filter( 'woocommerce_product_data_tabs', array( $this, 'filter_product_tabs' ), 50 );
 		}
@@ -167,6 +190,40 @@ class Products {
 		// Sync product inventory when a product is added to the cart.
 		add_action( 'woocommerce_add_to_cart', array( $this, 'maybe_stage_products_for_sync_inventory' ), 10, 4 );
 		add_action( 'shutdown', array( $this, 'maybe_sync_product_inventory' ) );
+	}
+
+	/**
+	 * Add help tabs.
+	 *
+	 * @since 4.7.0
+	 */
+	public function add_tabs() {
+		if ( ! function_exists( 'wc_get_screen_ids' ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+
+		if ( ! $screen || ! in_array( $screen->id, wc_get_screen_ids(), true ) ) {
+			return;
+		}
+
+		$help_tabs = $screen->get_help_tabs();
+		if ( ! isset( $help_tabs['woocommerce_onboard_tab'] ) ) {
+			return;
+		}
+
+		$updated_help_tab = $help_tabs['woocommerce_onboard_tab'];
+
+		$square_text  = '<h2>' . esc_html__( 'Square Onboarding Setup Wizard', 'woocommerce-square' ) . '</h2>';
+		$square_text .= '<p>' . esc_html__( 'If you need to access the Square onboarding setup wizard again, please click on the button below.', 'woocommerce-square' ) . '</p>' .
+			'<p><a href="' . esc_url( admin_url( 'admin.php?page=woocommerce-square-onboarding' ) ) . '" class="button button-primary">' . esc_html__( 'Setup wizard', 'woocommerce-square' ) . '</a></p>';
+
+		$updated_help_tab['content'] .= $square_text;
+
+		// Remove the old help tab and add the new one.
+		$screen->remove_help_tab( 'woocommerce_onboard_tab' );
+		$screen->add_help_tab( $updated_help_tab );
 	}
 
 	/**
@@ -504,6 +561,11 @@ class Products {
 		if ( is_string( $square_synced ) ) {
 			$errors = $this->check_product_sync_errors( $product );
 			if ( 'no' === $square_synced || empty( $errors ) ) {
+				if ( 'yes' === $square_synced && $product->is_type( 'variable' ) && wc_square()->get_settings_handler()->is_inventory_sync_enabled() ) {
+					// if syncing inventory with Square, parent variable products don't manage stock
+					$product->set_manage_stock( false );
+				}
+
 				Product::set_synced_with_square( $product, $square_synced );
 			} elseif ( ! empty( $errors ) ) {
 				foreach ( $errors as $error ) {
@@ -567,9 +629,12 @@ class Products {
 	 * @param \WC_Product $product product object
 	 */
 	public function maybe_adjust_square_stock( $product ) {
+		$is_new_product_editor_enabled = FeaturesUtil::feature_is_enabled( 'product_block_editor' );
 
 		// this is hooked in to general product object save, so scope to specifically saving products via the admin
-		if ( ! doing_action( 'wp_ajax_woocommerce_save_variations' ) && ! doing_action( 'woocommerce_admin_process_product_object' ) ) {
+		if ( $is_new_product_editor_enabled && ! wc_rest_is_from_product_editor() ) {
+			return;
+		} elseif ( ! $is_new_product_editor_enabled && ! doing_action( 'wp_ajax_woocommerce_save_variations' ) && ! doing_action( 'woocommerce_admin_process_product_object' ) ) {
 			return;
 		}
 
@@ -1049,7 +1114,7 @@ class Products {
 			switch ( $coupon->get_discount_type() ) {
 				case 'fixed_cart':
 					if ( Gift_Card::cart_contains_gift_card() ) {
-						throw new Exception( __( 'Sorry, this coupon is not applicable to gift card products.', 'woocommerce-square' ) );
+						throw new Exception( esc_html__( 'Sorry, this coupon is not applicable to gift card products.', 'woocommerce-square' ) );
 					}
 					break;
 			}
@@ -1079,10 +1144,10 @@ class Products {
 
 		// Add email data.
 		if ( Gift_Card::is_new() && isset( $_POST['square-gift-card-send-to-email'] ) && ! empty( $_POST['square-gift-card-send-to-email'] ) ) {
-			$sender_name = isset( $_POST['square-gift-card-sender-name'] ) ? wc_clean( wp_unslash( $_POST['square-gift-card-sender-name'] ) ) : '';
-			$email       = isset( $_POST['square-gift-card-send-to-email'] ) ? is_email( wp_unslash( $_POST['square-gift-card-send-to-email'] ) ) : '';
-			$first_name  = isset( $_POST['square-gift-card-sent-to-first-name'] ) ? wc_clean( wp_unslash( $_POST['square-gift-card-sent-to-first-name'] ) ) : '';
-			$message     = isset( $_POST['square-gift-card-sent-to-message'] ) ? wc_clean( wp_unslash( $_POST['square-gift-card-sent-to-message'] ) ) : '';
+			$sender_name = isset( $_POST['square-gift-card-sender-name'] ) ? wc_clean( wp_unslash( $_POST['square-gift-card-sender-name'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$email       = isset( $_POST['square-gift-card-send-to-email'] ) ? is_email( wp_unslash( $_POST['square-gift-card-send-to-email'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$first_name  = isset( $_POST['square-gift-card-sent-to-first-name'] ) ? wc_clean( wp_unslash( $_POST['square-gift-card-sent-to-first-name'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$message     = isset( $_POST['square-gift-card-sent-to-message'] ) ? wc_clean( wp_unslash( $_POST['square-gift-card-sent-to-message'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			if ( $sender_name ) {
 				$cart_item_data['square-gift-card-sender-name'] = $sender_name;
@@ -1104,15 +1169,15 @@ class Products {
 		// Add gift card number.
 		if ( Gift_Card::is_load() && isset( $_POST['square-gift-card-gan'] ) ) {
 			if ( empty( $_POST['square-gift-card-gan'] ) ) {
-				throw new Exception( __( 'The gift card number field is empty.', 'woocommerce-square' ) );
+				throw new Exception( esc_html__( 'The gift card number field is empty.', 'woocommerce-square' ) );
 			}
 
-			$cart_item_data['square-gift-card-gan'] = wc_clean( wp_unslash( $_POST['square-gift-card-gan'] ) );
+			$cart_item_data['square-gift-card-gan'] = wc_clean( wp_unslash( $_POST['square-gift-card-gan'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			$response = $this->get_plugin()->get_gateway()->get_api()->retrieve_gift_card_by_gan( $cart_item_data['square-gift-card-gan'] );
 
 			if ( ! $response->get_data() instanceof \Square\Models\RetrieveGiftCardFromGANResponse ) {
-				throw new Exception( __( 'The gift card number is either invalid or does not exist.', 'woocommerce-square' ) );
+				throw new Exception( esc_html__( 'The gift card number is either invalid or does not exist.', 'woocommerce-square' ) );
 			}
 		}
 
@@ -1168,33 +1233,6 @@ class Products {
 	}
 
 	/**
-	 * Replaces the `Add to cart` button on the shop page
-	 * to `Buy Gift Card` for a gift card product.
-	 *
-	 * @param string      $html    Add to Cart button HTML.
-	 * @param \WC_Product $product WooCommerce product.
-	 * @param array       $args    Attributes for the button.
-	 */
-	public function filter_shop_page_add_to_cart_button( $html, $product, $args ) {
-		if ( ! is_shop() ) {
-			return $html;
-		}
-
-		/** @var \WC_Product $product */
-		if ( ! Product::is_gift_card( $product ) ) {
-			return $html;
-		}
-
-		return sprintf(
-			'<a href="%s" class="%s" %s>%s</a>',
-			esc_url( $product->get_permalink() ),
-			'button wp-element-button',
-			isset( $args['attributes'] ) ? wc_implode_html_attributes( $args['attributes'] ) : '',
-			esc_html__( 'Buy Gift Card', 'woocommerce-square' )
-		);
-	}
-
-	/**
 	 * Adds a custom gift card placeholder image to products that are marked
 	 * as a gift card.
 	 *
@@ -1207,6 +1245,10 @@ class Products {
 	 * @return string
 	 */
 	public function filter_gift_card_product_featured_image_placeholder( $image, $product, $size ) {
+		if ( ! self::should_use_default_gift_card_placeholder_image() ) {
+			return $image;
+		}
+
 		if ( has_post_thumbnail( $product->get_id() ) ) {
 			return $image;
 		}
@@ -1215,7 +1257,7 @@ class Products {
 			return $image;
 		}
 
-		$placeholder_image_id = get_option( 'wc_square_gift_card_placeholder_id', 0 );
+		$placeholder_image_id = self::get_gift_card_default_placeholder_id();
 
 		$default_attr = array(
 			'class' => 'woocommerce-placeholder wp-post-image',
@@ -1245,6 +1287,10 @@ class Products {
 	 * @return string
 	 */
 	public function filter_single_product_featured_image_placeholder( $html ) {
+		if ( ! self::should_use_default_gift_card_placeholder_image() ) {
+			return $html;
+		}
+
 		$product_id = get_the_ID();
 
 		if ( ! $product_id ) {
@@ -1265,7 +1311,7 @@ class Products {
 			return $html;
 		}
 
-		$placeholder_image_id = get_option( 'wc_square_gift_card_placeholder_id', false );
+		$placeholder_image_id = self::get_gift_card_default_placeholder_id();
 
 		if ( wp_attachment_is_image( $placeholder_image_id ) ) {
 			$html = wc_get_gallery_image_html( $placeholder_image_id, true );
@@ -1290,7 +1336,7 @@ class Products {
 		if ( Product::is_gift_card( $product ) && Gift_Card::cart_contains_gift_card() ) {
 			$message         = esc_html__( 'You can only add 1 gift card product to your cart per order.', 'woocommerce-square' );
 			$wp_button_class = wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '';
-			throw new Exception( sprintf( '<a href="%s" class="button wc-forward%s">%s</a> %s', wc_get_cart_url(), esc_attr( $wp_button_class ), __( 'View cart', 'woocommerce-square' ), $message ) );
+			throw new Exception( sprintf( '<a href="%s" class="button wc-forward%s">%s</a> %s', esc_url( wc_get_cart_url() ), esc_attr( $wp_button_class ), esc_html__( 'View cart', 'woocommerce-square' ), esc_html( $message ) ) );
 		}
 
 		return $found_in_cart;
@@ -1360,5 +1406,187 @@ class Products {
 				$async_request->data( array( 'product_ids' => $this->products_to_inventory_sync ) )->dispatch();
 			}
 		}
+	}
+
+	/**
+	 * Add to cart text.
+	 *
+	 * @param string      $text    Add to cart text.
+	 * @param \WC_Product $product Product object.
+	 * @return string
+	 */
+	public function gift_card_add_to_cart_text( $text, $product ) {
+		if ( ! is_a( $product, 'WC_Product' ) ) {
+			return $text;
+		}
+
+		if ( is_single( $product->get_id() ) ) {
+			return $text;
+		}
+
+		if ( Product::is_gift_card( $product ) ) {
+			return esc_html__( 'Buy Gift Card', 'woocommerce-square' );
+		}
+
+		return $text;
+	}
+
+	/**
+	 * Add to cart URL.
+	 *
+	 * @param string      $url     Add to cart URL.
+	 * @param \WC_Product $product Product object.
+	 * @return string
+	 */
+	public function gift_card_add_to_cart_url( $url, $product ) {
+		if ( ! is_a( $product, 'WC_Product' ) ) {
+			return $url;
+		}
+
+		if ( is_single( $product->get_id() ) ) {
+			return $url;
+		}
+
+		if ( Product::is_gift_card( $product ) ) {
+			return get_permalink( $product->get_id() );
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Determine if the Product has options.
+	 *
+	 * This will change the add to card button link to product page.
+	 *
+	 * @param boolean     $has_options Whether the product has options.
+	 * @param \WC_Product $product     Product object.
+	 */
+	public function gift_card_product_has_options( $has_options, $product ) {
+		if ( ! is_a( $product, 'WC_Product' ) ) {
+			return $has_options;
+		}
+
+		if ( Product::is_gift_card( $product ) ) {
+			return true;
+		}
+
+		return $has_options;
+	}
+
+	/**
+	 * Determine if the Product supports a feature.
+	 *
+	 * Disable AJAX add to cart for gift card products.
+	 *
+	 * @param boolean     $supports Whether the product supports a feature.
+	 * @param string      $feature  Feature.
+	 * @param \WC_Product $product  Product object.
+	 * @return boolean
+	 */
+	public function gift_card_product_supports( $supports, $feature, $product ) {
+		if ( ! is_a( $product, 'WC_Product' ) ) {
+			return $supports;
+		}
+
+		if ( 'ajax_add_to_cart' === $feature && Product::is_gift_card( $product ) ) {
+			return false;
+		}
+
+		return $supports;
+	}
+
+	/**
+	 * Adds a custom gift card placeholder image to products that are marked
+	 * as a gift card.
+	 *
+	 * @param string      $image_id Image ID.
+	 * @param \WC_Product $product  WooCommerce product.
+	 *
+	 * @return string
+	 */
+	public function gift_card_product_image_id( $image_id, $product ) {
+		if ( ! self::should_use_default_gift_card_placeholder_image() ) {
+			return $image_id;
+		}
+
+		if ( ! Product::is_gift_card( $product ) ) {
+			return $image_id;
+		}
+
+		if ( has_post_thumbnail( $product->get_id() ) ) {
+			return $image_id;
+		}
+
+		if ( empty( $image_id ) ) {
+			$placeholder_image_id = self::get_gift_card_default_placeholder_id();
+
+			if ( $placeholder_image_id ) {
+				$image_id = $placeholder_image_id;
+			}
+		}
+
+		return $image_id;
+	}
+
+	/**
+	 * Returns true if a gift card product should use the provided
+	 * default placeholder image.
+	 *
+	 * @since 4.8.1
+	 *
+	 * @return bool
+	 */
+	public static function should_use_default_gift_card_placeholder_image() {
+		$settings   = get_option( Gift_Card::SQUARE_PAYMENT_SETTINGS_OPTION_NAME, array() );
+		$is_enabled = isset( $settings['enabled'] ) && 'yes' === $settings['enabled'];
+
+		if ( ! $is_enabled ) {
+			return false;
+		}
+
+		$should_use_placeholder = isset( $settings['is_default_placeholder'] ) && 'yes' === $settings['is_default_placeholder'];
+
+		if ( ! $should_use_placeholder ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the default placeholder image ID for gift card products.
+	 *
+	 * @since 4.8.1
+	 *
+	 * @return int
+	 */
+	public static function get_gift_card_default_placeholder_id() {
+		$settings = get_option( Gift_Card::SQUARE_PAYMENT_SETTINGS_OPTION_NAME, array() );
+
+		return (int) ( $settings['placeholder_id'] ?? 0 );
+	}
+
+	/**
+	 * Returns the default placeholder image URL for gift card products.
+	 *
+	 * @since 4.8.1
+	 *
+	 * @return string|bool
+	 */
+	public static function get_gift_card_default_placeholder_url() {
+		$placeholder_id = self::get_gift_card_default_placeholder_id();
+
+		if ( ! $placeholder_id ) {
+			return '';
+		}
+
+		$attachment = get_post( $placeholder_id );
+
+		if ( ! $attachment ) {
+			return '';
+		}
+
+		return wp_get_attachment_url( $attachment->ID );
 	}
 }

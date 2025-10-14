@@ -6,74 +6,92 @@ use AC\ListScreenRepository\Storage;
 use AC\Registerable;
 use AC\ScreenController;
 use AC\Table\LayoutPreference;
+use AC\Table\PrimaryColumnFactory;
 use AC\Type\ListScreenId;
 
-class QuickEdit implements Registerable {
+class QuickEdit implements Registerable
+{
 
-	/**
-	 * @var Storage
-	 */
-	private $storage;
+    private Storage $storage;
 
-	/**
-	 * @var LayoutPreference
-	 */
-	private $preference;
+    private LayoutPreference $preference;
 
-	public function __construct( Storage $storage, LayoutPreference $preference ) {
-		$this->storage = $storage;
-		$this->preference = $preference;
-	}
+    private PrimaryColumnFactory $primary_column_factory;
 
-	public function register() {
-		add_action( 'admin_init', [ $this, 'init_columns_on_quick_edit' ] );
-	}
+    public function __construct(
+        Storage $storage,
+        LayoutPreference $preference,
+        PrimaryColumnFactory $primary_column_factory
+    ) {
+        $this->storage = $storage;
+        $this->preference = $preference;
+        $this->primary_column_factory = $primary_column_factory;
+    }
 
-	/**
-	 * Get list screen when doing Quick Edit, a native WordPress ajax call
-	 */
-	public function init_columns_on_quick_edit() {
-		if ( ! wp_doing_ajax() ) {
-			return;
-		}
+    public function register(): void
+    {
+        add_action('admin_init', [$this, 'init_columns_on_quick_edit']);
+    }
 
-		switch ( filter_input( INPUT_POST, 'action' ) ) {
+    protected function get_type(): ?string
+    {
+        switch (filter_input(INPUT_POST, 'action')) {
+            // Quick edit post
+            case 'pll_update_post_rows':
+            case 'inline-save' :
+                return filter_input(INPUT_POST, 'post_type');
 
-			// Quick edit post
-			case 'inline-save' :
-				$type = filter_input( INPUT_POST, 'post_type' );
-				break;
+            // Adding term & Quick edit term
+            case 'add-tag' :
+            case 'inline-save-tax' :
+            case 'pll_update_term_rows':
+                return 'wp-taxonomy_' . filter_input(INPUT_POST, 'taxonomy');
 
-			// Adding term & Quick edit term
-			case 'add-tag' :
-			case 'inline-save-tax' :
-				$type = 'wp-taxonomy_' . filter_input( INPUT_POST, 'taxonomy' );
-				break;
+            // Quick edit comment & Inline reply on comment
+            case 'edit-comment' :
+            case 'replyto-comment' :
+                return 'wp-comments';
 
-			// Quick edit comment & Inline reply on comment
-			case 'edit-comment' :
-			case 'replyto-comment' :
-				$type = 'wp-comments';
-				break;
+            default:
+                return null;
+        }
+    }
 
-			default:
-				return;
-		}
+    /**
+     * Get list screen when doing Quick Edit, a native WordPress ajax call
+     */
+    public function init_columns_on_quick_edit(): void
+    {
+        if ( ! wp_doing_ajax()) {
+            return;
+        }
 
-		$id = $this->preference->get( $type );
+        $type = $this->get_type();
 
-		if ( ! ListScreenId::is_valid_id( $id ) ) {
-			return;
-		}
+        if ( ! $type) {
+            return;
+        }
 
-		$list_screen = $this->storage->find_by_user( new ListScreenId( $id ), wp_get_current_user() );
+        $id = $this->preference->get($type);
 
-		if ( ! $list_screen ) {
-			return;
-		}
+        if ( ! ListScreenId::is_valid_id($id)) {
+            return;
+        }
 
-		$screen_controller = new ScreenController( $list_screen );
-		$screen_controller->register();
-	}
+        $list_screen = $this->storage->find(new ListScreenId($id));
+
+        if ( ! $list_screen || ! $list_screen->is_user_allowed(wp_get_current_user())) {
+            return;
+        }
+
+        add_filter(
+            'list_table_primary_column',
+            [$this->primary_column_factory->create($list_screen), 'set_primary_column'],
+            20
+        );
+
+        $screen_controller = new ScreenController($list_screen);
+        $screen_controller->register();
+    }
 
 }

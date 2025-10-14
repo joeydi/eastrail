@@ -22,8 +22,8 @@ namespace WooCommerce\Square\Gateway;
 defined( 'ABSPATH' ) || exit;
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
-use Automattic\WooCommerce\Blocks\Payments\PaymentResult;
-use Automattic\WooCommerce\Blocks\Payments\PaymentContext;
+use Automattic\WooCommerce\StoreApi\Payments\PaymentContext;
+use Automattic\WooCommerce\StoreApi\Payments\PaymentResult;
 use Automattic\WooCommerce\Blocks\Package;
 use WooCommerce\Square\Plugin;
 use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway_Helper;
@@ -84,7 +84,7 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 	 * @return array
 	 */
 	public function get_payment_method_script_handles() {
-		$asset_path   = $this->plugin->get_plugin_path() . '/assets/blocks/build/index.asset.php';
+		$asset_path   = $this->plugin->get_plugin_path() . '/build/index.asset.php';
 		$version      = Plugin::VERSION;
 		$dependencies = array();
 
@@ -94,7 +94,7 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 			$dependencies = is_array( $asset ) && isset( $asset['dependencies'] ) ? $asset['dependencies'] : $dependencies;
 		}
 
-		wp_enqueue_style( 'wc-square-cart-checkout-block', $this->plugin->get_plugin_url() . '/assets/css/frontend/wc-square-cart-checkout-blocks.min.css', array(), Plugin::VERSION );
+		wp_enqueue_style( 'wc-square-cart-checkout-block', $this->plugin->get_plugin_url() . '/build/assets/frontend/wc-square-cart-checkout-blocks.css', array(), Plugin::VERSION );
 		wp_register_script(
 			'wc-square-credit-card-blocks-integration',
 			$this->plugin->get_plugin_url() . '/build/index.js',
@@ -132,6 +132,9 @@ class Blocks_Handler extends AbstractPaymentMethodType {
 				'payment_token_nonce'        => wp_create_nonce( 'payment_token_nonce' ),
 				'is_pay_for_order_page'      => is_wc_endpoint_url( 'order-pay' ),
 				'recalculate_totals_nonce'   => wp_create_nonce( 'wc-square-recalculate-totals' ),
+				'should_charge_order_nonce'  => wp_create_nonce( 'wc_' . $this->get_gateway()->get_id() . '_should_charge_order' ),
+				'order_id'                   => absint( get_query_var( 'order-pay' ) ),
+				'is_change_payment_method'   => $this->get_gateway()->is_change_payment_method_request(),
 			),
 			$this->digital_wallets_handler->get_localised_data()
 		);

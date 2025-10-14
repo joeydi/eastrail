@@ -1,6 +1,7 @@
 <?php
-if ( 'yes' === $donation_gift_aid ) {	
-	if ( ( in_array('single', $donation_gift_aid_area) && is_product() && 'single' === $type ) || ( in_array('cart', $donation_gift_aid_area) && $is_cart && 'cart' === $type ) || ( in_array('checkout', $donation_gift_aid_area) && $is_checkout && 'checkout' === $type ) || ( in_array('widget', $donation_gift_aid_area) && 'shortcode' === $type ) ) {
+if ( 'yes' === $donation_gift_aid ) {   
+
+	if ( ( in_array('single', $donation_gift_aid_area) && is_product() && 'single' === $_type ) || ( in_array('cart', $donation_gift_aid_area) && $is_cart && 'cart' === $_type ) || ( in_array('checkout', $donation_gift_aid_area) && $is_checkout && 'checkout' === $_type ) || ( in_array('widget', $donation_gift_aid_area) && 'shortcode' === $_type ) ) {
 		?>
 		<div class="wc-donation-gift-aid-wrapper">		
 			<?php 

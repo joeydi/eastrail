@@ -1,4 +1,70 @@
 *** Donation For WooCommerce ***
+2025-07-15 - Version 3.9.7
+* fix - dompdf library bug fixed.
+
+*** Donation For WooCommerce ***
+2025-04-14 - Version 3.9.6
+* fix - Gutenberg block for single page checkout donation.
+* update - dompdf library
+
+2025-04-07 - Version 3.9.5
+* new - Gutenberg block for single page checkout donation.
+* new - Admin Dashboard
+* new - Donation Email Templates
+* new - Donation on Products
+* new - E-Card Templates on Email
+* new - Awareness Email Templates
+* fix - UI fix with WooCommerce Subscription (Woo)
+* fix - Donation via manual order (WOOC-1902).
+
+2024-09-06 - Version 3.7.0
+* new - Campaign Categories.
+* new - Campaign Description & Short Description.
+* new - Option to make a campaign featured.
+* new - Add new block for all campaigns.
+* new - Add new block for specifically for featured campaigns.
+* new - Add coloum for recurring in reports.
+* new - Add filter to make credit card processing fees required.
+* new - Add loader animation when donate button is clicked.
+* new - Social Share bar options.
+* new - Campaign Timer Display Types.
+* fix - General setting tab on translation.
+* fix - fee_type on thankyou page.
+* fix - Columns for attachments.
+* fix - gutenburg block js loaded on frontend (wooc-1723).
+* fix - subcription issue fixed on user end settings.
+* update - Edit frontend ordering for list and grid view.
+* update - Declared compatibility with Subscriptions For WooCommerce.
+
+2024-02-13 - Version 3.6.2
+* fix - Fixed issues caught in previous version.
+
+2024-01-25 - Version 3.6.1
+* new - Added filter hook `wc_donation_delete_campaign_product_data` to prevent campaign product data deletion.
+* fix - Fixed Uncaught ValueError: Path cannot be empty.
+
+2023-11-10 - version 3.6
+* new - Daily Donation
+* new - Display Donor List
+* new - Custom amount field & Placeholder
+* fix - Hide campaigns from round off selecting if the campaign is selected for cart or checkout.
+* fix - Fixed scroll issue on cart page v3.5
+* update - Enhanced code optimization and strengthened security measures.
+* update - Declared compatibility with the cart/checkout Blocks.
+
+2023-07-07 - version 3.5
+* new - Tribute wall.
+* new - Cart campaign display location. 
+* new - Cart campaign display type page/popup. 
+* new - Cart campaign format type.
+* new - Checkout campaign display location. 
+* new - Compatibility with Product Vendors. 
+* new - Compatibility with Dokan. 
+
+2023-05-31 - version 3.4.6.3
+* new - Add donation icon on checkout widget
+* new - add filter to filter action hook for checkout widget position 
+
 2023-05-25 - version 3.4.6.2
 * new - Option to modify round off template.
 * new - Multiple options to add gift aid.

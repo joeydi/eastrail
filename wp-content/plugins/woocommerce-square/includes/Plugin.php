@@ -29,10 +29,12 @@ use WooCommerce\Square\Framework\PaymentGateway\Payment_Gateway_Plugin;
 use WooCommerce\Square\Framework\PaymentGateway\PaymentTokens\Square_Credit_Card_Payment_Token;
 use WooCommerce\Square\Framework\Square_Helper;
 use WooCommerce\Square\Gateway\Cash_App_Pay_Gateway;
+use WooCommerce\Square\Gateway\Gift_Card;
 use WooCommerce\Square\Handlers\Background_Job;
 use WooCommerce\Square\Handlers\Async_Request;
 use WooCommerce\Square\Handlers\Email;
 use WooCommerce\Square\Handlers\Order;
+use WooCommerce\Square\Handlers\Order_Sync;
 use WooCommerce\Square\Handlers\Product;
 use WooCommerce\Square\Handlers\Sync;
 use WooCommerce\Square\Handlers\Products;
@@ -53,6 +55,9 @@ class Plugin extends Payment_Gateway_Plugin {
 
 	/** string gateway ID */
 	const GATEWAY_ID = 'square_credit_card';
+
+	/** string Gift Cards gateway ID */
+	const GIFT_CARD_PAY_GATEWAY_ID = 'gift_cards_pay';
 
 	/** string Cash App Pay gateway ID */
 	const CASH_APP_PAY_GATEWAY_ID = 'square_cash_app_pay';
@@ -90,6 +95,9 @@ class Plugin extends Payment_Gateway_Plugin {
 	/** @var Async_Request Asynchronous request handler */
 	private $async_request_handler;
 
+	/** @var Order_Sync order sync handler */
+	private $order_sync_handler;
+
 	/**
 	 * Constructs the plugin.
 	 *
@@ -103,8 +111,9 @@ class Plugin extends Payment_Gateway_Plugin {
 			array(
 				'text_domain'  => 'woocommerce-square',
 				'gateways'     => array(
-					self::GATEWAY_ID              => Gateway::class,
-					self::CASH_APP_PAY_GATEWAY_ID => Cash_App_Pay_Gateway::class,
+					self::GATEWAY_ID               => Gateway::class,
+					self::CASH_APP_PAY_GATEWAY_ID  => Cash_App_Pay_Gateway::class,
+					self::GIFT_CARD_PAY_GATEWAY_ID => Gift_Card::class,
 				),
 				'require_ssl'  => true,
 				'supports'     => array(
@@ -135,8 +144,22 @@ class Plugin extends Payment_Gateway_Plugin {
 		add_action( 'action_scheduler_init', array( $this, 'schedule_token_migration_job' ) );
 		add_action( 'wc_square_init_payment_token_migration_v2', array( $this, 'register_payment_tokens_migration_scheduler' ) );
 		add_action( 'wc_square_init_payment_token_migration', '__return_false' );
+
+		// Unschedule order sync event if order sync is disabled.
+		add_action( 'admin_init', array( $this, 'unschedule_order_sync' ) );
 	}
 
+	/**
+	 * Unschedule order sync event if order sync is disabled.
+	 *
+	 * @since 5.0.0
+	 */
+	public function unschedule_order_sync() {
+		if ( ! $this->get_settings_handler()->is_order_fulfillment_sync_enabled() && as_has_scheduled_action( WC_SQUARE_SYNC_ORDERS_EVENT_HOOK, array(), wc_square()->get_id() ) ) {
+			// Delete the order sync event.
+			as_unschedule_all_actions( WC_SQUARE_SYNC_ORDERS_EVENT_HOOK, array(), wc_square()->get_id() );
+		}
+	}
 
 	/**
 	 * Includes required classes.
@@ -250,6 +273,16 @@ class Plugin extends Payment_Gateway_Plugin {
 		if ( ! $this->admin_handler && is_admin() ) {
 			$this->admin_handler = new Admin( $this );
 		}
+
+		// Initialize order sync handler if order sync is enabled.
+		if ( $this->get_settings_handler()->is_order_fulfillment_sync_enabled() ) {
+			$this->order_sync_handler = new Order_Sync();
+			$this->order_sync_handler->init();
+		}
+
+		// WooPayments compatibility.
+		$wcpay_compatibility = new WC_Payments_Compatibility();
+		$wcpay_compatibility->init();
 
 		/**
 		 * @see wc_square_initialized
@@ -395,29 +428,6 @@ class Plugin extends Payment_Gateway_Plugin {
 					)
 				);
 			}
-		} else {
-
-			if ( $this->is_plugin_settings() ) {
-
-				$instruction = __( 'To get started, connect with Square.', 'woocommerce-square' );
-
-			} else {
-
-				$instruction = sprintf(
-					/* translators: Placeholders: %1$s - <a> tag, %2$s - </a> tag */
-					__( 'To get started, %1$sconnect with Square &raquo;%2$s', 'woocommerce-square' ),
-					'<a href="' . esc_url( $this->get_settings_url() ) . '">',
-					'</a>'
-				);
-			}
-
-			$message = sprintf(
-				/* translators: Placeholders: %1$s - plugin name */
-				__( 'Thanks for installing %1$s!', 'woocommerce-square' ),
-				esc_html( $this->get_plugin_name() )
-			);
-
-			$this->get_admin_notice_handler()->add_admin_notice( $message . ' ' . $instruction, 'connect' );
 		}
 
 		// add a notice for out-of-bounds base locations
@@ -803,6 +813,17 @@ class Plugin extends Payment_Gateway_Plugin {
 	}
 
 	/**
+	 * Gets the order sync handler instance.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @return Order_Sync
+	 */
+	public function get_order_sync_handler() {
+		return $this->order_sync_handler;
+	}
+
+	/**
 	 * Gets the plugin name.
 	 *
 	 * @since 2.0.0
@@ -829,6 +850,30 @@ class Plugin extends Payment_Gateway_Plugin {
 			'page' => 'wc-settings',
 			'tab'  => self::PLUGIN_ID,
 		);
+
+		// All usage of this return value has been escaped late.
+		// nosemgrep audit.php.wp.security.xss.query-arg
+		return add_query_arg( $params, admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * Gets the Setup Wizard URL.
+	 *
+	 * @since 4.7.0
+	 *
+	 * @param string $step Step to go to.
+	 *
+	 * @return string
+	 */
+	public function get_square_onboarding_url( $step = '' ) {
+		$params = array(
+			'page' => 'woocommerce-square-onboarding',
+		);
+
+		// Add 'step' if $step is not empty.
+		if ( ! empty( $step ) ) {
+			$params['step'] = $step;
+		}
 
 		// All usage of this return value has been escaped late.
 		// nosemgrep audit.php.wp.security.xss.query-arg

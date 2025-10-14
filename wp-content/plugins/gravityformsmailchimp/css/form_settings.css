@@ -77,7 +77,14 @@
 	display: none;
  }
 
+#gform-settings-section-mailchimp-settings .gform-status-indicator:not(:has(span.gform-status-indicator-status)):hover {
+	box-shadow: none;
+	border-color: rgba(87, 192, 145, 0.24);
+}
 
+#gform-settings-section-mailchimp-settings .gform-status-indicator:not(:has(span.gform-status-indicator-status)) {
+	padding: 0.375rem 0.5rem 0.375rem 0.5rem;
+}
 
  html[dir=rtl] .gform-settings-field__conditional-logic .gf_conditional_logic_rules_container select:first-child {
 	 margin-left: 2px;

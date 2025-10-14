@@ -137,6 +137,17 @@ class Payment_Gateway_Payment_Tokens_Handler {
 
 		// perform the API request to tokenize the payment method if needed
 		if ( ! $response || $this->get_gateway()->tokenize_after_sale() ) {
+
+			/**
+			 * Set last Payment ID to payment nonce to use for tokenization.
+			 * This is used for tokenization when "CHARGE_AND_STORE" intent is used to generate a payment nonce.
+			 *
+			 * @see https://developer.squareup.com/docs/web-payments/sca-charge-and-store-card-on-file#charge-a-card-and-store-its-details
+			 */
+			if ( ! empty( $response ) && ! empty( $response->get_transaction_id() ) && ! empty( $order->payment->nonce->credit_card ) ) {
+				$order->payment->nonce->credit_card = $response->get_transaction_id();
+			}
+
 			$response = $gateway->get_api()->tokenize_payment_method( $order );
 		}
 
@@ -197,7 +208,7 @@ class Payment_Gateway_Payment_Tokens_Handler {
 				$message .= ' ' . sprintf( esc_html__( 'Transaction ID %s', 'woocommerce-square' ), $response->get_transaction_id() );
 			}
 
-			throw new \Exception( $message );
+			throw new \Exception( esc_html( $message ) );
 		}
 
 		return $order;
@@ -212,7 +223,6 @@ class Payment_Gateway_Payment_Tokens_Handler {
 	 * @param int $user_id user identifier
 	 * @param Payment_Gateway_Payment_Token $token the token
 	 * @param string|null $environment_id optional environment id, defaults to plugin current environment
-	 * @return bool|int false if token not added, user meta ID if added
 	 */
 	public function add_token( $user_id, $token, $environment_id = null ) {
 		$payment_token = new Square_Credit_Card_Payment_Token();

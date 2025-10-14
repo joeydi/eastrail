@@ -4,7 +4,7 @@ class WcdonationWidgetProces extends WP_Widget {
 	
 	public function __construct() {
 		
-		add_action( 'widgets_init', array( $this, 'register_wc_donation_widget') );
+		add_action( 'widgets_init', array( $this, 'register_wc_donation_widget' ) );
 
 		parent::__construct(
  
@@ -12,27 +12,25 @@ class WcdonationWidgetProces extends WP_Widget {
 			'wc-donation-widget', 
 			 
 			// Widget name will appear in UI
-			__('WC Donation', 'wc-donation'), 
+			'WC Donation', 
 			 
 			// Widget description
-			array( 'description' => __( 'WC Donation Widget is use to collect donation.', 'wc-donation' ) ) 
+			array( 'description' => 'WC Donation Widget is use to collect donation.' ) 
 		);
-
 	}
 
-	public function register_wc_donation_widget () {
+	public function register_wc_donation_widget() {
 
 		register_widget( 'WcdonationWidgetProces' );
-
 	}
 
 	// Widget Backend
-	public function form ( $instance ) { 
+	public function form( $instance ) { 
 
 		$campaigns = get_posts(array(
 			'fields'          => 'ids',
 			'posts_per_page'  => -1,
-			'post_type' => 'wc-donation'
+			'post_type' => 'wc-donation',
 		));
 
 		if ( isset( $instance[ 'campaign' ] ) ) {
@@ -75,7 +73,7 @@ class WcdonationWidgetProces extends WP_Widget {
 	}
 
 	// Updating widget replacing old instances with new
-	public function update ( $new_instance, $old_instance ) {
+	public function update( $new_instance, $old_instance ) {
 
 		$instance = array();
 		$instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
@@ -84,7 +82,7 @@ class WcdonationWidgetProces extends WP_Widget {
 	}
 
 	// Creating widget front-end
-	public function widget ( $args, $instance ) {
+	public function widget( $args, $instance ) {
 
 		/**
 		* Filter.
@@ -99,20 +97,20 @@ class WcdonationWidgetProces extends WP_Widget {
 		*/
 		$id = isset($instance[ 'campaign' ]) ? apply_filters( 'widget_campaign', $instance[ 'campaign' ] ) : '';
 		
-		$allowed_html = array (
+		$allowed_html = array(
 			'div' => array(
 				'id' => array(),
-				'class' => array()
+				'class' => array(),
 			),
 			'span' => array(
 				'id' => array(),
-				'class' => array()
+				'class' => array(),
 			),
 			'a' => array(
 				'id' => array(),
 				'class' => array(),
 				'href' => array(),
-				'target' => array()
+				'target' => array(),
 			),
 		);
 
@@ -125,7 +123,7 @@ class WcdonationWidgetProces extends WP_Widget {
 		
 		//checking backward compatibility
 		$old_product_id = get_option( 'wc-donation-widget-product');
-		if ( empty($id) && !empty($old_product_id) ) {			
+		if ( empty($id) && !empty($old_product_id) ) {          
 			
 			$id = get_post_meta($old_product_id, 'wc_donation_campaign', true);
 		}
@@ -137,7 +135,13 @@ class WcdonationWidgetProces extends WP_Widget {
 			if ( !empty($post_exist) && ( isset($post_exist->post_status) && 'trash' !== $post_exist->post_status ) ) {
 				$campaign_id = $id;
 				$object = WcdonationCampaignSetting::get_product_by_campaign($campaign_id);
-				$type = 'widget';
+				$_type = 'widget';
+				/* Donation setTimer Settings */
+				$setTimerDonation = WcDonation::setTimerDonation($object);
+				if ( false === $setTimerDonation['status'] && 'hide' === $setTimerDonation['type'] ) {
+					return;
+				}
+
 				echo '<div id="wc_donation_on_widget_' . esc_html($campaign_id) . '">';
 				/**
 				* Action.
@@ -145,7 +149,7 @@ class WcdonationWidgetProces extends WP_Widget {
 				* @since 3.4.5
 				*/
 				do_action ('wc_donation_before_widget_add_donation', $campaign_id);
-				require WC_DONATION_PATH . '/includes/views/frontend/frontend-order-donation.php';
+				require WC_DONATION_PATH . 'includes/views/frontend/frontend-order-donation.php';
 				echo '</div>';
 				/**
 				* Action.

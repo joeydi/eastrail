@@ -107,16 +107,15 @@ class API extends \WooCommerce\Square\API {
 
 
 	/**
-	 * Performs a credit card capture for a given authorized order.
+	 * Performs a capture for a given authorized order.
 	 *
-	 * @since 2.0.0
+	 * @since 4.6.0
 	 *
 	 * @param \WC_Order $order order object
 	 * @return \WooCommerce\Square\API\Response
 	 * @throws \Exception
 	 */
-	public function credit_card_capture( \WC_Order $order ) {
-
+	public function capture_payment( \WC_Order $order ) {
 		$location_id = ! empty( $order->capture->location_id ) ? $order->capture->location_id : $this->get_location_id();
 
 		// use the Payments API to capture orders that were processed with Square v2.2+
@@ -133,12 +132,26 @@ class API extends \WooCommerce\Square\API {
 		return $this->perform_request( $request );
 	}
 
+
+	/**
+	 * Performs a credit card capture for a given authorized order.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param \WC_Order $order order object
+	 * @return \WooCommerce\Square\API\Response
+	 * @throws \Exception
+	 */
+	public function credit_card_capture( \WC_Order $order ) {
+		return $this->capture_payment( $order );
+	}
+
 	/**
 	 * Performs a gift card charge for a given order.
 	 *
 	 * @param \WC_Order $order order object
 	 * @since 3.7.0
-	 * @return \WooCommerce\Square\API\Response
+	 * @return \WooCommerce\Square\Gateway\API\Responses\Create_Payment
 	 */
 	public function gift_card_charge( \WC_Order $order ) {
 		$request = new API\Requests\Payments( $this->get_location_id(), $this->client );
@@ -151,19 +164,33 @@ class API extends \WooCommerce\Square\API {
 	}
 
 	/**
-	 * Performs a Cash App Pay charge for the given order.
+	 * Performs a cash app pay authorization for the given order.
 	 *
-	 * @since 4.5.0
+	 * @since 4.6.0
 	 *
 	 * @param \WC_Order $order order object
 	 * @return \WooCommerce\Square\Gateway\API\Responses\Create_Payment
 	 * @throws \Exception
 	 */
-	public function cash_app_pay_charge( \WC_Order $order ) {
+	public function cash_app_pay_authorization( \WC_Order $order ) {
+		return $this->cash_app_pay_charge( $order, false );
+	}
+
+	/**
+	 * Performs a Cash App Pay charge for the given order.
+	 *
+	 * @since 4.5.0
+	 *
+	 * @param \WC_Order $order   Order object
+	 * @param bool      $capture Whether to capture the charge or not.
+	 * @return \WooCommerce\Square\Gateway\API\Responses\Create_Payment
+	 * @throws \Exception
+	 */
+	public function cash_app_pay_charge( \WC_Order $order, $capture = true ) {
 
 		$request = new API\Requests\Payments( $this->get_location_id(), $this->client );
 
-		$request->set_charge_data( $order, true, true );
+		$request->set_charge_data( $order, $capture, true );
 
 		$this->set_response_handler( API\Responses\Create_Payment::class );
 
@@ -494,6 +521,7 @@ class API extends \WooCommerce\Square\API {
 	 *
 	 * @param array  $payment_ids Array of payment IDs.
 	 * @param string $order_id    Square order ID.
+	 * @return \WooCommerce\Square\Gateway\API\Responses\Create_PayOrder
 	 * @since 3.9.0
 	 */
 	public function pay_order( $payment_ids, $order_id ) {
@@ -629,6 +657,26 @@ class API extends \WooCommerce\Square\API {
 	}
 
 	/**
+	 * Cancel authorized payment.
+	 *
+	 * @since 4.6.0
+	 *
+	 * @param string $payment_id transaction ID
+	 * @return API\Responses\Create_Payment
+	 * @throws \Exception
+	 */
+	public function cancel_payment( $payment_id ) {
+
+		$request = new API\Requests\Payments( $this->get_location_id(), $this->client );
+
+		$request->set_cancel_payment_data( $payment_id );
+
+		$this->set_response_handler( API\Responses\Create_Payment::class );
+
+		return $this->perform_request( $request );
+	}
+
+	/**
 	 * Retrieves a gift card using nonce.
 	 *
 	 * @since 3.7.0
@@ -668,6 +716,43 @@ class API extends \WooCommerce\Square\API {
 		return $this->perform_request( $request );
 	}
 
+	/**
+	 * Searches for Square orders.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param array  $location_ids Array of location IDs.
+	 * @param string $start_time   Start time in the RFC 3339 format for the search.
+	 * @param int    $limit        Number of orders to retrieve.
+	 * @param string $cursor       Cursor for pagination.
+	 * @param string $end_time     Optional end time in the RFC 3339 format for the search.
+	 *
+	 * @return array Array containing orders and cursor.
+	 *
+	 * @throws \Exception
+	 */
+	public function search_orders( $location_ids = array(), $start_time, $limit = 100, $cursor = '', $end_time = '' ) {
+
+		$request = new API\Requests\Orders( $this->client );
+
+		$request->set_search_orders_data( $location_ids, $start_time, $limit, $cursor, $end_time );
+
+		$this->set_response_handler( API\Responses\Search_Orders::class );
+
+		$response = $this->perform_request( $request );
+
+		if ( $response->get_data() instanceof \Square\Models\SearchOrdersResponse ) {
+			return $response->get_response_data();
+		}
+
+		throw new \Exception(
+			sprintf(
+				/* translators: %s: Error details from the searchOrders request. */
+				esc_html__( 'Failed to make request searchOrders: %s', 'woocommerce-square' ),
+				esc_html( $response->get_data() )
+			)
+		);
+	}
 
 	/**
 	 * Validates the parsed response.

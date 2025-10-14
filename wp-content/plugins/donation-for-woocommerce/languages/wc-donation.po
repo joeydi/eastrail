@@ -1,0 +1,1894 @@
+# https://wpml.org
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Project-Id-Version:WPML_EXPORT\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language:en\n"
+"MIME-Version: 1.0\n"
+
+# $headline  = __( 'Donation for WooCommerce version ' . WC_DONATION_VERSION, 'wc-donation' );
+# $message   = __( 'It is to inform you that we have changed the mechanism of donation and orders amount calculation for performance enhancement. If you see mixed or confusing data, please go to setting page for synchronization. After synchronization, your data will display fine.', 'wc-donation' );
+# $setting_text = 'Settings';
+
+msgid "It is to inform you that we have changed the mechanism of donation and orders amount calculation for performance enhancement. If you see mixed or confusing data, please go to setting page for synchronization. After synchronization, your data will display fine."
+msgstr ""
+
+# return array (
+# 'predefined' => __('Pre-Defined', 'wc-donation'),
+# 'free-value' => __('Custom Value', 'wc-donation'),
+
+msgid "Pre-Defined"
+msgstr ""
+
+# 'predefined' => __('Pre-Defined', 'wc-donation'),
+# 'free-value' => __('Custom Value', 'wc-donation'),
+# 'both' => __('Both', 'wc-donation'),
+
+msgid "Custom Value"
+msgstr ""
+
+# 'free-value' => __('Custom Value', 'wc-donation'),
+# 'both' => __('Both', 'wc-donation'),
+# );
+
+msgid "Both"
+msgstr ""
+
+# return array (
+# 'before' => __('Before', 'wc-donation'),
+# 'after'  => __('After', 'wc-donation'),
+
+msgid "Before"
+msgstr ""
+
+# 'before' => __('Before', 'wc-donation'),
+# 'after'  => __('After', 'wc-donation'),
+# );
+
+msgid "After"
+msgstr ""
+
+# return array (
+# 'select' => __('Dropdown', 'wc-donation'),
+# 'radio'  => __('Radio', 'wc-donation'),
+
+msgid "Dropdown"
+msgstr ""
+
+# 'select' => __('Dropdown', 'wc-donation'),
+# 'radio'  => __('Radio', 'wc-donation'),
+# 'label'  => __('Label', 'wc-donation')
+
+msgid "Radio"
+msgstr ""
+
+# 'radio'  => __('Radio', 'wc-donation'),
+# 'label'  => __('Label', 'wc-donation')
+# );
+
+msgid "Label"
+msgstr ""
+
+# return array (
+# 'disabled' => __('Disable', 'wc-donation'),
+# 'enabled' => __('Enable - Admin\'s Choice', 'wc-donation'),
+
+msgid "Disable"
+msgstr ""
+
+# 'disabled' => __('Disable', 'wc-donation'),
+# 'enabled' => __('Enable - Admin\'s Choice', 'wc-donation'),
+# 'user'  => __('Enable - User\'s Choice', 'wc-donation')
+
+msgid "Enable - Admin's Choice"
+msgstr ""
+
+# 'enabled' => __('Enable - Admin\'s Choice', 'wc-donation'),
+# 'user'  => __('Enable - User\'s Choice', 'wc-donation')
+# //'admin'  => __('Enable - Admin\'s Choice', 'wc-donation')
+
+msgid "Enable - User's Choice"
+msgstr ""
+
+# return array (
+# 'enabled' => __('Enable', 'wc-donation'),
+# 'disabled' => __('Disable', 'wc-donation'),
+
+msgid "Enable"
+msgstr ""
+
+# return array (
+# 'fixed_amount' => __('Amount Raised', 'wc-donation'),
+# 'percentage_amount' => __('Percentage Raised', 'wc-donation'),
+
+msgid "Amount Raised"
+msgstr ""
+
+# 'fixed_amount' => __('Amount Raised', 'wc-donation'),
+# 'percentage_amount' => __('Percentage Raised', 'wc-donation'),
+# 'no_of_donation' => __('Number of Donations', 'wc-donation'),
+
+msgid "Percentage Raised"
+msgstr ""
+
+# 'percentage_amount' => __('Percentage Raised', 'wc-donation'),
+# 'no_of_donation' => __('Number of Donations', 'wc-donation'),
+# 'no_of_days' => __('Number of Days', 'wc-donation'),
+
+msgid "Number of Donations"
+msgstr ""
+
+# 'no_of_donation' => __('Number of Donations', 'wc-donation'),
+# 'no_of_days' => __('Number of Days', 'wc-donation'),
+# );
+
+msgid "Number of Days"
+msgstr ""
+
+# <div id="message" class="error">
+# <p><?php printf( esc_html( __( 'Wc Donation webhooks Need Woocommerce to be active!', 'wc-donation' ) ) ); ?></p>
+# </div>
+
+msgid "Wc Donation webhooks Need Woocommerce to be active!"
+msgstr ""
+
+# if ( empty( $donation_product ) ) {
+# $message = __('You have enabled donation on this page but didn\'t select campaign for it.', 'wc-donation');
+# $notice_type = 'error';
+
+msgid "You have enabled donation on this page but didn't select campaign for it."
+msgstr ""
+
+# $donation_label  = !empty( $object->campaign['donationTitle'] ) ? $object->campaign['donationTitle'] : '';
+# $donation_button_text  = !empty( $object->campaign['donationBtnTxt'] ) ? $object->campaign['donationBtnTxt'] : esc_attr__('Donate', 'wc-donation');
+# $donation_button_color  = !empty( $object->campaign['donationBtnBgColor'] ) ? $object->campaign['donationBtnBgColor'] : '333333';
+
+msgid "Donate"
+msgstr ""
+
+# $donation_gift_aid_title = get_option( 'wc-donation-gift-aid-title' );
+# $donation_gift_aid_checkbox_title = ! empty( get_option( 'wc-donation-gift-aid-checkbox-title' ) ) ? get_option( 'wc-donation-gift-aid-checkbox-title' ) : __('Yes, I would like to claim Gift Aid', 'wc-donation');
+# $donation_gift_aid_explanation = get_option( 'wc-donation-gift-aid-explanation' );
+
+msgid "Yes, I would like to claim Gift Aid"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Date:', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( $date ); ?></td>
+
+msgid "Date:"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Donor Email:', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( $donor_email ); ?></td>
+
+msgid "Donor Email:"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Order ID:', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( $order_id ); ?></td>
+
+msgid "Order ID:"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Campaign', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( get_the_title( $campaign_id ) ); ?></td>
+
+msgid "Campaign"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Product SKU', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( $product_sku ); ?></td>
+
+msgid "Product SKU"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Donation Amount', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( $donation_amount ); ?></td>
+
+msgid "Donation Amount"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Tribute', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( $tribute ); ?></td>
+
+msgid "Tribute"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Cause', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( $cause_name ); ?></td>
+
+msgid "Cause"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Gift Aid', 'wc-donation'); ?></th>
+# <td><?php echo esc_html( $gift_aid ); ?></td>
+
+msgid "Gift Aid"
+msgstr ""
+
+# <form method="POST">
+# <input type="submit" name="clear_filter" class="button button-primary" value="<?php echo esc_html__( 'Clear Filter', 'wc-donation' ); ?>">
+# <input id="wc-donation-export-report-csv" class="button action" type="submit" name="export_csv" value="<?php echo esc_html__( 'Export CSV', 'wc-donation' ); ?>" >
+
+msgid "Clear Filter"
+msgstr ""
+
+# <input type="submit" name="clear_filter" class="button button-primary" value="<?php echo esc_html__( 'Clear Filter', 'wc-donation' ); ?>">
+# <input id="wc-donation-export-report-csv" class="button action" type="submit" name="export_csv" value="<?php echo esc_html__( 'Export CSV', 'wc-donation' ); ?>" >
+# <input id="wc-donation-export-report-pdf" class="button action" type="submit" name="export_pdf" value="<?php echo esc_html__( 'Download PDF', 'wc-donation' ); ?>" >
+
+msgid "Export CSV"
+msgstr ""
+
+# <input id="wc-donation-export-report-csv" class="button action" type="submit" name="export_csv" value="<?php echo esc_html__( 'Export CSV', 'wc-donation' ); ?>" >
+# <input id="wc-donation-export-report-pdf" class="button action" type="submit" name="export_pdf" value="<?php echo esc_html__( 'Download PDF', 'wc-donation' ); ?>" >
+# <input type="hidden" name="user_id" value="<?php echo esc_attr( $user_id ); ?>">
+
+msgid "Download PDF"
+msgstr ""
+
+# <div>
+# <input type="submit" name="year" class="<?php echo esc_html( @$active_year ); ?>" value="<?php echo esc_html__( 'Year', 'wc-donation' ); ?>" />
+# </div>
+
+msgid "Year"
+msgstr ""
+
+# <div>
+# <input type="submit" name="last_month" class="<?php echo esc_html( @$active_last_month ); ?>" value="<?php echo esc_html__( 'Last Month', 'wc-donation' ); ?>" />
+# </div>
+
+msgid "Last Month"
+msgstr ""
+
+# <div>
+# <input type="submit" name="this_month" class="<?php echo esc_html( @$active_this_month ); ?>" value="<?php echo esc_html__( 'This Month', 'wc-donation' ); ?>" />
+# </div>
+
+msgid "This Month"
+msgstr ""
+
+# <div>
+# <input type="submit" name="last_week" class="<?php echo esc_html( @$active_last_Week ); ?>" value="<?php echo esc_html__( 'Last 7 days', 'wc-donation' ); ?>" />
+# </div>
+
+msgid "Last 7 days"
+msgstr ""
+
+# <div>
+# <label><?php echo esc_html__('Custom: ', 'wc-donation'); ?></label>
+# <input type="text" placeholder="<?php echo esc_html__('yy-mm-dd', 'wc-donation'); ?>" name="DateFrom" value="<?php echo esc_html( sanitize_text_field( @$_REQUEST['DateFrom'] ) ); ?>" autocomplete="off" readonly />
+
+msgid "Custom: "
+msgstr ""
+
+# <label><?php echo esc_html__('Custom: ', 'wc-donation'); ?></label>
+# <input type="text" placeholder="<?php echo esc_html__('yy-mm-dd', 'wc-donation'); ?>" name="DateFrom" value="<?php echo esc_html( sanitize_text_field( @$_REQUEST['DateFrom'] ) ); ?>" autocomplete="off" readonly />
+# <strong><?php echo esc_html__(' - ', 'wc-donation'); ?></strong>
+
+msgid "yy-mm-dd"
+msgstr ""
+
+# <input type="text" placeholder="<?php echo esc_html__('yy-mm-dd', 'wc-donation'); ?>" name="DateFrom" value="<?php echo esc_html( sanitize_text_field( @$_REQUEST['DateFrom'] ) ); ?>" autocomplete="off" readonly />
+# <strong><?php echo esc_html__(' - ', 'wc-donation'); ?></strong>
+# <input type="text" placeholder="<?php echo esc_html__('yy-mm-dd', 'wc-donation'); ?>" name="DateTo" value="<?php echo esc_html( sanitize_text_field( @$_REQUEST['DateTo'] ) ); ?>" autocomplete="off" readonly />
+
+msgid " - "
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__('Order', 'wc-donation'); ?></th>
+# <th><?php echo esc_html__('Campaign', 'wc-donation'); ?></th>
+
+msgid "Order"
+msgstr ""
+
+# <th><?php echo esc_html__('Campaign', 'wc-donation'); ?></th>
+# <th><?php echo esc_html__('Donation', 'wc-donation'); ?></th>
+# <th><?php echo esc_html__('Date', 'wc-donation'); ?></th>
+
+msgid "Donation"
+msgstr ""
+
+# <th><?php echo esc_html__('Donation', 'wc-donation'); ?></th>
+# <th><?php echo esc_html__('Date', 'wc-donation'); ?></th>
+# <th><?php echo esc_html__('Action', 'wc-donation'); ?></th>
+
+msgid "Date"
+msgstr ""
+
+# <th><?php echo esc_html__('Date', 'wc-donation'); ?></th>
+# <th><?php echo esc_html__('Action', 'wc-donation'); ?></th>
+# </tr>
+
+msgid "Action"
+msgstr ""
+
+# <td>
+# <a href="#TB_inline?inlineId=report-<?php echo esc_attr($report_id); ?>" style="margin: 0 5px 5px 0;" title="<?php echo esc_html__('Donation Report For #' . $order_id); ?>" class="thickbox button button-primary view-donation-report" ><?php echo esc_html__('View Report', 'wc-donation'); ?></a>
+# <a href="<?php echo esc_url ( admin_url('admin-ajax.php') . '?action=wc_donation_generate_report_pdf&order_id=' . $order_id . '&product_id=' . $product_id . '&_wpnonce=' . wp_create_nonce('wc_donation_generate_report_pdf') ); ?>" style="margin: 0 5px 5px 0;" class="button button-primary download-donation-report" ><?php echo esc_html__('Download PDF', 'wc-donation'); ?></a>
+
+msgid "View Report"
+msgstr ""
+
+# } else {
+# echo '<p class="report_no_found">' . esc_html__( 'Sorry, no reports found', 'wc-donation' ) . '</p>';
+# }
+
+msgid "Sorry, no reports found"
+msgstr ""
+
+# <?php if( 'yes' != $deactivate_thumbnail ): ?>
+# <th class="campaign-thumbnail"><?php esc_html_e( 'Thumbnail', 'wc-donation' ); ?></th>
+# <?php endif; ?>
+
+msgid "Thumbnail"
+msgstr ""
+
+# 
+# <th class="campaign-name"><?php esc_html_e( 'Campaign Name', 'wc-donation' ); ?></th>
+# 
+
+msgid "Campaign Name"
+msgstr ""
+
+# <?php if( 'yes' != $deactivate_description ): ?>
+# <th class="campaign-description"><?php esc_html_e( 'Description', 'wc-donation' ); ?></th>
+# <?php endif; ?>
+
+msgid "Description"
+msgstr ""
+
+# <?php if( 'yes' != $deactivate_causes ): ?>
+# <th class="campaign-causes"><?php esc_html_e( 'Causes', 'wc-donation' ); ?></th>
+# <?php endif; ?>
+
+msgid "Causes"
+msgstr ""
+
+# 
+# <th class="campaign-amount"><?php esc_html_e( 'Amount', 'wc-donation' ); ?></th>
+# <th class="campaign-call-to-action"></th>
+
+msgid "Amount"
+msgstr ""
+
+# <div class="wc-donation-tribute-wrapper">
+# <h3 class="wc-donation-title"><?php echo esc_html__( 'Tributes', 'wc-donation' ); ?></h3>
+# <div class="all_tributes">
+
+msgid "Tributes"
+msgstr ""
+
+# <div style="clear:both;"></div>
+# <input type="hidden" id="wc_donation_trubte_name_<?php echo esc_attr($campaign_id) . '_' . esc_attr($wp_rand); ?>" class="wc_donation_trubte_name" Placeholder="<?php echo esc_html__( 'Enter Name', 'wc-donation' ); ?>" value="">
+# <?php if( 'yes' == get_option( 'wc-donation-messages' ) ) : ?>
+
+msgid "Enter Name"
+msgstr ""
+
+# <?php if( 'yes' == get_option( 'wc-donation-messages' ) ) : ?>
+# <input type="hidden" id="wc_donation_trubte_message_<?php echo esc_attr($campaign_id) . '_' . esc_attr($wp_rand); ?>" class="wc_donation_trubte_message" Placeholder="<?php echo esc_html__( 'Enter Message', 'wc-donation' ); ?>" value="">
+# <?php endif; ?>
+
+msgid "Enter Message"
+msgstr ""
+
+# <select name="wc_select_price" data-id="<?php echo esc_attr($campaign_id) . '_' . esc_attr($wp_rand); ?>" class='wc-label-select select wc-input-text <?php echo esc_attr($where_currency_symbole); ?>' id='wc-donation-f-donation-value-<?php echo esc_attr($wp_rand); ?>'>
+# <option value=""><?php echo esc_html__('--Please select--', 'wc-donation'); ?></option>
+# <?php
+
+msgid "--Please select--"
+msgstr ""
+
+# ?>
+# <option value="wc-donation-other-amount"><?php echo esc_html__('Other', 'wc-donation'); ?></option>
+# <?php
+
+msgid "Other"
+msgstr ""
+
+# */
+# $placeholder_other_val = apply_filters( 'wc_donation_other_amount_placeholder', esc_html__('Enter amount between ', 'wc-donation') . $donation_min_value . ' - ' . $donation_max_value, $donation_min_value, $donation_max_value );
+# ?>
+
+msgid "Enter amount between "
+msgstr ""
+
+# <span class="dashicons dashicons-money-alt"></span>
+# <?php ! empty( $donation_label ) ? esc_html_e( __( $donation_label, 'wc-donation' ) ) : _e( 'Donate Amount', 'wc-donation' ); ?>
+# </h3>
+
+msgid "Donate Amount"
+msgstr ""
+
+# <?php if ( 'enabled' === $dispDonorCount  ) { ?>
+# <li class="wc_donor_count"><?php echo esc_attr($get_donations['total_donors']) . ' ' . esc_html__('Donors', 'wc-donation'); ?></li>
+# <?php } ?>
+
+msgid "Donors"
+msgstr ""
+
+# <?php } ?>
+# <span><?php esc_html_e('Raised', 'wc-donation'); ?></span>
+# </div>
+
+msgid "Raised"
+msgstr ""
+
+# <div class="required_amount">
+# <span><?php esc_html_e('of', 'wc-donation'); ?></span>
+# <?php echo wp_kses_post( wc_price( $fixedAmount ) ); ?>
+
+msgid "of"
+msgstr ""
+
+# <span><?php echo esc_attr($get_donations['total_donations']); ?></span>
+# <span><?php esc_html_e('Donation Raised', 'wc-donation'); ?></span>
+# </div>
+
+msgid "Donation Raised"
+msgstr ""
+
+# <?php /* translators: %d define number of days */ ?>
+# <span><?php printf( esc_html__( _n('%d day Left', '%d days Left', $leftDays, 'wc-donation'), 'wc-donation' ), esc_attr($leftDays) ); ?></span>
+# </div>
+
+msgid "%d day Left"
+msgstr ""
+
+# <?php /* translators: %d define number of days */ ?>
+# <span><?php printf( esc_html__( _n('%d day Left', '%d days Left', $leftDays, 'wc-donation'), 'wc-donation' ), esc_attr($leftDays) ); ?></span>
+# </div>
+
+msgid "%d days Left"
+msgstr ""
+
+# <?php /* translators: %d define number of days */ ?>
+# <span><?php printf( esc_html__( _n('Out of %d Day', 'Out of %d Days', $totaltDays, 'wc-donation' ), 'wc-donation'), esc_attr($totaltDays) ); ?></span>
+# </div>
+
+msgid "Out of %d Day"
+msgstr ""
+
+# <?php /* translators: %d define number of days */ ?>
+# <span><?php printf( esc_html__( _n('Out of %d Day', 'Out of %d Days', $totaltDays, 'wc-donation' ), 'wc-donation'), esc_attr($totaltDays) ); ?></span>
+# </div>
+
+msgid "Out of %d Days"
+msgstr ""
+
+# <div class="row2">
+# <h3 class="wc-donation-title"><?php echo esc_html__('Select Cause', 'wc-donation' ); ?></h3>
+# <div class="cause-wrapper after">
+
+msgid "Select Cause"
+msgstr ""
+
+# <ul class="causes-dropdown">
+# <li class="init"><?php echo esc_html__('--Select Cause--', 'wc-donation'); ?></li>
+# <?php
+
+msgid "--Select Cause--"
+msgstr ""
+
+# <tr>
+# <th><?php echo esc_html__( 'Item', 'wc-donation' ); ?></th>
+# <td><?php echo esc_html__( 'Charge', 'wc-donation' ); ?></td>
+
+msgid "Item"
+msgstr ""
+
+# <th><?php echo esc_html__( 'Item', 'wc-donation' ); ?></th>
+# <td><?php echo esc_html__( 'Charge', 'wc-donation' ); ?></td>
+# </tr>
+
+msgid "Charge"
+msgstr ""
+
+# <th><?php echo esc_html__( 'Donation', 'wc-donation' ); ?></th>
+# <td><span class="wc-donation-currency-symbol"><?php echo esc_attr($currency_symbol); ?></span><span class="wc-donation-amt"><?php echo esc_html__('NONE', 'wc-donation'); ?></span></td>
+# </tr>
+
+msgid "NONE"
+msgstr ""
+
+# ?>
+# <th><?php echo esc_html__( 'Fees', 'wc-donation' ) . ' ( ' . esc_attr( get_option( 'wc-donation-fees-percent' ) ) . '% )'; ?></th>
+# <?php
+
+msgid "Fees"
+msgstr ""
+
+# <tr class="wc-donation-summary-total">
+# <th><?php echo esc_html__( 'Total', 'wc-donation' ); ?></th>
+# <td><span class="wc-donation-currency-symbol"><?php echo esc_attr($currency_symbol); ?></span><span class="wc-donation-amt"><?php echo esc_html__('No Charge', 'wc-donation'); ?></span></td>
+
+msgid "Total"
+msgstr ""
+
+# <th><?php echo esc_html__( 'Total', 'wc-donation' ); ?></th>
+# <td><span class="wc-donation-currency-symbol"><?php echo esc_attr($currency_symbol); ?></span><span class="wc-donation-amt"><?php echo esc_html__('No Charge', 'wc-donation'); ?></span></td>
+# </tr>
+
+msgid "No Charge"
+msgstr ""
+
+# <div>
+# <p><span><?php ( $guest_user ) ? esc_html_e( "Anonymous", 'wc-donation' ) : esc_attr_e( $user->user_email ); ?></span> &nbsp;-&nbsp; <?php esc_attr_e( $tribute['tribute_name'] ); ?></p>
+# <p class="tribute-timestamp"><?php echo date_i18n( "M d, Y", $tribute['timestamp'] ); ?></p>
+
+msgid "Anonymous"
+msgstr ""
+
+# */
+# $message = apply_filters( 'wc_donation_change_admin_email_message', __( 'Thank you for your donation. Your Kindness is appreciated.', 'wc-donation' ) );
+# ?>
+
+msgid "Thank you for your donation. Your Kindness is appreciated."
+msgstr ""
+
+# ?>
+# <p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo esc_html__( 'Dear', 'wc-donation' ) . ' ' . esc_html( $order_billing_first_name ); ?></p>
+# <p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo esc_html( $message ); ?></p>
+
+msgid "Dear"
+msgstr ""
+
+# <br><br>
+# <h3><?php echo esc_html__( 'Donation Details', 'wc-donation' ); ?></h3>
+# <ul style="display: block; width: 100%; padding:  0; margin: 0 0 10px 0; list-style:none; font-size: 14px;">
+
+msgid "Donation Details"
+msgstr ""
+
+# <li style="margin: 0 0 5px 0;"><strong><?php echo esc_html__( 'Campaign', 'wc-donation' ); ?>: <?php echo esc_html( get_the_title( $campaign_id ) ); ?></strong></li>
+# <li style="margin: 0 0 5px 0;"><strong><?php echo esc_html__( 'Order #', 'wc-donation' ); ?>: </strong><?php echo esc_html( $my_order->get_id() ); ?></li>
+# <li style="margin: 0 0 5px 0;"><strong><?php echo esc_html__( 'Amount', 'wc-donation' ); ?>: </strong><?php echo esc_html( $currency . '' . $item->get_total() ); ?></li>
+
+msgid "Order #"
+msgstr ""
+
+# <li style="margin: 0 0 5px 0;"><strong><?php echo esc_html__( 'Amount', 'wc-donation' ); ?>: </strong><?php echo esc_html( $currency . '' . $item->get_total() ); ?></li>
+# <li style="margin: 0 0 5px 0;"><strong><?php echo esc_html__( 'Payment Method', 'wc-donation' ); ?>: </strong><?php echo esc_html( $my_order->get_payment_method_title() ); ?></li>
+# <?php
+
+msgid "Payment Method"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-on-cart" class="wc-text-label"><?php echo esc_attr( __( 'Show Donation form on cart', 'wc-donation' ) ); ?></label>
+# </div>
+
+msgid "Show Donation form on cart"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr( __( 'Select Campaign', 'wc-donation' ) ); ?></label>
+# <select class='select short' style="width:200px;" name='wc-donation-cart-product[]' multiple>
+
+msgid "Select Campaign"
+msgstr ""
+
+# <select class='select short' style="width:200px;" name='wc-donation-cart-product[]' multiple>
+# <!-- <option value=""><?php echo esc_html(__('select Campaign', 'wc-donation')); ?></option> -->
+# <?php
+
+msgid "select Campaign"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr( __( 'Choose Location on Cart', 'wc-donation' ) ); ?></label>
+# <select class='select short' style="width:200px;" name='wc-donation-cart-location'>
+
+msgid "Choose Location on Cart"
+msgstr ""
+
+# <?php endif; ?>
+# <label for=""><?php echo esc_attr( __( 'Campaign Display Type', 'wc-donation' ) ); ?></label>
+# <div class="select-wrapper cart-campaign-display-type-option" style="margin-top: 10px;">
+
+msgid "Campaign Display Type"
+msgstr ""
+
+# <?php endif; ?>
+# <label for=""><?php echo esc_attr( __( 'Campaign Display Format', 'wc-donation' ) ); ?></label>
+# <div class="select-wrapper cart-campaign-display-format-option" style="margin-top: 10px;">
+
+msgid "Campaign Display Format"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr( __( 'Campaign Format Type', 'wc-donation' ) ); ?></label>
+# <select class='select short' style="width:200px;" name='wc-donation-cart-campaign-format-type'>
+
+msgid "Campaign Format Type"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-deactivate-campaign-thumbnail" class="wc-text-label"><?php echo esc_attr( __( 'Deactivate Campaign Thumbnail', 'wc-donation' ) ); ?></label>
+# </div>
+
+msgid "Deactivate Campaign Thumbnail"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-deactivate-campaign-causes" class="wc-text-label"><?php echo esc_attr( __( 'Deactivate Campaign Causes', 'wc-donation' ) ); ?></label>
+# </div>
+
+msgid "Deactivate Campaign Causes"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-deactivate-campaign-description" class="wc-text-label"><?php echo esc_attr( __( 'Deactivate Campaign Description', 'wc-donation' ) ); ?></label>
+# </div>
+
+msgid "Deactivate Campaign Description"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-on-checkout" class="wc-text-label"><?php echo esc_attr( __( 'Show Donation form on checkout', 'wc-donation' ) ); ?></label>
+# </div>
+
+msgid "Show Donation form on checkout"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-on-round" class="wc-text-label"><?php echo esc_attr( __( 'Round Off Donation', 'wc-donation' ) ); ?></label>
+# </div>
+
+msgid "Round Off Donation"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-card-fee" class="wc-text-label"><?php echo esc_attr( __( 'Credit Card Processing Fees', 'wc-donation' ) ); ?></label>
+# </div>
+
+msgid "Credit Card Processing Fees"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label><?php echo esc_attr( __( 'Select Campaigns', 'wc-donation' ) ); ?></label>
+# <?php //wp_enqueue_style('select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' ); ?>
+
+msgid "Select Campaigns"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Round Off Multiplier', 'wc-donation' ); ?><br><small style="color:#777"><?php echo esc_attr__( '(number should be greater than 0. if empty or other value than integer, it will be considered as 1)', 'wc-donation' ); ?></small></label>
+# <input type="number" min="1" value="<?php echo esc_attr($donation_round_multiplier); ?>" name="wc-donation-round-multiplier" id="wc-donation-round-multiplier" />
+
+msgid "Round Off Multiplier"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Round Off Multiplier', 'wc-donation' ); ?><br><small style="color:#777"><?php echo esc_attr__( '(number should be greater than 0. if empty or other value than integer, it will be considered as 1)', 'wc-donation' ); ?></small></label>
+# <input type="number" min="1" value="<?php echo esc_attr($donation_round_multiplier); ?>" name="wc-donation-round-multiplier" id="wc-donation-round-multiplier" />
+
+msgid "(number should be greater than 0. if empty or other value than integer, it will be considered as 1)"
+msgstr ""
+
+# <!-- <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Popup title', 'wc-donation' ); ?></label>
+# <input type="text" value="<?php echo esc_attr($donation_label); ?>" name="wc-donation-round-field-label" id="wc-donation-round-field-label" />
+
+msgid "Popup title"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Popup Message (use %amount% to show dynamic donation value in message)', 'wc-donation' ); ?></label>
+# <textarea name="wc-donation-round-field-message" id="wc-donation-round-field-message" cols="30" rows="5" style="resize:none"><?php echo esc_attr($donation_message); ?></textarea>
+
+msgid "Popup Message (use %amount% to show dynamic donation value in message)"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Cancel Button Text', 'wc-donation' ); ?></label>
+# <input type="text" value="<?php echo esc_attr($donation_button_cancel_text); ?>" name="wc-donation-round-button-cancel-text" id="wc-donation-round-button-cancel-text" />
+
+msgid "Cancel Button Text"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Select Fees Type', 'wc-donation' ); ?></label>
+# <select name="wc-donation-fees-type" id="wc-donation-fees-type">
+
+msgid "Select Fees Type"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Enter Fees Amount', 'wc-donation' ); ?><br><small style="color:#777"><?php echo esc_attr__( '(Enter processing fees amount to be charged)', 'wc-donation' ); ?></small></label>
+# <input type="number" min="1" value="<?php echo esc_attr($donation_fees_percent); ?>" name="wc-donation-fees-percent" id="wc-donation-fees-percent" />
+
+msgid "Enter Fees Amount"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Enter Fees Amount', 'wc-donation' ); ?><br><small style="color:#777"><?php echo esc_attr__( '(Enter processing fees amount to be charged)', 'wc-donation' ); ?></small></label>
+# <input type="number" min="1" value="<?php echo esc_attr($donation_fees_percent); ?>" name="wc-donation-fees-percent" id="wc-donation-fees-percent" />
+
+msgid "(Enter processing fees amount to be charged)"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Enter Processing Fees Text', 'wc-donation' ); ?></label>
+# <textarea name="wc-donation-fees-field-message" id="wc-donation-fees-field-message" cols="30" rows="5" style="resize:none"><?php echo esc_attr($donation_fees_message); ?></textarea>
+
+msgid "Enter Processing Fees Text"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Gift Aid Title', 'wc-donation' ); ?></label>
+# <input type="text" value="<?php echo esc_attr($donation_gift_aid_title); ?>" name="wc-donation-gift-aid-title" id="wc-donation-gift-aid-title" />
+
+msgid "Gift Aid Title"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Gift Aid Checkbox Text', 'wc-donation' ); ?></label>
+# <input type="text" value="<?php echo esc_attr($donation_gift_aid_checkbox_title); ?>" name="wc-donation-gift-aid-checkbox-title" id="wc-donation-gift-aid-title" />
+
+msgid "Gift Aid Checkbox Text"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Gift Aid Explanation', 'wc-donation' ); ?></label>
+# <textarea name="wc-donation-gift-aid-explanation" id="wc-donation-gift-aid-explanation" cols="30" rows="6" style="resize:none"><?php echo esc_attr($donation_gift_aid_explanation); ?></textarea>
+
+msgid "Gift Aid Explanation"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for=""><?php echo esc_attr__( 'Gift Aid Declaration Message', 'wc-donation' ); ?></label>
+# <textarea name="wc-donation-gift-aid-declaration" id="wc-donation-gift-aid-declaration" cols="30" rows="6" style="resize:none"><?php echo esc_attr($donation_gift_aid_declaration); ?></textarea>
+
+msgid "Gift Aid Declaration Message"
+msgstr ""
+
+# 
+# <h1 class="wc-main-title"><?php echo esc_html__('General Setting', 'wc-donation'); ?></h1>
+# <div class="sep20px">&nbsp;</div>
+
+msgid "General Setting"
+msgstr ""
+
+# <div class="wc-block-setting">
+# <h3><?php echo esc_html__('Cart Donation', 'wc-donation'); ?></h3>
+# <?php
+
+msgid "Cart Donation"
+msgstr ""
+
+# <div class="select-wrapper" id="wc-donation-deactivate-columns-in-table-format">
+# <label for="" style=""><?php echo esc_html__('Deactivate Columns in Table Format', 'wc-donation'); ?></label>
+# <div class="select-wrapper" style="margin-top: 10px;">
+
+msgid "Deactivate Columns in Table Format"
+msgstr ""
+
+# <div class="wc-block-setting">
+# <h3><?php echo esc_html__('Checkout Donation', 'wc-donation'); ?></h3>
+# <?php
+
+msgid "Checkout Donation"
+msgstr ""
+
+# <select name="wc-donation-fees-type" id="wc-donation-fees-type">
+# <option value="percentage" <?php selected($donation_fees_type, 'percentage', true); ?>><?php echo esc_html__('Percentage', 'wc-donation'); ?></option>
+# <option value="fixed" <?php selected($donation_fees_type, 'fixed', true); ?>><?php echo esc_html__('Fixed', 'wc-donation'); ?></option>
+
+msgid "Percentage"
+msgstr ""
+
+# <option value="percentage" <?php selected($donation_fees_type, 'percentage', true); ?>><?php echo esc_html__('Percentage', 'wc-donation'); ?></option>
+# <option value="fixed" <?php selected($donation_fees_type, 'fixed', true); ?>><?php echo esc_html__('Fixed', 'wc-donation'); ?></option>
+# </select>
+
+msgid "Fixed"
+msgstr ""
+
+# <div class="wc-block-setting">
+# <h3><?php echo esc_html__('Gift Aid UK', 'wc-donation'); ?></h3>
+# <?php
+
+msgid "Gift Aid UK"
+msgstr ""
+
+# </label>
+# <label class="wc-text-label"><?php echo esc_html__( 'Visible on Cart', 'wc-donation' ); ?></label>
+# </div>
+
+msgid "Visible on Cart"
+msgstr ""
+
+# </label>
+# <label class="wc-text-label"><?php echo esc_html__( 'Visible on Checkout', 'wc-donation' ); ?></label>
+# </div>
+
+msgid "Visible on Checkout"
+msgstr ""
+
+# </label>
+# <label class="wc-text-label"><?php echo esc_html__( 'Visible on Widget', 'wc-donation' ); ?></label>
+# </div>
+
+msgid "Visible on Widget"
+msgstr ""
+
+# </label>
+# <label class="wc-text-label"><?php echo esc_html__( 'Visible on single Page', 'wc-donation' ); ?></label>
+# </div>
+
+msgid "Visible on single Page"
+msgstr ""
+
+# <div class="wc-block-setting">
+# <h3><?php echo esc_html__('PDF Receipt', 'wc-donation'); ?></h3>
+# <?php
+
+msgid "PDF Receipt"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-pdf-receipt" class="wc-text-label"><?php echo esc_html__( 'Enable to send PDF Receipt with Email', 'wc-donation' ); ?></label>
+# </div>
+
+msgid "Enable to send PDF Receipt with Email"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-tributes" class="wc-text-label"><?php echo esc_html__( 'Enable Tributes', 'wc-donation' ); ?></label>
+# </div>
+
+msgid "Enable Tributes"
+msgstr ""
+
+# <div class="select-wrapper">
+# <h3><?php echo esc_html__('Messages', 'wc-donation'); ?></h3>
+# <label class="wc-donation-switch">
+
+msgid "Messages"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-messages" class="wc-text-label"><?php echo esc_html__( 'Enable Messages', 'wc-donation' ); ?></label>
+# </div>
+
+msgid "Enable Messages"
+msgstr ""
+
+# <div class="wc-block-setting">
+# <h3><?php echo esc_html__('WC Donation API', 'wc-donation'); ?></h3>
+# <?php
+
+msgid "WC Donation API"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-tributes" class="wc-text-label"><?php echo esc_html__( 'Enable API', 'wc-donation' ); ?></label>
+# </div>
+
+msgid "Enable API"
+msgstr ""
+
+# <div class="wc-block-setting">
+# <h3><?php echo esc_html__('Synchronize Campaign Data', 'wc-donation'); ?></h3>
+# <div class="select-wrapper">
+
+msgid "Synchronize Campaign Data"
+msgstr ""
+
+# <div class="select-wrapper">
+# <a href="#" id="wc_donation_sync_data" class="button button-primary"><?php echo esc_html__('Synchronize', 'wc-donation'); ?></a>
+# <small style="color: #777;display:block;margin-top:5px"><?php echo esc_html__( 'By clicking this button, your donation order data will be properly synced. Use this, if you are finding inacurrate campaign data.', 'wc-donation' ); ?></small>
+
+msgid "Synchronize"
+msgstr ""
+
+# <a href="#" id="wc_donation_sync_data" class="button button-primary"><?php echo esc_html__('Synchronize', 'wc-donation'); ?></a>
+# <small style="color: #777;display:block;margin-top:5px"><?php echo esc_html__( 'By clicking this button, your donation order data will be properly synced. Use this, if you are finding inacurrate campaign data.', 'wc-donation' ); ?></small>
+# </div>
+
+msgid "By clicking this button, your donation order data will be properly synced. Use this, if you are finding inacurrate campaign data."
+msgstr ""
+
+# 
+# <a href="#" id="tribute-add-more"><?php echo esc_attr( __( 'Add Level', 'wc-donation' ) ); ?></a>
+# </div>
+
+msgid "Add Level"
+msgstr ""
+
+# <label class="wc-donation-label" for="tribute-<?php echo esc_attr($key); ?>"><?php echo esc_attr( __( 'Label', 'wc-donation' ) ); ?></label>
+# <input type="text" id="tribute-<?php echo esc_attr($key); ?>" Placeholder="<?php echo esc_html__('Enter Label', 'wc-donation'); ?>" name="tributes[]" value="<?php echo esc_attr($val); ?>">
+# </div>
+
+msgid "Enter Label"
+msgstr ""
+
+# /* translators: %1$s: html tag, %2$s: version, %3$s: html tag*/
+# echo sprintf( esc_html__('%1$s Welcome to Donation For Woocommerce %2$s! %3$s', 'wc-donation'), '<h1>', esc_attr(WC_DONATION_VERSION), '</h1>' );
+# /* translators: %1$s: html tag, %2$s: html tag*/
+
+msgid "%1$s Welcome to Donation For Woocommerce %2$s! %3$s"
+msgstr ""
+
+# /* translators: %1$s: html tag, %2$s: html tag*/
+# echo sprintf( esc_html__('%1$s The simple and intuitive interface of Donation Product for WooCommerce is more than meets the eye %2$s', 'wc-donation'), '<h3>', '</h3>' );
+# /* translators: %1$s: html tag, %2$s: html tag*/
+
+msgid "%1$s The simple and intuitive interface of Donation Product for WooCommerce is more than meets the eye %2$s"
+msgstr ""
+
+# /* translators: %1$s: html tag, %2$s: html tag*/
+# echo sprintf( esc_html__('%1$s Donation Product for WooCommerce gives you the ability to add ‘donation acceptance’ as a regular WooCommerce product so a visitor can add the donation to their shopping cart and pay for it. %2$s', 'wc-donation'), '<p>', '</p>' );
+# ?>
+
+msgid "%1$s Donation Product for WooCommerce gives you the ability to add ‘donation acceptance’ as a regular WooCommerce product so a visitor can add the donation to their shopping cart and pay for it. %2$s"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for="wc-donation-display-donation-type" class="wc-donation-label"><?php echo esc_attr( __( 'Display Type', 'wc-donation' ) ); ?></label>
+# <select name='wc-donation-display-donation-type' id="wc-donation-display-donation-type">
+
+msgid "Display Type"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label for="wc-donation-currency-position" class="wc-donation-label"><?php echo esc_attr( __( 'Currency Position', 'wc-donation' ) ); ?></label>
+# <select name='wc-donation-currency-position' id="wc-donation-currency-position">
+
+msgid "Currency Position"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="wc-donation-title"><?php echo esc_attr( __( 'Donation Field Label', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-title" Placeholder="<?php echo esc_html__('Enter Donation Field Label', 'wc-donation'); ?>" name="wc-donation-title" value="<?php echo esc_attr($donationTitle); ?>">
+
+msgid "Donation Field Label"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="wc-donation-button-text"><?php echo esc_attr( __( 'Donation Button Label', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-button-text" Placeholder="<?php echo esc_html__('Enter Donation Button Label', 'wc-donation'); ?>" name="wc-donation-button-text" value="<?php echo esc_attr($donationBtnTxt); ?>">
+
+msgid "Donation Button Label"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="wc-donation-button-text-color"><?php echo esc_attr( __( 'Donation Button Text Color', 'wc-donation' ) ); ?></label>
+# <input type="text" class="jscolor" id="wc-donation-button-text-color" name="wc-donation-button-text-color" value="<?php echo esc_attr($donationBtnTxtColor); ?>">
+
+msgid "Donation Button Text Color"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="wc-donation-button-bg-color"><?php echo esc_attr( __( 'Donation Button Color', 'wc-donation' ) ); ?></label>
+# <input type="text" class="jscolor" id="wc-donation-button-bg-color" name="wc-donation-button-bg-color" value="<?php echo esc_attr($donationBtnBgColor); ?>">
+
+msgid "Donation Button Color"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-title"><?php echo esc_attr( __( 'Donation Field Label', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-title" Placeholder="<?php echo esc_html__('Enter Donation Field Label', 'wc-donation'); ?>" name="wc-donation-title" value="<?php echo esc_attr($donationTitle); ?>">
+# </div>
+
+msgid "Enter Donation Field Label"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-button-text"><?php echo esc_attr( __( 'Donation Button Label', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-button-text" Placeholder="<?php echo esc_html__('Enter Donation Button Label', 'wc-donation'); ?>" name="wc-donation-button-text" value="<?php echo esc_attr($donationBtnTxt); ?>">
+# </div>
+
+msgid "Enter Donation Button Label"
+msgstr ""
+
+# <div class="select-wrapper display-option">
+# <label class="wc-donation-label" for=""><?php echo esc_attr( __( 'Amount Type', 'wc-donation' ) ); ?></label>
+# <?php
+
+msgid "Amount Type"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="free-min-amount"><?php echo esc_attr( __( 'Min Amount', 'wc-donation' ) ); ?></label>
+# <input type="text" id="free-min-amount" Placeholder="<?php echo esc_html__('Enter Amount', 'wc-donation'); ?>" name="free-min-amount" value="<?php echo esc_attr($freeMinAmount); ?>">
+
+msgid "Min Amount"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="free-max-amount"><?php echo esc_attr( __( 'Max Amount', 'wc-donation' ) ); ?></label>
+# <input type="text" id="free-max-amount" Placeholder="<?php echo esc_html__('Enter Amount', 'wc-donation'); ?>" name="free-max-amount" value="<?php echo esc_attr($freeMaxAmount); ?>">
+
+msgid "Max Amount"
+msgstr ""
+
+# <a href="#" class="dashicons dashicons-trash pred-delete"></a>
+# <h4><?php echo esc_html__('Donation Level', 'wc-donation'); ?></h4>
+# <div class="select-wrapper">
+
+msgid "Donation Level"
+msgstr ""
+
+# <label class="wc-donation-label" for="pred-amount-<?php echo esc_attr($key); ?>"><?php echo esc_attr( __( 'Amount', 'wc-donation' ) ); ?></label>
+# <input type="number" step="0.01" id="pred-amount-<?php echo esc_attr($key); ?>" Placeholder="<?php echo esc_html__('Enter Amount', 'wc-donation'); ?>" name="pred-amount[]" value="<?php echo esc_attr($val); ?>">
+# </div>
+
+msgid "Enter Amount"
+msgstr ""
+
+# <div id="wc-donation-recurring-schedules">
+# <label for="_subscription_period_interval" class="wc-donation-label"><?php echo esc_attr( __( 'Interval & Length Of Recurring Donation', 'wc-donation' ) ); ?></label>
+# <div style="clear:both;height:15px;">&nbsp;</div>
+
+msgid "Interval & Length Of Recurring Donation"
+msgstr ""
+
+# <div id="message" class="notice notice-warning">
+# <p><?php echo esc_html__('WooCommerce Subscriptions is inactive. The WooCommerce Subscription plugin must be active for Recurring donation to work.', 'wc-donation'); ?></p>
+# </div>
+
+msgid "WooCommerce Subscriptions is inactive. The WooCommerce Subscription plugin must be active for Recurring donation to work."
+msgstr ""
+
+# <div class="select-wrapper" id="wc-donation-recurring-text">
+# <label class="wc-donation-label" for="wc-donation-recurring-txt"><?php echo esc_html__('Recurring Text', 'wc-donation' ); ?></label>
+# <input type="text" id="wc-donation-recurring-txt" name="wc-donation-recurring-txt" placeholder="Enter Donation Recurring Text" value="<?php echo esc_attr( $recurring_text ); ?>">
+
+msgid "Recurring Text"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="wc-donation-cause-name"><?php echo esc_attr( __( 'Cause Name', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-cause-name" Placeholder="<?php echo esc_html__('Enter Donation Cause Name', 'wc-donation'); ?>">
+
+msgid "Cause Name"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="wc-donation-cause-desc"><?php echo esc_attr( __( 'Cause Description', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-cause-desc" Placeholder="<?php echo esc_html__('Enter Donation Cause Description', 'wc-donation'); ?>">
+
+msgid "Cause Description"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="wc-donation-cause-img"><?php echo esc_attr( __( 'Cause Thumbnail', 'wc-donation' ) ); ?></label>
+# <a href="javascript:void(0);" class="button button-primary button-large donation-cause-thumb-upl"><?php echo esc_html__( 'Upload Thumbnail', 'wc-donation' ); ?></a>
+
+msgid "Cause Thumbnail"
+msgstr ""
+
+# <div class="select-wrapper goal-display-option">
+# <label class="wc-donation-label" for=""><?php echo esc_html__( 'Donation Cause', 'wc-donation' ); ?></label>
+# <?php
+
+msgid "Donation Cause"
+msgstr ""
+
+# <div class="wc-donation-tooltip-box">
+# <small class="wc-donation-tooltip"><?php echo esc_html__('If enable, You can show causes on this campaign.', 'wc-donation'); ?></small>
+# </div>
+
+msgid "If enable, You can show causes on this campaign."
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-cause-name"><?php echo esc_attr( __( 'Cause Name', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-cause-name" Placeholder="<?php echo esc_html__('Enter Donation Cause Name', 'wc-donation'); ?>">
+# </div>
+
+msgid "Enter Donation Cause Name"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-cause-desc"><?php echo esc_attr( __( 'Cause Description', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-cause-desc" Placeholder="<?php echo esc_html__('Enter Donation Cause Description', 'wc-donation'); ?>">
+# </div>
+
+msgid "Enter Donation Cause Description"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-cause-img"><?php echo esc_attr( __( 'Cause Thumbnail', 'wc-donation' ) ); ?></label>
+# <a href="javascript:void(0);" class="button button-primary button-large donation-cause-thumb-upl"><?php echo esc_html__( 'Upload Thumbnail', 'wc-donation' ); ?></a>
+# <input type="hidden" id="wc-donation-cause-thumb" name="donation-cause-thumb" value="">
+
+msgid "Upload Thumbnail"
+msgstr ""
+
+# <div class="select-wrapper">
+# <a href="javascript:void(0);" id="wcd-add-cause" class="wc-button-primary"><?php echo esc_html__( 'Save', 'wc-donation' ); ?></a>
+# </div>
+
+msgid "Save"
+msgstr ""
+
+# <tr>
+# <td id="cb" class="manage-column column-cb check-column"><label class="screen-reader-text" for="cb-select-all-1"><?php echo esc_html__( 'Select All', 'wc-donation' ); ?></label><input id="cb-select-all-1" type="checkbox"></td>
+# <th scope="col" id="cause_img" class="manage-column column-cause_img column-primary"><?php echo esc_html__( 'Image', 'wc-donation' ); ?></th>
+
+msgid "Select All"
+msgstr ""
+
+# <td id="cb" class="manage-column column-cb check-column"><label class="screen-reader-text" for="cb-select-all-1"><?php echo esc_html__( 'Select All', 'wc-donation' ); ?></label><input id="cb-select-all-1" type="checkbox"></td>
+# <th scope="col" id="cause_img" class="manage-column column-cause_img column-primary"><?php echo esc_html__( 'Image', 'wc-donation' ); ?></th>
+# <th scope="col" id="cause_name" class="manage-column column-cause_name"><?php echo esc_html__( 'Causes', 'wc-donation' ); ?></th>
+
+msgid "Image"
+msgstr ""
+
+# <th scope="col" id="cause_desc" class="manage-column column-cause_desc"><?php echo esc_html__( 'Description', 'wc-donation' ); ?></th>
+# <th scope="col" id="actions" class="manage-column column-actions"><?php echo esc_html__( 'Actions', 'wc-donation' ); ?></th>
+# </tr>
+
+msgid "Actions"
+msgstr ""
+
+# ?>
+# <tr class="no-items"><td class="colspanchange" colspan="8"><?php echo esc_html__( 'No Causes Found', 'wc-donation' ); ?></td></tr>
+# <?php } ?>
+
+msgid "No Causes Found"
+msgstr ""
+
+# <tr>
+# <td class="manage-column column-delete delete-column"><button class="button button-primary button-large delete-selected-causes"><?php echo esc_html__( 'Delete Selected', 'wc-donation' ); ?></button></td>
+# </tr>
+
+msgid "Delete Selected"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-disp-single-page" class="wc-text-label"><?php echo esc_attr( __( 'Display product single page', 'wc-donation' ) ); ?></label>
+# <div class="sep15px">&nbsp;</div>
+
+msgid "Display product single page"
+msgstr ""
+
+# </label>
+# <label for="wc-donation-disp-shop-page" class="wc-text-label"><?php echo esc_attr( __( 'Display product shop page', 'wc-donation' ) ); ?></label>
+# <small style="display:block; margin-top :10px; font-weight: bold">(<?php echo esc_html( __( 'If single page is disable this will disable automatically.', 'wc-donation' ) ); ?>)</small>
+
+msgid "Display product shop page"
+msgstr ""
+
+# <label for="wc-donation-disp-shop-page" class="wc-text-label"><?php echo esc_attr( __( 'Display product shop page', 'wc-donation' ) ); ?></label>
+# <small style="display:block; margin-top :10px; font-weight: bold">(<?php echo esc_html( __( 'If single page is disable this will disable automatically.', 'wc-donation' ) ); ?>)</small>
+# <div class="sep15px">&nbsp;</div>
+
+msgid "If single page is disable this will disable automatically."
+msgstr ""
+
+# <div class="select-wrapper goal-display-option">
+# <label class="wc-donation-label" for=""><?php echo esc_attr( __( 'Donation Goal', 'wc-donation' ) ); ?></label>
+# <?php
+
+msgid "Donation Goal"
+msgstr ""
+
+# <div class="select-wrapper goal-display-type">
+# <label class="wc-donation-label" for=""><?php echo esc_attr( __( 'Goal Type', 'wc-donation' ) ); ?></label>
+# <ul class="wc-donation-list">
+
+msgid "Goal Type"
+msgstr ""
+
+# <div class="select-wrapper wc-donation-goal-target" id="blk_fixed_amount">
+# <label class="wc-donation-label" for="wc-donation-goal-fixed-amount-field"><?php echo esc_attr( __( 'Goal Amount', 'wc-donation' ) ); ?></label>
+# <input type="number" id="wc-donation-goal-fixed-amount-field" Placeholder="<?php echo esc_html__('Enter Goal Amount', 'wc-donation'); ?>" name="wc-donation-goal-fixed-amount-field" value="<?php echo esc_attr($fixedAmount); ?>">
+
+msgid "Goal Amount"
+msgstr ""
+
+# <div class="select-wrapper wc-donation-goal-target" id="blk_fixed_initial_amount">
+# <label class="wc-donation-label" for="wc-donation-goal-fixed-initial-amount-field"><?php echo esc_attr( __( 'Initial Goal Amount', 'wc-donation' ) ); ?></label>
+# <input type="number" id="wc-donation-goal-fixed-initial-amount-field" Placeholder="<?php echo esc_html__('Enter Initial Goal Amount', 'wc-donation'); ?>" name="wc-donation-goal-fixed-initial-amount-field" value="<?php echo esc_attr($fixedInitialAmount); ?>">
+
+msgid "Initial Goal Amount"
+msgstr ""
+
+# <div class="select-wrapper wc-donation-goal-target" id="blk_no_of_donation">
+# <label class="wc-donation-label" for="wc-donation-goal-no-of-donation-field"><?php echo esc_attr( __( 'No. of Donations', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-goal-no-of-donation-field" Placeholder="<?php echo esc_html__('Enter No. of Donations', 'wc-donation'); ?>" name="wc-donation-goal-no-of-donation-field" value="<?php echo esc_attr($no_of_donation); ?>">
+
+msgid "No. of Donations"
+msgstr ""
+
+# <div class="select-wrapper wc-donation-goal-target" id="blk_no_of_days">
+# <label class="wc-donation-label" for="wc-donation-goal-no-of-days-field"><?php echo esc_attr( __( 'End of Goal', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-goal-no-of-days-field" Placeholder="<?php echo esc_html__('dd-mm-yy', 'wc-donation'); ?>" name="wc-donation-goal-no-of-days-field" value="<?php echo esc_attr(gmdate('d-M-Y', strtotime($no_of_days))); ?>">
+
+msgid "End of Goal"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label" for="wc-donation-goal-progress-bar-color"><?php echo esc_attr( __( 'Progress bar Color', 'wc-donation' ) ); ?></label>
+# <input type="text" class="jscolor" id="wc-donation-goal-progress-bar-color" name="wc-donation-goal-progress-bar-color" value="<?php echo esc_attr($progressBarColor); ?>">
+
+msgid "Progress bar Color"
+msgstr ""
+
+# <div class="select-wrapper goal-display-option">
+# <label class="wc-donation-label" for=""><?php echo esc_attr( __( 'Display Donor Count', 'wc-donation' ) ); ?></label>
+# <?php
+
+msgid "Display Donor Count"
+msgstr ""
+
+# ?>
+# <label class="wc-donation-label"><?php echo esc_attr( __( 'Close Form', 'wc-donation' ) ); ?></label>
+# <input class="inp-cbx" style="display: none" type="checkbox" id="wc-donation-goal-close-form" name="wc-donation-goal-close-form" value="enabled" <?php esc_attr_e($checked); ?> >
+
+msgid "Close Form"
+msgstr ""
+
+# <div class="select-wrapper" id="close_msg_text">
+# <label class="wc-donation-label" for="wc-donation-goal-close-form-text"><?php echo esc_attr( __( 'Message', 'wc-donation' ) ); ?></label>
+# <textarea name="wc-donation-goal-close-form-text" Placeholder="<?php echo esc_html__('Enter Message Here', 'wc-donation'); ?>" id="wc-donation-goal-close-form-text" cols="50" rows="4"><?php echo esc_attr($message); ?></textarea>
+
+msgid "Message"
+msgstr ""
+
+# ?>
+# <label class="wc-donation-label"><?php echo esc_attr( __( 'Display Goal on Shop Page', 'wc-donation' ) ); ?></label>
+# <input class="inp-cbx" style="display: none" type="checkbox" id="wc-donation-progress-on-shop" name="wc-donation-progress-on-shop" value="enabled" <?php esc_attr_e($checked); ?> >
+
+msgid "Display Goal on Shop Page"
+msgstr ""
+
+# ?>
+# <label class="wc-donation-label"><?php echo esc_attr( __( 'Display Goal on Widget', 'wc-donation' ) ); ?></label>
+# <input class="inp-cbx" style="display: none" type="checkbox" id="wc-donation-progress-on-widget" name="wc-donation-progress-on-widget" value="enabled" <?php esc_attr_e($checked); ?> >
+
+msgid "Display Goal on Widget"
+msgstr ""
+
+# <div class="select-wrapper">
+# <label class="wc-donation-label"><?php echo esc_attr( __( 'Reset Goal', 'wc-donation' ) ); ?></label>
+# <a href="#" id="wc-donation-goal-reset" class="button button-primary button-large" style="background-color: #d73131; border-color: #d73131;" data-campaign-id="<?php esc_attr_e( $this->campaign_id ); ?>"><?php echo esc_html__( 'Reset Goal', 'wc-donation' ); ?></a>
+
+msgid "Reset Goal"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-goal-fixed-amount-field"><?php echo esc_attr( __( 'Goal Amount', 'wc-donation' ) ); ?></label>
+# <input type="number" id="wc-donation-goal-fixed-amount-field" Placeholder="<?php echo esc_html__('Enter Goal Amount', 'wc-donation'); ?>" name="wc-donation-goal-fixed-amount-field" value="<?php echo esc_attr($fixedAmount); ?>">
+# <div class="wc-donation-tooltip-box">
+
+msgid "Enter Goal Amount"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-goal-fixed-initial-amount-field"><?php echo esc_attr( __( 'Initial Goal Amount', 'wc-donation' ) ); ?></label>
+# <input type="number" id="wc-donation-goal-fixed-initial-amount-field" Placeholder="<?php echo esc_html__('Enter Initial Goal Amount', 'wc-donation'); ?>" name="wc-donation-goal-fixed-initial-amount-field" value="<?php echo esc_attr($fixedInitialAmount); ?>">
+# <div class="wc-donation-tooltip-box">
+
+msgid "Enter Initial Goal Amount"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-goal-no-of-donation-field"><?php echo esc_attr( __( 'No. of Donations', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-goal-no-of-donation-field" Placeholder="<?php echo esc_html__('Enter No. of Donations', 'wc-donation'); ?>" name="wc-donation-goal-no-of-donation-field" value="<?php echo esc_attr($no_of_donation); ?>">
+# <div class="wc-donation-tooltip-box">
+
+msgid "Enter No. of Donations"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-goal-no-of-days-field"><?php echo esc_attr( __( 'End of Goal', 'wc-donation' ) ); ?></label>
+# <input type="text" id="wc-donation-goal-no-of-days-field" Placeholder="<?php echo esc_html__('dd-mm-yy', 'wc-donation'); ?>" name="wc-donation-goal-no-of-days-field" value="<?php echo esc_attr(gmdate('d-M-Y', strtotime($no_of_days))); ?>">
+# <div class="wc-donation-tooltip-box">
+
+msgid "dd-mm-yy"
+msgstr ""
+
+# <label class="wc-donation-label" for="wc-donation-goal-close-form-text"><?php echo esc_attr( __( 'Message', 'wc-donation' ) ); ?></label>
+# <textarea name="wc-donation-goal-close-form-text" Placeholder="<?php echo esc_html__('Enter Message Here', 'wc-donation'); ?>" id="wc-donation-goal-close-form-text" cols="50" rows="4"><?php echo esc_attr($message); ?></textarea>
+# <div class="wc-donation-tooltip-box">
+
+msgid "Enter Message Here"
+msgstr ""
+
+# 
+# <div id="dialog-reset" title="<?php echo esc_html__('Warning', 'wc-donation'); ?>" style="display:none">
+# <center>
+
+msgid "Warning"
+msgstr ""
+
+# </svg>
+# <h4><?php echo esc_html__('Are you sure you want to reset this goal?', 'wc-donation'); ?></h4>
+# <p><?php echo esc_html__('Clicking reset will reset your current goal and all progress will be lost.', 'wc-donation'); ?></p>
+
+msgid "Are you sure you want to reset this goal?"
+msgstr ""
+
+# <h4><?php echo esc_html__('Are you sure you want to reset this goal?', 'wc-donation'); ?></h4>
+# <p><?php echo esc_html__('Clicking reset will reset your current goal and all progress will be lost.', 'wc-donation'); ?></p>
+# </center>
+
+msgid "Clicking reset will reset your current goal and all progress will be lost."
+msgstr ""
+
+# */
+# $message = apply_filters( 'wc_donation_change_pdf_message', esc_html__('Thank you for your donations:', 'wc-donation') );
+# /**
+
+msgid "Thank you for your donations:"
+msgstr ""
+
+# ?>
+# <p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo esc_html__('Please find the donation transactions', 'wc-donation'); ?></p>
+# <p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo esc_html( $message ); ?></p>
+
+msgid "Please find the donation transactions"
+msgstr ""
+
+# <th style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html__( 'Amount', 'wc-donation' ); ?></th>
+# <th style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html__( 'Order ID', 'wc-donation' ); ?></th>
+# <th style="border-width: 1px;border-color:#000;border-style:solid;padding:3px;"><?php echo esc_html__( 'Causes', 'wc-donation' ); ?></th>
+
+msgid "Order ID"
+msgstr ""
+
+# ?>
+# <p><?php echo esc_html__('Sincerely,', 'wc-donation'); ?></p>
+# <strong><?php echo esc_html( get_bloginfo( 'name' ) ); ?></strong>
+
+msgid "Sincerely,"
+msgstr ""
+
+# /* translators: %1$s refers to html tag, %2$s refers to html tag */
+# printf(esc_html__('%1$s Campaign deleted by admin %2$s', 'wc-donation'), '<p class="wc-donation-error">', '</p>' );
+# return;
+
+msgid "%1$s Campaign deleted by admin %2$s"
+msgstr ""
+
+# if ( ! isset( $atts['ids'] ) || empty( $atts['ids'] ) ) {
+# return esc_html__('Campaign ids are missing', 'wc-donation');
+# } else {
+
+msgid "Campaign ids are missing"
+msgstr ""
+
+# if ( ! isset( $atts['titles'] ) || empty( $atts['titles'] ) ) {
+# return esc_html__('Tab titles are missing', 'wc-donation');
+# } else {
+
+msgid "Tab titles are missing"
+msgstr ""
+
+# /* translators: %1$s refers to html tag, %2$s refers to html tag */
+# printf(esc_html__('%1$s Please enter correct shortcode %2$s', 'wc-donation'), '<p class="wc-donation-error">', '</p>' );
+# }
+
+msgid "%1$s Please enter correct shortcode %2$s"
+msgstr ""
+
+# 'wc_donation_meta__1',
+# esc_html__( 'Display Donation Product', 'wc-donation' ),
+# array( $this, 'render_wc_donation_meta__1_html'),
+
+msgid "Display Donation Product"
+msgstr ""
+
+# 'wc_donation_meta__2',
+# esc_html__( 'Campaign Shortcode', 'wc-donation' ),
+# array( $this, 'render_wc_donation_meta__2_html'),
+
+msgid "Campaign Shortcode"
+msgstr ""
+
+# if( empty( $button_title ) ) {
+# $button_title = esc_html__( 'View Campaigns', 'wc-donation' );
+# }
+
+msgid "View Campaigns"
+msgstr ""
+
+# if( empty( $popup_title ) ) {
+# $popup_title = esc_html__( 'Campaigns', 'wc-donation' );
+# }
+
+msgid "Campaigns"
+msgstr ""
+
+# $columns['amount'] = __('Amount', 'wc-donation');
+# $columns['total_donations'] = __('Total Donations', 'wc-donation');
+# $columns['total_donation_amount'] = __('Total Amount', 'wc-donation');
+
+msgid "Total Donations"
+msgstr ""
+
+# $columns['total_donations'] = __('Total Donations', 'wc-donation');
+# $columns['total_donation_amount'] = __('Total Amount', 'wc-donation');
+# $columns['initial_goal_amount'] = __('Initial Goal Amount', 'wc-donation');
+
+msgid "Total Amount"
+msgstr ""
+
+# $columns['initial_goal_amount'] = __('Initial Goal Amount', 'wc-donation');
+# $columns['total_donors'] = __('Total Donors', 'wc-donation');
+# $columns['shortcode'] = __('Shortcode', 'wc-donation');
+
+msgid "Total Donors"
+msgstr ""
+
+# $columns['total_donors'] = __('Total Donors', 'wc-donation');
+# $columns['shortcode'] = __('Shortcode', 'wc-donation');
+# $columns['actions'] = __('Actions', 'wc-donation');
+
+msgid "Shortcode"
+msgstr ""
+
+# 'name_admin_bar'        => _x( 'WC Donation', 'Add New on Toolbar', 'wc-donation' ),
+# 'add_new'               => __( 'Add New', 'wc-donation' ),
+# 'add_new_item'          => __( 'Add New Campaign', 'wc-donation' ),
+
+msgid "Add New"
+msgstr ""
+
+# 'add_new'               => __( 'Add New', 'wc-donation' ),
+# 'add_new_item'          => __( 'Add New Campaign', 'wc-donation' ),
+# 'new_item'              => __( 'New Campaign', 'wc-donation' ),
+
+msgid "Add New Campaign"
+msgstr ""
+
+# 'add_new_item'          => __( 'Add New Campaign', 'wc-donation' ),
+# 'new_item'              => __( 'New Campaign', 'wc-donation' ),
+# 'edit_item'             => __( 'Edit Campaign', 'wc-donation' ),
+
+msgid "New Campaign"
+msgstr ""
+
+# 'new_item'              => __( 'New Campaign', 'wc-donation' ),
+# 'edit_item'             => __( 'Edit Campaign', 'wc-donation' ),
+# 'view_item'             => __( 'View Campaign', 'wc-donation' ),
+
+msgid "Edit Campaign"
+msgstr ""
+
+# 'edit_item'             => __( 'Edit Campaign', 'wc-donation' ),
+# 'view_item'             => __( 'View Campaign', 'wc-donation' ),
+# 'all_items'             => __( 'All Campaigns', 'wc-donation' ),
+
+msgid "View Campaign"
+msgstr ""
+
+# 'view_item'             => __( 'View Campaign', 'wc-donation' ),
+# 'all_items'             => __( 'All Campaigns', 'wc-donation' ),
+# 'search_items'          => __( 'Search Campaign', 'wc-donation' ),
+
+msgid "All Campaigns"
+msgstr ""
+
+# 'all_items'             => __( 'All Campaigns', 'wc-donation' ),
+# 'search_items'          => __( 'Search Campaign', 'wc-donation' ),
+# 'parent_item_colon'     => __( 'Parent Campaign:', 'wc-donation' ),
+
+msgid "Search Campaign"
+msgstr ""
+
+# 'search_items'          => __( 'Search Campaign', 'wc-donation' ),
+# 'parent_item_colon'     => __( 'Parent Campaign:', 'wc-donation' ),
+# 'not_found'             => __( 'No Campaign found.', 'wc-donation' ),
+
+msgid "Parent Campaign:"
+msgstr ""
+
+# 'parent_item_colon'     => __( 'Parent Campaign:', 'wc-donation' ),
+# 'not_found'             => __( 'No Campaign found.', 'wc-donation' ),
+# 'not_found_in_trash'    => __( 'No Campaign found in Trash.', 'wc-donation' ),
+
+msgid "No Campaign found."
+msgstr ""
+
+# 'not_found'             => __( 'No Campaign found.', 'wc-donation' ),
+# 'not_found_in_trash'    => __( 'No Campaign found in Trash.', 'wc-donation' ),
+# 'featured_image'        => _x( 'Campaign Cover Image', 'Overrides the “Featured Image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+
+msgid "No Campaign found in Trash."
+msgstr ""
+
+# add_submenu_page (
+# __( 'edit.php?post_type=wc-donation', 'wc-donation' ),
+# __( 'Home', 'wc-donation' ),
+
+msgid "edit.php?post_type=wc-donation"
+msgstr ""
+
+# __( 'edit.php?post_type=wc-donation', 'wc-donation' ),
+# __( 'Home', 'wc-donation' ),
+# __( 'Home', 'wc-donation' ),
+
+msgid "Home"
+msgstr ""
+
+# __( 'Home', 'wc-donation' ),
+# __( 'manage_options', 'wc-donation' ),
+# __( 'home', 'wc-donation' ),
+
+msgid "manage_options"
+msgstr ""
+
+# __( 'manage_options', 'wc-donation' ),
+# __( 'home', 'wc-donation' ),
+# array ( $this, 'wc_donation_home_view' ),
+
+msgid "home"
+msgstr ""
+
+# __( 'edit.php?post_type=wc-donation', 'wc-donation' ),
+# __( 'General Settings', 'wc-donation' ),
+# __( 'General Settings', 'wc-donation' ),
+
+msgid "General Settings"
+msgstr ""
+
+# __( 'manage_options', 'wc-donation' ),
+# __( 'general', 'wc-donation' ),
+# array ( $this, 'wc_donation_setting_view' ),
+
+msgid "general"
+msgstr ""
+
+# $labels = array(
+# 'name'                  => _x( 'WC Donation', 'Post type general name', 'wc-donation' ),
+# 'singular_name'         => _x( 'WC Donation', 'Post type singular name', 'wc-donation' ),
+
+msgctxt "Post type general name"
+msgid "WC Donation"
+msgstr ""
+
+# 'name'                  => _x( 'WC Donation', 'Post type general name', 'wc-donation' ),
+# 'singular_name'         => _x( 'WC Donation', 'Post type singular name', 'wc-donation' ),
+# 'menu_name'             => _x( 'WC Donation', 'Admin Menu text', 'wc-donation' ),
+
+msgctxt "Post type singular name"
+msgid "WC Donation"
+msgstr ""
+
+# 'singular_name'         => _x( 'WC Donation', 'Post type singular name', 'wc-donation' ),
+# 'menu_name'             => _x( 'WC Donation', 'Admin Menu text', 'wc-donation' ),
+# 'name_admin_bar'        => _x( 'WC Donation', 'Add New on Toolbar', 'wc-donation' ),
+
+msgctxt "Admin Menu text"
+msgid "WC Donation"
+msgstr ""
+
+# 'menu_name'             => _x( 'WC Donation', 'Admin Menu text', 'wc-donation' ),
+# 'name_admin_bar'        => _x( 'WC Donation', 'Add New on Toolbar', 'wc-donation' ),
+# 'add_new'               => __( 'Add New', 'wc-donation' ),
+
+msgctxt "Add New on Toolbar"
+msgid "WC Donation"
+msgstr ""
+
+# 'not_found_in_trash'    => __( 'No Campaign found in Trash.', 'wc-donation' ),
+# 'featured_image'        => _x( 'Campaign Cover Image', 'Overrides the “Featured Image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+# 'set_featured_image'    => _x( 'Set cover image', 'Overrides the “Set featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+
+msgctxt "Overrides the “Featured Image” phrase for this post type. Added in 4.3"
+msgid "Campaign Cover Image"
+msgstr ""
+
+# 'featured_image'        => _x( 'Campaign Cover Image', 'Overrides the “Featured Image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+# 'set_featured_image'    => _x( 'Set cover image', 'Overrides the “Set featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+# 'remove_featured_image' => _x( 'Remove cover image', 'Overrides the “Remove featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+
+msgctxt "Overrides the “Set featured image” phrase for this post type. Added in 4.3"
+msgid "Set cover image"
+msgstr ""
+
+# 'set_featured_image'    => _x( 'Set cover image', 'Overrides the “Set featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+# 'remove_featured_image' => _x( 'Remove cover image', 'Overrides the “Remove featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+# 'use_featured_image'    => _x( 'Use as cover image', 'Overrides the “Use as featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+
+msgctxt "Overrides the “Remove featured image” phrase for this post type. Added in 4.3"
+msgid "Remove cover image"
+msgstr ""
+
+# 'remove_featured_image' => _x( 'Remove cover image', 'Overrides the “Remove featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+# 'use_featured_image'    => _x( 'Use as cover image', 'Overrides the “Use as featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+# 'archives'              => _x( 'Campaign archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'wc-donation' ),
+
+msgctxt "Overrides the “Use as featured image” phrase for this post type. Added in 4.3"
+msgid "Use as cover image"
+msgstr ""
+
+# 'use_featured_image'    => _x( 'Use as cover image', 'Overrides the “Use as featured image” phrase for this post type. Added in 4.3', 'wc-donation' ),
+# 'archives'              => _x( 'Campaign archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'wc-donation' ),
+# 'insert_into_item'      => _x( 'Insert into Campaign', 'Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4', 'wc-donation' ),
+
+msgctxt "The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4"
+msgid "Campaign archives"
+msgstr ""
+
+# 'archives'              => _x( 'Campaign archives', 'The post type archive label used in nav menus. Default “Post Archives”. Added in 4.4', 'wc-donation' ),
+# 'insert_into_item'      => _x( 'Insert into Campaign', 'Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4', 'wc-donation' ),
+# 'uploaded_to_this_item' => _x( 'Uploaded to this Campaign', 'Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4', 'wc-donation' ),
+
+msgctxt "Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4"
+msgid "Insert into Campaign"
+msgstr ""
+
+# 'insert_into_item'      => _x( 'Insert into Campaign', 'Overrides the “Insert into post”/”Insert into page” phrase (used when inserting media into a post). Added in 4.4', 'wc-donation' ),
+# 'uploaded_to_this_item' => _x( 'Uploaded to this Campaign', 'Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4', 'wc-donation' ),
+# 'filter_items_list'     => _x( 'Filter Campaign list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'wc-donation' ),
+
+msgctxt "Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4"
+msgid "Uploaded to this Campaign"
+msgstr ""
+
+# 'uploaded_to_this_item' => _x( 'Uploaded to this Campaign', 'Overrides the “Uploaded to this post”/”Uploaded to this page” phrase (used when viewing media attached to a post). Added in 4.4', 'wc-donation' ),
+# 'filter_items_list'     => _x( 'Filter Campaign list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'wc-donation' ),
+# 'items_list_navigation' => _x( 'Campaign list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'wc-donation' ),
+
+msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter Campaign list"
+msgstr ""
+
+# 'filter_items_list'     => _x( 'Filter Campaign list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'wc-donation' ),
+# 'items_list_navigation' => _x( 'Campaign list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'wc-donation' ),
+# 'items_list'            => _x( 'Campaign list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'wc-donation' ),
+
+msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "Campaign list navigation"
+msgstr ""
+
+# 'items_list_navigation' => _x( 'Campaign list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'wc-donation' ),
+# 'items_list'            => _x( 'Campaign list', 'Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4', 'wc-donation' ),
+# );
+
+msgctxt "Screen reader text for the items list heading on the post type listing screen. Default “Posts list”/”Pages list”. Added in 4.4"
+msgid "Campaign list"
+msgstr ""
+
+# if ( 'yes' !== $this->_DONATION_API ) {
+# return new WP_Error( 'DONATION_API_DSIABLED', esc_html__( 'The WC Donation API is disabled on this site', 'wc-donation' ), array( 'status' => 400 ) );
+# }
+
+msgid "The WC Donation API is disabled on this site"
+msgstr ""
+
+# if ( !$user->roles ) {
+# return new WP_Error( 'FORBIDDEN', esc_html__( 'You are not allowed to access', 'wc-donation' ), array( 'status' => 403 ) );
+# }
+
+msgid "You are not allowed to access"
+msgstr ""
+
+# if ( ! array_intersect( $allowed_roles, $user->roles ) ) {
+# return new WP_Error( 'NOT_AUTHORIZED', esc_html__( 'You are not authorized to do that.', 'wc-donation' ), array( 'status' => 401 ) );
+# }
+
+msgid "You are not authorized to do that."
+msgstr ""
+
+# 'ID' => $post->ID,
+# 'message' => esc_html__( 'Campaign deleted successfully', 'wc-donation' )
+# );
+
+msgid "Campaign deleted successfully"
+msgstr ""
+
+# } else {
+# return new WP_Error( 'NOT_FOUND', esc_html__('Unable to delete. Campaign ID not found!', 'wc-donation'), array( 'status' => 404 ) );
+# }
+
+msgid "Unable to delete. Campaign ID not found!"
+msgstr ""
+
+# } else {
+# return new WP_Error( 'NOT_FOUND', esc_html__('Unable to update. Campaign ID not found!', 'wc-donation'), array( 'status' => 404 ) );
+# }
+
+msgid "Unable to update. Campaign ID not found!"
+msgstr ""
+
+# $item_data[] = array(
+# 'key' => __('Tribute Message', 'wc-donation'),
+# 'value' => wc_clean( $cart_item['tribute_message'] ),
+
+msgid "Tribute Message"
+msgstr ""
+
+# $item_data[] = array(
+# 'key' => __('Processing Fees', 'wc-donation'),
+# 'value' => wc_clean( $cart_item['processing_fee'] ),
+
+msgid "Processing Fees"
+msgstr ""
+
+# echo '<select name="' . esc_attr( $filter_id ) . '">
+# <option value="">' . esc_html( __( 'Filter by Campaign Name', 'wc-donation' ) ) . '</option>';
+# $all_campaigns = get_posts(array(
+
+msgid "Filter by Campaign Name"
+msgstr ""
+
+# if ( !isset( $_POST['nonce'] ) || ( isset( $_POST['nonce'] ) && !wp_verify_nonce(sanitize_text_field($_POST['nonce']), '_wcdnonce' ) ) ) {
+# wp_die( esc_html__( 'Not Authorized', 'wc-donation' ) );
+# }
+
+msgid "Not Authorized"
+msgstr ""
+
+# if ( !isset($_POST['campaign_id']) || empty( sanitize_text_field($_POST['campaign_id']) ) ) {
+# wp_die( esc_html__( 'No campaign ID found!', 'wc-donation' ) );
+# }
+
+msgid "No campaign ID found!"
+msgstr ""
+
+# */
+# 'other_amount_placeholder' => apply_filters( 'wc_donation_other_amount_alert', esc_html__( 'Enter amount between %min% - %max%', 'wc-donation'), '%min%', '%max%'),
+# 'is_checkout' => is_checkout(),
+
+msgid "Enter amount between %min% - %max%"
+msgstr ""
+
+# // Widget name will appear in UI
+# __('WC Donation', 'wc-donation'),
+# 
+
+msgid "WC Donation"
+msgstr ""
+
+# // Widget description
+# array( 'description' => __( 'WC Donation Widget is use to collect donation.', 'wc-donation' ) )
+# );
+
+msgid "WC Donation Widget is use to collect donation."
+msgstr ""
+
+# 
+# $title = __( 'New title', 'wc-donation' );
+# 
+
+msgid "New title"
+msgstr ""
+
+# <div id="message" class="notice notice-success">
+# <p><?php printf( esc_html( __( 'Email sent to client successfully', 'wc-donation' ) ) ); ?></p>
+# </div>
+
+msgid "Email sent to client successfully"
+msgstr ""
+
+# <div id="message" class="notice notice-success">
+# <p><?php printf( esc_html( __( 'There is an error while sending email to client. Please ask Administrator.', 'wc-donation' ) ) ); ?></p>
+# </div>
+
+msgid "There is an error while sending email to client. Please ask Administrator."
+msgstr ""
+
+# $columns['campaign_name']   = __( 'Campaign', 'wc-donation' );
+# $columns['product_sku']     = __( 'SKU', 'wc-donation' );
+# $columns['cause_name']      = __( 'Cause', 'wc-donation' );
+
+msgid "SKU"
+msgstr ""
+
+# $columns['gift_aid']        = __( 'Gift Aid', 'wc-donation' );
+# $columns['order_id']        = __( 'Order No.', 'wc-donation' );
+# $columns['donation_amount'] = __( 'Amount', 'wc-donation' );
+
+msgid "Order No."
+msgstr ""
+
+# 'post_type'   => 'wc-donation-report',
+# 'post_title'  => __( 'Report for ', 'wc-donation' ) . get_the_title( $campaign_id ),
+# 'post_status' => 'private',
+
+msgid "Report for "
+msgstr ""
+
+# 'name_admin_bar'        => _x( 'Donation Reports', 'Add New on Toolbar', 'wc-donation' ),
+# 'all_items'             => __( 'Reports', 'wc-donation' ),
+# 'search_items'          => __( 'Search Donation Reports', 'wc-donation' ),
+
+msgid "Reports"
+msgstr ""
+
+# 'all_items'             => __( 'Reports', 'wc-donation' ),
+# 'search_items'          => __( 'Search Donation Reports', 'wc-donation' ),
+# 'parent_item_colon'     => __( 'Parent Donation Reports:', 'wc-donation' ),
+
+msgid "Search Donation Reports"
+msgstr ""
+
+# 'search_items'          => __( 'Search Donation Reports', 'wc-donation' ),
+# 'parent_item_colon'     => __( 'Parent Donation Reports:', 'wc-donation' ),
+# 'not_found'             => __( 'No Donation Reports found.', 'wc-donation' ),
+
+msgid "Parent Donation Reports:"
+msgstr ""
+
+# 'parent_item_colon'     => __( 'Parent Donation Reports:', 'wc-donation' ),
+# 'not_found'             => __( 'No Donation Reports found.', 'wc-donation' ),
+# 'not_found_in_trash'    => __( 'No Donation Reports found in Trash.', 'wc-donation' ),
+
+msgid "No Donation Reports found."
+msgstr ""
+
+# 'not_found'             => __( 'No Donation Reports found.', 'wc-donation' ),
+# 'not_found_in_trash'    => __( 'No Donation Reports found in Trash.', 'wc-donation' ),
+# 'filter_items_list'     => _x( 'Filter WC Donation Reports list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'wc-donation' ),
+
+msgid "No Donation Reports found in Trash."
+msgstr ""
+
+# // translators: %1$s <p>, %2$s </p>
+# echo sprintf( esc_html__( '%1$s You need to login in order to see donation reports. %2$s', 'wc-donation' ), '<p>', '</p>' );
+# }
+
+msgid "%1$s You need to login in order to see donation reports. %2$s"
+msgstr ""
+
+# esc_html__( 'Campaign', 'wc-donation' ),
+# esc_html__( 'Currency', 'wc-donation' ),
+# esc_html__( 'Amount', 'wc-donation' ),
+
+msgid "Currency"
+msgstr ""
+
+# $labels = array(
+# 'name'                  => _x( 'Donation Reports', 'Post type general name', 'wc-donation' ),
+# 'singular_name'         => _x( 'Donation Reports', 'Post type singular name', 'wc-donation' ),
+
+msgctxt "Post type general name"
+msgid "Donation Reports"
+msgstr ""
+
+# 'name'                  => _x( 'Donation Reports', 'Post type general name', 'wc-donation' ),
+# 'singular_name'         => _x( 'Donation Reports', 'Post type singular name', 'wc-donation' ),
+# 'menu_name'             => _x( 'Reports', 'Admin Menu text', 'wc-donation' ),
+
+msgctxt "Post type singular name"
+msgid "Donation Reports"
+msgstr ""
+
+# 'singular_name'         => _x( 'Donation Reports', 'Post type singular name', 'wc-donation' ),
+# 'menu_name'             => _x( 'Reports', 'Admin Menu text', 'wc-donation' ),
+# 'name_admin_bar'        => _x( 'Donation Reports', 'Add New on Toolbar', 'wc-donation' ),
+
+msgctxt "Admin Menu text"
+msgid "Reports"
+msgstr ""
+
+# 'menu_name'             => _x( 'Reports', 'Admin Menu text', 'wc-donation' ),
+# 'name_admin_bar'        => _x( 'Donation Reports', 'Add New on Toolbar', 'wc-donation' ),
+# 'all_items'             => __( 'Reports', 'wc-donation' ),
+
+msgctxt "Add New on Toolbar"
+msgid "Donation Reports"
+msgstr ""
+
+# 'not_found_in_trash'    => __( 'No Donation Reports found in Trash.', 'wc-donation' ),
+# 'filter_items_list'     => _x( 'Filter WC Donation Reports list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'wc-donation' ),
+# 'items_list_navigation' => _x( 'WC Donation Reports list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'wc-donation' ),
+
+msgctxt "Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4"
+msgid "Filter WC Donation Reports list"
+msgstr ""
+
+# 'filter_items_list'     => _x( 'Filter WC Donation Reports list', 'Screen reader text for the filter links heading on the post type listing screen. Default “Filter posts list”/”Filter pages list”. Added in 4.4', 'wc-donation' ),
+# 'items_list_navigation' => _x( 'WC Donation Reports list navigation', 'Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4', 'wc-donation' ),
+# );
+
+msgctxt "Screen reader text for the pagination heading on the post type listing screen. Default “Posts list navigation”/”Pages list navigation”. Added in 4.4"
+msgid "WC Donation Reports list navigation"
+msgstr ""

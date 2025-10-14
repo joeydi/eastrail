@@ -12,7 +12,7 @@
 $message = apply_filters( 'wc_donation_change_admin_email_message', __( 'Thank you for your donation. Your Kindness is appreciated.', 'wc-donation' ) );
 ?>
 <p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo esc_html__( 'Dear', 'wc-donation' ) . ' ' . esc_html( $order_billing_first_name ); ?></p>
-<p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo esc_html( $message ); ?></p>
+<p style="margin: 0 0 5px 0; font-size: 14px;"><?php echo wp_kses_post( $message ); ?></p>
 <br><br>
 <h3><?php echo esc_html__( 'Donation Details', 'wc-donation' ); ?></h3>
 <ul style="display: block; width: 100%; padding:  0; margin: 0 0 10px 0; list-style:none; font-size: 14px;">

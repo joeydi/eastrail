@@ -1,0 +1,1 @@
+<h3 class="title"><?php esc_attr_e( $camaign_title ); ?></h3>

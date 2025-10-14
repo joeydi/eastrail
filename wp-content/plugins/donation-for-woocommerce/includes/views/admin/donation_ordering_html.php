@@ -8,7 +8,7 @@ $ordering = ! empty( get_post_meta ( $this->campaign_id, 'ordering', true  ) ) ?
 	'subscription',
 	'main-goal',
 	'button',
-	'extra-fee-summary'
+	'extra-fee-summary',
 );
 ?>
 <ul id="donation-block-sortable" data-campaign_id="<?php esc_attr_e($this->campaign_id); ?>">

@@ -82,7 +82,7 @@ class Payment_Gateway_Apple_Pay_AJAX {
 
 			$request = $this->get_handler()->get_cart_payment_request( WC()->cart );
 
-			$this->get_handler()->log( sprintf( "Payment Request:\n %s", print_r( $request, true ) ) );
+			$this->get_handler()->log( sprintf( "Payment Request:\n %s", print_r( $request, true ) ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 
 			wp_send_json_success( wp_json_encode( $request ) );
 
@@ -122,6 +122,7 @@ class Payment_Gateway_Apple_Pay_AJAX {
 
 		} catch ( \Exception $e ) {
 
+			/* translators: %s: error message */
 			$this->get_handler()->log( sprintf( esc_html__( 'Could not validate merchant. %s', 'woocommerce-square' ), $e->getMessage() ) );
 
 			wp_send_json_error( array(
@@ -150,12 +151,15 @@ class Payment_Gateway_Apple_Pay_AJAX {
 			// if a contact is passed, set the customer address data
 			if ( isset( $_REQUEST['contact'] ) && is_array( $_REQUEST['contact'] ) ) {
 
-				$contact = wp_parse_args( wc_clean( $_REQUEST['contact'] ), array(
-					'administrativeArea' => null,
-					'countryCode'        => null,
-					'locality'           => null,
-					'postalCode'         => null,
-				) );
+				$contact = wp_parse_args(
+					wc_clean( wp_unslash( $_REQUEST['contact'] ) ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					array(
+						'administrativeArea' => null,
+						'countryCode'        => null,
+						'locality'           => null,
+						'postalCode'         => null,
+					)
+				);
 
 				$state    = $contact['administrativeArea'];
 				$country  = strtoupper( $contact['countryCode'] );
@@ -184,7 +188,7 @@ class Payment_Gateway_Apple_Pay_AJAX {
 				'total'            => $payment_request['total'],
 			);
 
-			$this->get_handler()->log( sprintf( "New totals:\n %s", print_r( $data, true ) ) );
+			$this->get_handler()->log( sprintf( "New totals:\n %s", print_r( $data, true ) ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 
 			wp_send_json_success( $data );
 

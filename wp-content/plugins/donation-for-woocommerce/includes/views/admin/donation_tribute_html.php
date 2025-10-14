@@ -2,8 +2,8 @@
 $tributes = !empty( get_post_meta ( $this->campaign_id, 'tributes', true  ) ) ? get_post_meta ( $this->campaign_id, 'tributes', true  ) : array();
 ?>
 <div id="wc-donation-tribute-wrapper" class="display-wrapper">
-	<?php		
-	if ( ! empty( $tributes ) ) {				
+	<?php	  
+	if ( ! empty( $tributes ) ) {               
 		foreach ( $tributes as $key => $val ) {
 			?>
 			<div class="tribute" id="tribute-<?php echo esc_attr($key); ?>">
