@@ -1,5 +1,11 @@
 <?php
 
+require 'vendor/autoload.php';
+
+\Sentry\init([
+  'dsn' => 'https://0b7f17c42c6846fa2e04c86e881b5b7b@o4510189952172032.ingest.us.sentry.io/4510189976551424',
+]);
+
 require 'inc/comments.php';
 require 'inc/events.php';
 require 'inc/gravityforms.php';
