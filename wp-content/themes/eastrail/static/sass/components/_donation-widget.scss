@@ -6,9 +6,11 @@
 }
 
 .price-wrapper {
-  margin-bottom: 15px;
+  margin-bottom: 15px !important;
+  align-items: normal;
 }
 
 .wc-donation-f-donation-other-value {
   margin-bottom: 0;
+  padding: 8px;
 }
