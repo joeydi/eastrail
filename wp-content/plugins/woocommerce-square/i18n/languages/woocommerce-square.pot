@@ -2,10 +2,10 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce Square 5.1.0\n"
+"Project-Id-Version: WooCommerce Square 5.1.1\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/woocommerce-square\n"
-"POT-Creation-Date: 2025-09-29 15:18:41+00:00\n"
+"POT-Creation-Date: 2025-11-05 15:37:38+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -3100,31 +3100,31 @@ msgstr ""
 msgid "Variations with missing SKUs cannot be imported."
 msgstr ""
 
-#: includes/Sync/Product_Import.php:1021 includes/Sync/Product_Import.php:1340
+#: includes/Sync/Product_Import.php:1023 includes/Sync/Product_Import.php:1342
 msgid "The SKU already exists on another product"
 msgstr ""
 
-#: includes/Sync/Product_Import.php:1255
+#: includes/Sync/Product_Import.php:1257
 #. translators: Placeholders: %1$s - variation ID, %2$s - product name
 msgid "Variation #%1$s of %2$s"
 msgstr ""
 
-#: includes/Sync/Product_Import.php:1636
+#: includes/Sync/Product_Import.php:1638
 #. translators: Placeholders: %s - missing parameter name
 msgid "Missing parameter %s"
 msgstr ""
 
-#: includes/Sync/Product_Import.php:1642
+#: includes/Sync/Product_Import.php:1644
 #. translators: Placeholders: %s - comma separated list of valid product types
 msgid "Invalid product type - the product type must be any of these: %s"
 msgstr ""
 
-#: includes/Sync/Product_Import.php:1686
+#: includes/Sync/Product_Import.php:1688
 #. translators: Placeholders: %1$s - Square item name, %2$s - Failure reason
 msgid "Could not update %1$s from Square. %2$s"
 msgstr ""
 
-#: includes/Sync/Product_Import.php:1689
+#: includes/Sync/Product_Import.php:1691
 #. translators: Placeholders: %1$s - Square item name, %2$s - Failure reason
 msgid "Could not import %1$s from Square. %2$s"
 msgstr ""
@@ -3435,7 +3435,7 @@ msgctxt "verb"
 msgid "Review"
 msgstr ""
 
-#: includes/Framework/Square_Helper.php:219
+#: includes/Framework/Square_Helper.php:222
 #: includes/Utilities/Array_Utility.php:90
 msgctxt "coordinating conjunction for a list of items: a, b, and c"
 msgid "and"
