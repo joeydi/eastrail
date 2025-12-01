@@ -1,10 +1,8 @@
 #!/bin/bash
 # Sync script for Kinsta production server
 
-# SSH="eastrail-staging"
-# REMOTE_ROOT="/www/eastrail_237/public"
-SSH="RCM=arb0HBkc26@rba.bf4.myftpupload.com"
-REMOTE_ROOT="/home/RCM=arb0HBkc26/html"
+SSH="eastrail"
+REMOTE_ROOT="/home/client_78d386529_669548/html"
 
 printf "\nWhich direction would you like to sync?\n"
 DIRECTIONS="Down Up"
