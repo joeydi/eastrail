@@ -820,6 +820,28 @@ ET.initMapEmbed = function () {
     });
 };
 
+ET.initDonationNonce = function () {
+  var donationScript = $('#wc-donation-frontend-script-js-extra');
+
+  // Make sure the wc donation script is on the page
+  if (!donationScript.length) return;
+
+  // Make sure the proper nonce var is available
+  if (typeof wcOrderScript === 'undefined' ||
+      typeof wcOrderScript.donationToOrder === 'undefined' ||
+      typeof wcOrderScript.donationToOrder.nonce === 'undefined') return;
+
+  // Fetch the nonce and update the nonce var
+  $.get(ET.ajaxurl + '?action=get_donation_nonce', function (response) {
+    if (response.success) {
+      var nonce = response.data.nonce;
+      wcOrderScript.donationToOrder.nonce = nonce;
+    } else {
+      console.error('Error fetching donation nonce');
+    }
+  });
+};
+
 $(document).ready(function () {
     ET.initHeaderMenu();
     ET.initHeaderScrollBehavior();
@@ -838,6 +860,7 @@ $(document).ready(function () {
     ET.initFAQs();
     ET.initBanners();
     ET.initTimeline();
+    ET.initDonationNonce();
 });
 
 $(window).on("load", function () {
